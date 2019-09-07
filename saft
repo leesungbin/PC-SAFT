@@ -1,0 +1,15 @@
+#!/bin/sh
+
+ENVFILE="env/$1"
+COMMAND="$2"
+shift; shift;
+
+export $(cat $ENVFILE | xargs)
+
+if [ $COMMAND = "run" ]; then
+    go run main.go
+elif [ $COMMAND = "db:migrate" ]; then
+    psql $POSTGRES_URL -f schema/schema.sql
+else
+    echo "Unsupported Command: $COMMAND"
+fi
