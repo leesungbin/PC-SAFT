@@ -1,4 +1,5 @@
 APP_NAME=pcsaft
 PORT=9709
 POSTGRES_URL=postgres://localhost:5432/pcsaft?sslmode=disable
-DB_MAX_CONNECTIONS=3
+POSTGRES_DBNAME=pcsaft
+DEFAULT_DATA_PATH=../component_data/
