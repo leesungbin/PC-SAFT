@@ -40,7 +40,10 @@ func readData(filename string) Component {
 	}
 
 	for j, d := range strings.Fields(string(saftData)) {
-		data[cnt-1+j], _ = strconv.ParseFloat(d, 64)
+		data[cnt+j], _ = strconv.ParseFloat(d, 64)
+		// if j == 1 && data[cnt+j] > 1e-5 { // : sig, convert (A) to (m) -> db error just zero value
+		// 	data[cnt+j] *= 1e-10
+		// }
 	}
 
 	return Component{strings.TrimSpace(string(name)), data}

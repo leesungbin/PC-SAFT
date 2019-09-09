@@ -10,6 +10,7 @@ type SaftEnv struct {
 	PORT              string
 	POSTGRES_URL      string
 	DEFAULT_DATA_PATH string
+	POSTGRES_DBNAME   string
 }
 
 func GetAppEnv() SaftEnv {

@@ -22,7 +22,9 @@ func main() {
 	env := env.GetAppEnv()
 	// values := fmt.Sprintln(env)
 	// fmt.Println(values)
+	// prop := fmt.Sprintf("dbname=%s sslmode=disable", env.POSTGRES_DBNAME)
 	db, err := sql.Open("postgres", "dbname=pcsaft sslmode=disable")
+
 	if err != nil {
 		panic(err)
 	} else {
