@@ -24,8 +24,8 @@ var benzene_water_res = CrossAssociatedValues{
 	},
 }
 
-func TestPrepareBinaryParameter(t *testing.T) {
-	got := PrepareBinaryParameter(Components{benzene, water_polar})
+func TestPrepareCrossParameter(t *testing.T) {
+	got := PrepareCrossParameter(Components{benzene, water_polar})
 	if !CalcSuccess999(got.eAB, benzene_water_res.eAB) {
 		t.Errorf("water & benzene eAB expected %v but got %v", benzene_water_res.eAB, got.eAB)
 	}

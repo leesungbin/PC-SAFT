@@ -18,7 +18,7 @@ type CrossAssociatedValues struct {
 	kAB [][]float64
 }
 
-func PrepareBinaryParameter(components Components) (res CrossAssociatedValues) {
+func PrepareCrossParameter(components Components) (res CrossAssociatedValues) {
 	// # of components <- expected to 3
 	nc := len(components)
 	kAB := make([][]float64, nc)
