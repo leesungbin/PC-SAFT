@@ -5,10 +5,8 @@ import (
 )
 
 type InitInputFragment struct {
-	Tc float64
-	Pc float64
-	Tb float64
-	x  float64
+	component Component
+	x         float64
 }
 
 type Result struct {
@@ -20,8 +18,8 @@ func BublP_init(components []InitInputFragment, T float64) (res Result) {
 	res.y = make([]float64, len(components))
 	Psat := make([]float64, len(components))
 	for i, c := range components {
-		B := math.Log(c.Pc/1.013) / ((1 / c.Tb) - (1 / c.Tc))
-		A := math.Log(1.013) + B/c.Tb
+		B := math.Log(c.component.Pc/1.013) / ((1 / c.component.Tb) - (1 / c.component.Tc))
+		A := math.Log(1.013) + B/c.component.Tb
 		Psat[i] = math.Exp(A - B/T)
 		res.P += Psat[i] * c.x
 	}
