@@ -24,24 +24,34 @@ var benzene_water_res = CrossAssociatedValues{
 	},
 }
 
-func TestPrepareCrossParameter(t *testing.T) {
+func Test_PrepareCrossParameter(t *testing.T) {
 	got := PrepareCrossParameter(Components{benzene, water_polar})
-	if !CalcSuccess999(got.eAB, benzene_water_res.eAB) {
-		t.Errorf("water & benzene eAB expected %v but got %v", benzene_water_res.eAB, got.eAB)
-	}
-	if !CalcSuccess999(got.kAB, benzene_water_res.kAB) {
-		t.Errorf("water & benzene kAB expected %v but got %v", benzene_water_res.kAB, got.kAB)
-	}
 
-	// [[0, 0, 0], [0, 0.0, 1353.35], [0, 1353.35, 2706.7]] [[0, 0, 0], [0, 0.0, 0.0], [0, 0.0, 0.08924]]
-}
-
-func CalcSuccess999(c1 [][]float64, c2 [][]float64) bool {
-	for i := 0; i < len(c1[0]); i++ {
-		cmp := c1[i][i] / c2[i][i]
-		if cmp < 0.999 || cmp > 1.001 {
-			return false
+	for i, v := range got.eAB {
+		for j, w := range v {
+			if !PassWithAccuracy4(w, benzene_water_res.eAB[i][j]) {
+				t.Errorf("%.4f %.4f", w, benzene_water_res.eAB[i][j])
+				t.Errorf("water & benzene eAB expected %v but got %v, erorr at eAB[%d][%d]", benzene_water_res.eAB, got.eAB, i, j)
+			}
 		}
 	}
-	return true
+	for i, v := range got.kAB {
+		for j, w := range v {
+			if !PassWithAccuracy4(w, benzene_water_res.kAB[i][j]) {
+				t.Errorf("%.4f %.4f", w, benzene_water_res.kAB[i][j])
+				t.Errorf("water & benzene kAB expected %v but got %v, erorr at kAB[%d][%d]", benzene_water_res.kAB, got.kAB, i, j)
+			}
+		}
+	}
+}
+
+// 유효숫자 4자리 검증
+func PassWithAccuracy4(compare float64, want float64) bool {
+	if compare < 0.0001 && compare > -0.0001 && want < 0.0001 && want > -0.0001 {
+		return true
+	}
+	if compare/want >= 0.9999 && compare/want <= 1.0001 {
+		return true
+	}
+	return false
 }

@@ -47,7 +47,6 @@ func PrepareCrossParameter(components Components) (res CrossAssociatedValues) {
 			eAB[j][i] = eAB[i][j]
 			fmt.Printf("kAB[i][j] : %f, eAB[i][j] : %f\n", kAB[i][j], eAB[i][j])
 		}
-
 	}
 	res = CrossAssociatedValues{eAB: eAB, kAB: kAB}
 	return res
