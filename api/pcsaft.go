@@ -45,7 +45,6 @@ func PCsaft(C PCsaftInput) (res PCsaftResult) {
 			zet[j] += pi / 6 * rho_num * C.x_[i] * C.component[i].m * Pow(d[i], float64(j))
 		}
 	}
-
 	// ## hard sphere term [Test Complete]
 	// Zhc initialize with m_*Zhs
 	Zhc := M * (zet[3]/(1-zet[3]) +
@@ -280,7 +279,7 @@ func PCsaft(C PCsaftInput) (res PCsaftResult) {
 
 	// ## calculate fugacity ------------------------------------------------------------------------------------------
 	Ahs := 1 / zet[0] * (3*zet[1]*zet[2]/(1-zet[3]) + Pow(zet[2], 3)/zet[3]/Pow(1-zet[3], 2) +
-		(Pow(zet[2], 2)/Pow(zet[3], 2)-zet[0])*math.Log(1-zet[3]))
+		(Pow(zet[2], 3)/Pow(zet[3], 2)-zet[0])*math.Log(1-zet[3]))
 	Ahc := M * Ahs
 	for i := 0; i < nc; i++ {
 		Ahc += -C.x_[i] * (C.component[i].m - 1) * math.Log(g[i])
@@ -289,7 +288,7 @@ func PCsaft(C PCsaftInput) (res PCsaftResult) {
 	for i := 0; i < 4; i++ {
 		tx[i] = make([]float64, nc)
 		for j := 0; j < nc; j++ {
-			tx[i][j] = pi / 6 * rho_num * C.component[j].m * Pow(d[j], float64(j))
+			tx[i][j] = pi / 6 * rho_num * C.component[j].m * Pow(d[j], float64(i))
 		}
 	}
 	Ahsx := make([]float64, nc)
@@ -309,7 +308,7 @@ func PCsaft(C PCsaftInput) (res PCsaftResult) {
 				Pow(d[i]/2, 2)*(4*zet[2]*tx[2][k]/Pow(1-zet[3], 3)+6*Pow(zet[2], 2)*tx[3][k]/Pow(1-zet[3], 4))
 		}
 	}
-
+	// fmt.Printf("%v %v\n", Ahsx, gx)
 	Ahcx := make([]float64, nc)
 	for k := 0; k < nc; k++ {
 		Ahcx[k] = C.component[k].m*Ahs + M*Ahsx[k] - (C.component[k].m-1)*math.Log(g[k]) // # with correlation
@@ -324,7 +323,7 @@ func PCsaft(C PCsaftInput) (res PCsaftResult) {
 			lnphi[k] += -C.x_[j] * Ahcx[j]
 		}
 	}
-
+	// fmt.Printf("%v %v\n", Ahcx, lnphi)
 	// # Dispersion term
 	Adisp := -2*pi*rho_num*I1*m2esig3 - pi*rho_num*M*C1*I2*m2e2sig3
 
@@ -334,8 +333,8 @@ func PCsaft(C PCsaftInput) (res PCsaftResult) {
 		for j := 0; j < nc; j++ {
 			sig3 := Pow((C.component[k].sig+C.component[j].sig)/2, 3)
 			ekT := math.Sqrt(C.component[k].eps*C.component[j].eps) * (1 - ek_AB.kAB[k][j]) / C.T
-			m2ekTsig3x[k] += 2 * C.component[k].m * C.component[j].x * C.component[j].m * ekT * sig3
-			m2ekT2sig3x[k] += 2 * C.component[k].m * C.component[k].x * C.component[j].m * Pow(ekT, 2) * sig3
+			m2ekTsig3x[k] += 2 * C.component[k].m * C.x_[j] * C.component[j].m * ekT * sig3
+			m2ekT2sig3x[k] += 2 * C.component[k].m * C.x_[j] * C.component[j].m * Pow(ekT, 2) * sig3
 		}
 	}
 
@@ -355,6 +354,7 @@ func PCsaft(C PCsaftInput) (res PCsaftResult) {
 			bx[i][k] = C.component[k].m/Pow(M, 2)*b1[i] + C.component[k].m/Pow(M, 2)*(3-4/M)*b2[i]
 		}
 	}
+	fmt.Printf("%v %v\n%v %v\n%v %v\n", Adisp, m2ekTsig3x, m2ekT2sig3x, C1x, ax, bx)
 	I1x := make([]float64, nc)
 	I2x := make([]float64, nc)
 	for k := 0; k < nc; k++ {
