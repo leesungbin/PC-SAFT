@@ -378,7 +378,6 @@ func PCsaft(C PCsaftInput) (res PCsaftResult) {
 	}
 
 	// # Association term
-
 	// # single associaing components of I
 	if ncas == 1 {
 		Aassoc := C.component[idx].x
@@ -386,21 +385,21 @@ func PCsaft(C PCsaftInput) (res PCsaftResult) {
 		Xx := make([]float64, nc)
 		for k := 0; k < nc; k++ {
 			Delx[k] = gx[idx][k] * F1 * K1
-			Xx[k] = -Pow(X1, 2) / (1 + rho_num*C.component[idx].x*Pow(X1, 2)*Del1) * (rho_num * C.component[idx].x * X1 * Delx[k])
+			Xx[k] = -Pow(X1, 2) / (1 + rho_num*C.x_[idx]*Pow(X1, 2)*Del1) * (rho_num * C.x_[idx] * X1 * Delx[k])
 		}
 		for k := 1; k < nc; k++ {
-			Xx[k] += -Pow(X1, 2) / (1 + rho_num*C.component[idx].x*Pow(X1, 2)*Del1) * (rho_num * X1 * Del1)
+			Xx[k] += -Pow(X1, 2) / (1 + rho_num*C.x_[idx]*Pow(X1, 2)*Del1) * (rho_num * X1 * Del1)
 		}
-		Xx[idx] += -Pow(X1, 2) / (1 + rho_num*C.component[idx].x*Pow(X1, 2)*Del1) * (rho_num * X1 * Del1)
+		Xx[idx] += -Pow(X1, 2) / (1 + rho_num*C.x_[idx]*Pow(X1, 2)*Del1) * (rho_num * X1 * Del1)
 		Aassocx := make([]float64, nc)
 		for k := 0; k < nc; k++ {
-			Aassocx[k] = C.component[idx].x * 2 * (1/X1 - 1/2) * Xx[k]
+			Aassocx[k] = C.x_[idx] * 2 * (1/X1 - 1/2) * Xx[k]
 		}
 		Aassocx[idx] += 2 * (math.Log(X1) - X1/2 + 1/2)
 		for k := 0; k < nc; k++ {
 			lnphi[k] += Aassoc + Aassocx[k]
 			for j := 0; j < nc; j++ {
-				lnphi[k] += -C.component[j].x * Aassocx[j]
+				lnphi[k] += -C.x_[j] * Aassocx[j]
 			}
 		}
 	} else if ncas >= 2 {
@@ -429,14 +428,14 @@ func PCsaft(C PCsaftInput) (res PCsaftResult) {
 				for k := 0; k < nc; k++ {
 					sum := rho_num * X[k] * DEL[i][k]
 					for j := 0; j < nc; j++ {
-						sum += rho_num * C.component[j].x * X[j] * DELx[i][j][k]
+						sum += rho_num * C.x_[j] * X[j] * DELx[i][j][k]
 						if j == i {
 							continue
 						}
-						sum += rho_num * C.component[j].x * Xx[j][k] * DEL[i][j]
+						sum += rho_num * C.x_[j] * Xx[j][k] * DEL[i][j]
 					}
 
-					Xx[i][k] = -Pow(X[i], 2) / (1 + rho_num*C.component[i].x*Pow(X[i], 2)*DEL[i][i]) * sum
+					Xx[i][k] = -Pow(X[i], 2) / (1 + rho_num*C.x_[i]*Pow(X[i], 2)*DEL[i][i]) * sum
 					err += math.Abs(Xx[i][k] - Xxold[i][k])
 				}
 			}
@@ -446,12 +445,12 @@ func PCsaft(C PCsaftInput) (res PCsaftResult) {
 		}
 		Aassoc := 0.
 		for i := 0; i < nc; i++ {
-			Aassoc += C.component[i].x * 2 * (math.Log(X[i]) - X[i]/2 + 1/2)
+			Aassoc += C.x_[i] * 2 * (math.Log(X[i]) - X[i]/2 + 1/2)
 		}
 		Aassocx := make([]float64, nc)
 		for k := 0; k < nc; k++ {
 			for i := 0; i < nc; i++ {
-				Aassocx[k] += C.component[i].x * 2 * (1/X[i] - 1/2) * Xx[i][k]
+				Aassocx[k] += C.x_[i] * 2 * (1/X[i] - 1/2) * Xx[i][k]
 			}
 			Aassocx[k] += 2 * (math.Log(X[k]) - X[k]/2 + 1/2)
 		}
@@ -459,7 +458,7 @@ func PCsaft(C PCsaftInput) (res PCsaftResult) {
 		for k := 0; k < nc; k++ {
 			lnphi[k] += Aassoc + Aassocx[k]
 			for j := 0; j < nc; j++ {
-				lnphi[k] += -C.component[j].x * Aassocx[j]
+				lnphi[k] += -C.x_[j] * Aassocx[j]
 			}
 		}
 
@@ -478,7 +477,7 @@ func PCsaft(C PCsaftInput) (res PCsaftResult) {
 		for k := 0; k < nc; k++ {
 			sum := 0.
 			for i := 0; i < nc; i++ {
-				sum += C.component[i].x * C.component[i].m * C.component[k].m * C.component[i].x * C.component[k].x * mu2k[i] * mu2k[k] / Pow(dd[i][k], 3)
+				sum += C.x_[i] * C.component[i].m * C.component[k].m * C.component[i].x * C.component[k].x * mu2k[i] * mu2k[k] / Pow(dd[i][k], 3)
 			}
 			A2px[k] = -2 * pi / 9 * rho_num / Pow(C.T, 2) * (2*sum*I2p + sumij*dI2px[k])
 		}
@@ -486,7 +485,7 @@ func PCsaft(C PCsaftInput) (res PCsaftResult) {
 			sum := 0.
 			for i := 0; i < nc; i++ {
 				for j := 0; j < nc; j++ {
-					sum += C.component[i].x * C.component[j].x * C.component[i].m * C.component[j].m * C.component[k].m *
+					sum += C.x_[i] * C.x_[j] * C.component[i].m * C.component[j].m * C.component[k].m *
 						C.component[i].x * C.component[j].x * C.component[k].x * mu2k[i] * mu2k[j] * mu2k[k] / (dd[i][j] * dd[j][k] * dd[i][k])
 				}
 			}
@@ -498,7 +497,7 @@ func PCsaft(C PCsaftInput) (res PCsaftResult) {
 		for k := 0; k < nc; k++ {
 			lnphi[k] += Apolar + Apolx[k]
 			for j := 0; j < nc; j++ {
-				lnphi[k] += -C.component[k].x * Apolx[j]
+				lnphi[k] += -C.x_[j] * Apolx[j]
 			}
 		}
 	}

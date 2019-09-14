@@ -8,7 +8,7 @@ var testInput = PCsaftInput{
 	0.0001157378925614143, 338.7, []float64{0.1, 0.4, 0.5}, []float64{0, 0, 0}, Components{Ethane, Nhexane, Cyclohexane},
 }
 var want = PCsaftResult{
-	[]float64{3.5206e-10, 3.7982999999999997e-10, 3.8499e-10}, 0.9531949926503014,
+	[]float64{0.3905800095221037, 0.01173591989723688, 0.006813729979993502}, 0.9531949926503014,
 }
 
 func Test_pcsaft(t *testing.T) {
