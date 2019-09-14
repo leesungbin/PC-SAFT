@@ -28,6 +28,12 @@ type CrossAssociatedValues struct {
 	kAB [][]float64
 }
 
+type IdealInput struct {
+	P  float64   // bar
+	T  float64   // K
+	z_ []float64 // component fraction
+}
+
 func PrepareCrossParameter(components Components) (res CrossAssociatedValues) {
 	// # of components <- expected to 3
 	nc := len(components)
@@ -75,4 +81,11 @@ func ConvertAtoM_sig(sig *float64) float64 {
 // math.Pow(x,y) x**y
 func Pow(x float64, y float64) float64 {
 	return math.Pow(x, y)
+}
+
+// Ideal equation of state
+func IdealVolume(yam IdealInput) (Vm float64) {
+	R := 8.314e-5 // (m3.bar/mol/K)
+	Vm = R * yam.T / yam.P
+	return
 }

@@ -8,7 +8,12 @@ type InitInputFragment struct {
 	component Component
 	x         float64
 }
-
+type CalculationInput struct {
+	T  float64
+	P  float64
+	x_ []float64
+	y_ []float64
+}
 type Result struct {
 	P float64
 	y []float64
@@ -28,3 +33,5 @@ func BublP_init(components []InitInputFragment, T float64) (res Result) {
 	}
 	return
 }
+
+// func BublP(data CalculationInput)

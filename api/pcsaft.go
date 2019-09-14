@@ -323,8 +323,8 @@ func PCsaft(C PCsaftInput) (res PCsaftResult) {
 			lnphi[k] += -C.x_[j] * Ahcx[j]
 		}
 	}
-	// fmt.Printf("%v %v\n", Ahcx, lnphi)
-	// # Dispersion term
+
+	// # Dispersion term [Test Complete]
 	Adisp := -2*pi*rho_num*I1*m2esig3 - pi*rho_num*M*C1*I2*m2e2sig3
 
 	m2ekTsig3x := make([]float64, nc)
@@ -350,11 +350,11 @@ func PCsaft(C PCsaftInput) (res PCsaftResult) {
 		ax[i] = make([]float64, nc)
 		bx[i] = make([]float64, nc)
 		for k := 0; k < nc; k++ {
-			ax[i][k] = C.component[k].m/Pow(M, 2)*a1[i] + C.component[k].m/Pow(M, 2)*(3-4/M)*a2[i]
-			bx[i][k] = C.component[k].m/Pow(M, 2)*b1[i] + C.component[k].m/Pow(M, 2)*(3-4/M)*b2[i]
+			ax[i][k] = C.component[k].m/(M*M)*a1[i] + C.component[k].m/(M*M)*(3-4/M)*a2[i]
+			bx[i][k] = C.component[k].m/(M*M)*b1[i] + C.component[k].m/(M*M)*(3-4/M)*b2[i]
 		}
 	}
-	fmt.Printf("%v %v\n%v %v\n%v %v\n", Adisp, m2ekTsig3x, m2ekT2sig3x, C1x, ax, bx)
+
 	I1x := make([]float64, nc)
 	I2x := make([]float64, nc)
 	for k := 0; k < nc; k++ {
@@ -363,17 +363,17 @@ func PCsaft(C PCsaftInput) (res PCsaftResult) {
 			I2x[k] += b[i]*float64(i)*tx[3][k]*Pow(n, float64(i-1)) + bx[i][k]*Pow(n, float64(i))
 		}
 	}
-
 	Adispx := make([]float64, nc)
 	for k := 0; k < nc; k++ {
 		Adispx[k] = -2*pi*rho_num*(I1x[k]*m2esig3+I1*m2ekTsig3x[k]) -
 			pi*rho_num*((C.component[k].m*C1*I2+M*C1x[k]*I2+M*C1*I2x[k])*m2e2sig3+
 				M*C1*I2*m2ekT2sig3x[k])
 	}
+
 	for k := 0; k < nc; k++ {
 		lnphi[k] += Adisp + Adispx[k]
 		for j := 0; j < nc; j++ {
-			lnphi[k] += -C.component[j].x * Adispx[j]
+			lnphi[k] += -C.x_[j] * Adispx[j]
 		}
 	}
 

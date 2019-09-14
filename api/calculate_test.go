@@ -1,6 +1,7 @@
 package api
 
 import (
+	"math"
 	"testing"
 )
 
@@ -41,10 +42,11 @@ func Test_PrepareCrossParameter(t *testing.T) {
 
 // 유효숫자 4자리 검증
 func PassWithAccuracy4(compare float64, want float64) bool {
-	if compare < 0.0001 && compare > -0.0001 && want < 0.0001 && want > -0.0001 {
-		return true
+	if want == 0 {
+		return math.Abs(compare-want) < 1e-4
 	}
-	if compare/want >= 0.9999 && compare/want <= 1.0001 {
+	res := math.Abs((compare - want) / want)
+	if res < 1e-4 {
 		return true
 	}
 	return false
