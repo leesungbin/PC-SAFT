@@ -20,7 +20,9 @@ var benzene_water_res = CrossAssociatedValues{
 }
 
 func Test_PrepareCrossParameter(t *testing.T) {
-	got := PrepareCrossParameter(Components{Benzene, Water_polar})
+	input := Comps{}
+	input.data = []Component{Benzene, Water_polar}
+	got := PrepareCrossParameter(input)
 
 	for i, v := range got.eAB {
 		for j, w := range v {

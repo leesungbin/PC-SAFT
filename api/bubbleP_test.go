@@ -29,24 +29,27 @@ var Ethane = Component{"ethane", 30.070, 305.40, 48.800, 0.099, 184.60, 1.6069, 
 var Nhexane = Component{"n-hexane", 86.178, 507.50, 30.100, 0.299, 341.90, 3.0576, 3.7983, 236.77, 0.000000, 0.00, 0.000, 0.00000}
 var Cyclohexane = Component{"cyclohexane", 84.162, 553.50, 40.700, 0.212, 353.80, 2.5303, 3.8499, 278.11, 0.000000, 0.00, 0.000, 0.00000}
 
-var TestInput = []InitInputFragment{
-	{Ethane, 0.2},
-	{Nhexane, 0.3},
-	{Cyclohexane, 0.5},
-}
-var ExpectOutput = Result{
+var bublP_init_expectOutput = Result{
 	18.065865443773628,
 	[]float64{0.9669884021380635, 0.015248381227162324, 0.017763216634774145},
 }
+var TestComponents = &Comps{data: []Component{Ethane, Nhexane, Cyclohexane}}
+var testComposition = []float64{0.2, 0.3, 0.5}
+var TestTemperature = 338.7
 
 func Test_BublP_init(t *testing.T) {
-	got := BublP_init(TestInput, 338.7)
-	if !PassWithAccuracy4(got.P, ExpectOutput.P) {
-		t.Errorf("Expected %v got %v", ExpectOutput.P, got.P)
+	got := TestComponents.BublP_init(testComposition, TestTemperature)
+	if !PassWithAccuracy4(got.P, bublP_init_expectOutput.P) {
+		t.Errorf("Expected %v got %v", bublP_init_expectOutput.P, got.P)
 	}
 	for i, v := range got.y {
-		if !PassWithAccuracy4(v, ExpectOutput.y[i]) {
-			t.Errorf("Expected %v got %v", ExpectOutput.y[i], v)
+		if !PassWithAccuracy4(v, bublP_init_expectOutput.y[i]) {
+			t.Errorf("Expected %v got %v", bublP_init_expectOutput.y[i], v)
 		}
 	}
+}
+
+func Test_BublP(t *testing.T) {
+	got := TestComponents.BublP(CalculationInput{T: TestTemperature, x_: testComposition})
+	t.Errorf("%v", got)
 }
