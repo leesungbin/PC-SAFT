@@ -55,7 +55,6 @@ func PrepareCrossParameter(components Comps) (res CrossAssociatedValues) {
 	for i := 0; i < nc; i++ {
 		kAB[i][i] = components.data[i].k
 		eAB[i][i] = components.data[i].e
-		// fmt.Println(kAB[i][i], eAB[i][i])
 	}
 
 	var sig_i, sig_j float64
@@ -67,7 +66,6 @@ func PrepareCrossParameter(components Comps) (res CrossAssociatedValues) {
 			kAB[j][i] = kAB[i][j]
 			eAB[i][j] = (eAB[i][i] + eAB[j][j]) / 2
 			eAB[j][i] = eAB[i][j]
-			// fmt.Printf("kAB[i][j] : %f, eAB[i][j] : %f\n", kAB[i][j], eAB[i][j])
 		}
 	}
 	res = CrossAssociatedValues{eAB: eAB, kAB: kAB}
@@ -107,19 +105,22 @@ func (components *Comps) FindV_newton(in NewtonInput) (Vres float64, err error) 
 	max_iter := 100
 	V := in.V0
 	dV := V * 1e-5
-
+	f := components.Peos_P(in)
 	for i := 0; i < max_iter; i++ {
-		f := components.Peos_P(in)
+		// fmt.Println(i, in.V0)
+		// f := components.Peos_P(in)
 		if math.Abs(f/in.P) < 1e-5 {
 			return V, nil
 		}
 		in.V0 = V + dV
-		dfdV := (components.Peos_P(in) - f) / dV
+		f_next := components.Peos_P(in)
+		dfdV := (f_next - f) / dV
 		if math.Abs(dfdV*V/in.P) < 1e-5 {
 			return -1, errors.New("Convergence error")
 		}
 		delV := -f / dfdV
 		V += delV
+		f = f_next
 	}
 	return V, nil
 }

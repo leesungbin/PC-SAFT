@@ -5,9 +5,6 @@ import (
 	"testing"
 )
 
-var Water_polar = Component{"water (polar)", 18.015, 647.3, 221.2, 0.344, 373.15, 1.0405, 2.9657, 175.15, 0.08924, 2706.7, 1.85, 0.66245}
-var Benzene = Component{"benzene", 78.114, 562.2, 48.9, 0.212, 353.2, 2.4653, 3.6478, 287.35, 0.0, 0.0, 0.0, 0.0}
-
 var benzene_water_res = CrossAssociatedValues{
 	eAB: [][]float64{
 		[]float64{0.0, 1353.35},
@@ -52,4 +49,27 @@ func PassWithAccuracy4(compare float64, want float64) bool {
 		return true
 	}
 	return false
+}
+
+var findVnewtonInput = NewtonInput{0.0001157378925614143, 9.422949332244094, 338.7, []float64{0.1, 0.4, 0.5}}
+var findVnewtonOutput = 0.00012126259852862196
+
+func Test_FindV_newton(t *testing.T) {
+	Vres, err := TestComponents.FindV_newton(findVnewtonInput)
+	if err != nil {
+		t.Errorf("error panic %v", err)
+	} else {
+		if !PassWithAccuracy4(Vres, findVnewtonOutput) {
+			t.Errorf("got %v, expected %v\n", Vres, findVnewtonOutput)
+		}
+	}
+}
+
+var Peos_POutput = 222.49341754650348
+
+func Test_Peos_P(t *testing.T) {
+	f := TestComponents.Peos_P(findVnewtonInput)
+	if !PassWithAccuracy4(f, Peos_POutput) {
+		t.Errorf("got %v, expected %v\n", f, Peos_POutput)
+	}
 }
