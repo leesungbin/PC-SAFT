@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math"
 	"time"
+
+	"gonum.org/v1/gonum/mat"
 )
 
 type PCsaftInput struct {
@@ -199,31 +201,58 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult) {
 				break
 			}
 		}
-		DX := make([]float64, nc)
 
-		for {
-			DXold := DX
-			err := 0.
-			for i := 0; i < nc; i++ {
-				sum := 0.
-				for j := 0; j < nc; j++ {
-					sum += C.x_[j] * X[j] * (DEL[i][j] + roDDEL[i][j])
-					if j == i {
-						continue
-					}
-					sum += rho_num * C.x_[j] * DX[j] * DEL[i][j]
-				}
-				DX[i] = -X[i] * X[i] / (1 + rho_num*C.x_[i]*X[i]*X[i]*DEL[i][i]) * sum
-				err += math.Abs(DX[i] - DXold[i])
+		// iteration
+		// DX := make([]float64, nc)
+		// for {
+		// 	DXold := DX
+		// 	err := 0.
+		// 	for i := 0; i < nc; i++ {
+		// 		sum := 0.
+		// 		for j := 0; j < nc; j++ {
+		// 			sum += C.x_[j] * X[j] * (DEL[i][j] + roDDEL[i][j])
+		// 			if j == i {
+		// 				continue
+		// 			}
+		// 			sum += rho_num * C.x_[j] * DX[j] * DEL[i][j]
+		// 		}
+		// 		DX[i] = -X[i] * X[i] / (1 + rho_num*C.x_[i]*X[i]*X[i]*DEL[i][i]) * sum
+		// 		err += math.Abs(DX[i] - DXold[i])
+		// 	}
+		// 	if err/float64(nc+1) < 1e-6 {
+		// 		break
+		// 	}
+		// }
+
+		// matrix
+		A := make([][]float64, nc)
+		B := make([]float64, nc)
+		for i := 0; i < nc; i++ {
+			A[i] = make([]float64, nc)
+		}
+		for i := 0; i < nc; i++ {
+			A[i][i] = 1
+			B[i] = 0
+			for j := 0; j < nc; j++ {
+				A[i][j] += X[i] * X[i] * rho_num * C.x_[j] * DEL[i][j]
+				B[i] += -X[i] * X[i] * C.x_[j] * X[j] * (DEL[i][j] + roDDEL[i][j])
 			}
-			if err/float64(nc+1) < 1e-6 {
-				break
+		}
+		a := make([]float64, nc*nc)
+		for i := 0; i < nc; i++ {
+			for j := 0; j < nc; j++ {
+				a[i*nc+j] = A[i][j]
 			}
 		}
 
+		A_ := mat.NewDense(nc, nc, a)
+		B_ := mat.NewDense(nc, 1, B)
+		var DX mat.Dense
+		DX.Solve(A_, B_)
+
 		Zassoc = 0
 		for i := 0; i < nc; i++ {
-			Zassoc += C.x_[i] * 2 * (1/X[i] - 1./2.) * rho_num * DX[i]
+			Zassoc += C.x_[i] * 2 * (1/X[i] - 1./2.) * rho_num * DX.At(i, 0)
 		}
 	}
 
