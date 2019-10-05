@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"time"
@@ -21,11 +22,11 @@ type PCsaftResult struct {
 }
 
 const N_av float64 = 6.02214179e23
-const pi float64 = math.Pi
+const Pi float64 = math.Pi
 const R float64 = 8.314e-5 // (m3.bar/mol/K)
 
 // PCsaft equation of state
-func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult) {
+func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult, err error) {
 	start := time.Now()
 	nc := len(components.data) // # of components
 	rho_m := 1 / C.V           // molar density
@@ -43,7 +44,7 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult) {
 		d[i] = components.data[i].sig * (1 - 0.12*math.Exp(-3*components.data[i].eps/C.T))
 
 		for j := 0; j < 4; j++ {
-			zet[j] += pi / 6 * rho_num * C.x_[i] * components.data[i].m * Pow(d[i], float64(j))
+			zet[j] += Pi / 6 * rho_num * C.x_[i] * components.data[i].m * Pow(d[i], float64(j))
 		}
 	}
 	// ## hard sphere term [Test Complete]
@@ -110,7 +111,7 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult) {
 			m2e2sig3 += C.x_[i] * C.x_[j] * components.data[i].m * components.data[j].m * e_kT * e_kT * sig_ij3
 		}
 	}
-	Zdisp := -2*pi*rho_num*dI1*m2esig3 - pi*rho_num*M*(C1*dI2+C2*n*I2)*m2e2sig3
+	Zdisp := -2*Pi*rho_num*dI1*m2esig3 - Pi*rho_num*M*(C1*dI2+C2*n*I2)*m2e2sig3
 
 	// ## association term [not completed]
 	Zassoc := 0.
@@ -280,7 +281,7 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult) {
 			}
 		}
 
-		rosta := 6 / pi * zet[3]
+		rosta := 6 / Pi * zet[3]
 		I2p = (1 - 0.3618*rosta - 0.3205*Pow(rosta, 2) + 0.1078*Pow(rosta, 3)) / Pow(1-0.5236*rosta, 2)
 		I3p = (1 + 0.62378*rosta - 0.11658*Pow(rosta, 2)) / (1 - 0.59056*rosta + 0.20059*Pow(rosta, 2))
 		DI2p = (0.6854 - 0.83043848*rosta + 0.3234*Pow(rosta, 2) - 0.05644408*Pow(rosta, 3)) / Pow(1-0.5236*rosta, 3)
@@ -291,8 +292,8 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult) {
 					components.data[i].x * components.data[j].x * mu2k[i] * mu2k[j] / Pow(dd[i][j], 3)
 			}
 		}
-		A2p = -2 * pi / 9 * rho_num / Pow(C.T, 2) * sumij * I2p
-		roDA2p := A2p - 2*pi/9*rho_num/Pow(C.T, 2)*sumij*rosta*DI2p
+		A2p = -2 * Pi / 9 * rho_num / Pow(C.T, 2) * sumij * I2p
+		roDA2p := A2p - 2*Pi/9*rho_num/Pow(C.T, 2)*sumij*rosta*DI2p
 		for i := 0; i < nc; i++ {
 			for j := 0; j < nc; j++ {
 				for l := 0; l < nc; l++ {
@@ -300,8 +301,8 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult) {
 				}
 			}
 		}
-		A3p = 5 * pi * pi / 162 * Pow(rho_num, 2) / Pow(C.T, 3) * sumijl * I3p
-		roDA3p := 2*A3p + 5*pi*pi/162*Pow(rho_num, 2)/Pow(C.T, 3)*sumijl*rosta*DI3p
+		A3p = 5 * Pi * Pi / 162 * Pow(rho_num, 2) / Pow(C.T, 3) * sumijl * I3p
+		roDA3p := 2*A3p + 5*Pi*Pi/162*Pow(rho_num, 2)/Pow(C.T, 3)*sumijl*rosta*DI3p
 
 		if math.Abs(A2p) < 1e-10 {
 			Zpolar = 0
@@ -309,7 +310,11 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult) {
 			Zpolar = 2/(1-A3p/A2p)*roDA2p - 1/Pow(1-A3p/A2p, 2)*(roDA2p-roDA3p)
 		}
 	}
-	res.Z = 1. + Zhc + Zdisp + Zassoc + Zpolar // calculated compressibility factor (Z)
+	Z := 1. + Zhc + Zdisp + Zassoc + Zpolar // calculated
+	if Z < 0 {
+		return res, errors.New("Z < 0\n")
+	}
+	res.Z = Z // calculated compressibility factor (Z)
 
 	// ## calculate fugacity ------------------------------------------------------------------------------------------
 	Ahs := 1 / zet[0] * (3*zet[1]*zet[2]/(1-zet[3]) + Pow(zet[2], 3)/zet[3]/Pow(1-zet[3], 2) +
@@ -322,7 +327,7 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult) {
 	for i := 0; i < 4; i++ {
 		tx[i] = make([]float64, nc)
 		for j := 0; j < nc; j++ {
-			tx[i][j] = pi / 6 * rho_num * components.data[j].m * Pow(d[j], float64(i))
+			tx[i][j] = Pi / 6 * rho_num * components.data[j].m * Pow(d[j], float64(i))
 		}
 	}
 	Ahsx := make([]float64, nc)
@@ -362,7 +367,7 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult) {
 	// fmt.Printf("%v %v %v\n", gx, Ahcx, lnphi) // complete
 
 	// # Dispersion term
-	Adisp := -2*pi*rho_num*I1*m2esig3 - pi*rho_num*M*C1*I2*m2e2sig3
+	Adisp := -2*Pi*rho_num*I1*m2esig3 - Pi*rho_num*M*C1*I2*m2e2sig3
 
 	m2ekTsig3x := make([]float64, nc)
 	m2ekT2sig3x := make([]float64, nc)
@@ -403,8 +408,8 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult) {
 	}
 	Adispx := make([]float64, nc)
 	for k := 0; k < nc; k++ {
-		Adispx[k] = -2*pi*rho_num*(I1x[k]*m2esig3+I1*m2ekTsig3x[k]) -
-			pi*rho_num*((components.data[k].m*C1*I2+M*C1x[k]*I2+M*C1*I2x[k])*m2e2sig3+
+		Adispx[k] = -2*Pi*rho_num*(I1x[k]*m2esig3+I1*m2ekTsig3x[k]) -
+			Pi*rho_num*((components.data[k].m*C1*I2+M*C1x[k]*I2+M*C1*I2x[k])*m2e2sig3+
 				M*C1*I2*m2ekT2sig3x[k])
 	}
 	// fmt.Printf("%v %v %v\n", I1x, I2x, Adispx) // complete
@@ -520,7 +525,7 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult) {
 			for i := 0; i < nc; i++ {
 				sum += C.x_[i] * components.data[i].m * components.data[k].m * components.data[i].x * components.data[k].x * mu2k[i] * mu2k[k] / Pow(dd[i][k], 3)
 			}
-			A2px[k] = -2 * pi / 9 * rho_num / Pow(C.T, 2) * (2*sum*I2p + sumij*dI2px[k])
+			A2px[k] = -2 * Pi / 9 * rho_num / Pow(C.T, 2) * (2*sum*I2p + sumij*dI2px[k])
 		}
 		for k := 0; k < nc; k++ {
 			sum := 0.
@@ -530,7 +535,7 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult) {
 						components.data[i].x * components.data[j].x * components.data[k].x * mu2k[i] * mu2k[j] * mu2k[k] / (dd[i][j] * dd[j][k] * dd[i][k])
 				}
 			}
-			A3px[k] = 5 * Pow(pi, 2) / 162 * Pow(rho_num, 2) / Pow(C.T, 3) * (3*sum*I3p + sumijl*dI3px[k])
+			A3px[k] = 5 * Pow(Pi, 2) / 162 * Pow(rho_num, 2) / Pow(C.T, 3) * (3*sum*I3p + sumijl*dI3px[k])
 		}
 		for k := 0; k < nc; k++ {
 			Apolx[k] = 2/(1-A3p/A2p)*A2px[k] - 1/Pow(1-A3p/A2p, 2)*(A2px[k]-A3px[k])

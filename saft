@@ -10,8 +10,8 @@ if [ $COMMAND = "run" ]; then
     go run main.go
 elif [ $COMMAND = "db:migrate" ]; then
     psql $POSTGRES_URL -f schema/schema.sql
-elif [ $COMMAND = "db:default" ]; then
-    python3 ./schema/data_parsing.py
+# elif [ $COMMAND = "db:default" ]; then
+#     python3 ./schema/data_parsing.py
 else
     echo "Unsupported Command: $COMMAND"
 fi

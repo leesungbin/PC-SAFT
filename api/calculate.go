@@ -6,29 +6,6 @@ import (
 	"math"
 )
 
-type Component struct {
-	Name string
-	// Data order : mw, Tc, Pc, omega, Tb, m, sig, eps, k, e, d, x
-	// idx        : 0   1   2   3      4   5  6    7    8  9  10 11
-	mw    float64
-	Tc    float64
-	Pc    float64
-	omega float64
-	Tb    float64
-	m     float64
-	sig   float64
-	eps   float64
-	k     float64
-	e     float64
-	d     float64
-	x     float64
-}
-type Comps struct {
-	data []Component
-	phi  []float64
-	Z    float64
-}
-
 type CrossAssociatedValues struct {
 	eAB [][]float64
 	kAB [][]float64
@@ -95,7 +72,10 @@ type NewtonInput struct {
 }
 
 func (components *Comps) Peos_P(in NewtonInput) (f float64) {
-	res := components.PCsaft(PCsaftInput{in.V0, in.T, in.z_})
+	res, err := components.PCsaft(PCsaftInput{in.V0, in.T, in.z_})
+	if err != nil {
+		fmt.Printf("Peos_P error: %v\n", err)
+	}
 	Peos := R * in.T / in.V0 * res.Z
 	f = Peos - in.P
 	return f
@@ -107,8 +87,7 @@ func (components *Comps) FindV_newton(in NewtonInput) (Vres float64, err error) 
 	dV := V * 1e-5
 	f := components.Peos_P(in)
 	for i := 0; i < max_iter; i++ {
-		// fmt.Println(i, in.V0)
-		// f := components.Peos_P(in)
+		fmt.Printf("%v\n", f)
 		if math.Abs(f/in.P) < 1e-5 {
 			return V, nil
 		}
@@ -116,7 +95,7 @@ func (components *Comps) FindV_newton(in NewtonInput) (Vres float64, err error) 
 		f_next := components.Peos_P(in)
 		dfdV := (f_next - f) / dV
 		if math.Abs(dfdV*V/in.P) < 1e-5 {
-			return -1, errors.New("Convergence error")
+			return V, errors.New("Convergence error")
 		}
 		delV := -f / dfdV
 		V += delV
@@ -138,6 +117,7 @@ func (components *Comps) GetVolume(in FindVolumeInput) (V float64) {
 func (components *Comps) Fugacity(V float64, P float64, z_ []float64) (fug []float64) {
 	if len(components.phi) == 1 && (components.phi)[0] == 0 {
 		fmt.Println("0 fugacity")
+		fug = []float64{0}
 	}
 	for i := 0; i < len(z_); i++ {
 		fug[i] = (components.phi)[i] * z_[i] * P
