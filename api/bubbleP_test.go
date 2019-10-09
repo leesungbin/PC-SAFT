@@ -29,7 +29,7 @@ var want_BublP_init = Result{
 	18.065865443773628,
 	[]float64{0.9669884021380635, 0.015248381227162324, 0.017763216634774145},
 }
-var want_BublP = CalculationResult{}
+var want_BublP = CalculationResult{P: 11.91104, y: []float64{0.9311, 0.0318, 0.0371}}
 
 var Composition_NNN = []float64{0.2, 0.3, 0.5}
 var Temperature = 338.7
@@ -48,5 +48,12 @@ func Test_BublP_init(t *testing.T) {
 
 func Test_BublP(t *testing.T) {
 	got := NNN_ethane_nHexane_cyclohexane.BublP(CalculationInput{T: Temperature, x_: Composition_NNN})
-	t.Errorf("%v", got)
+	if !PassWithAccuracy4(got.P, want_BublP.P) {
+		t.Errorf("Expected %v got %v", want_BublP, got)
+	}
+	for i, v := range got.y {
+		if !PassWithAccuracy4(v, want_BublP.y[i]) {
+			t.Errorf("Expected %v got %v", want_BublP, got)
+		}
+	}
 }

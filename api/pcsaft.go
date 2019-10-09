@@ -2,9 +2,7 @@ package api
 
 import (
 	"errors"
-	"fmt"
 	"math"
-	"time"
 
 	"gonum.org/v1/gonum/mat"
 )
@@ -27,7 +25,7 @@ const R float64 = 8.314e-5 // (m3.bar/mol/K)
 
 // PCsaft equation of state
 func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult, err error) {
-	start := time.Now()
+	// start := time.Now()
 	nc := len(components.data) // # of components
 	rho_m := 1 / C.V           // molar density
 	rho_num := rho_m * N_av    // number density
@@ -98,15 +96,15 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult, err error) {
 	m2e2sig3 := 0.
 
 	// Binary parameters,, assume 0
-	Keps := make([][]float64, nc)
+	components.Keps = make([][]float64, nc)
 	for i := 0; i < nc; i++ {
-		Keps[i] = make([]float64, nc)
+		components.Keps[i] = make([]float64, nc)
 	}
 
 	for i := 0; i < nc; i++ {
 		for j := 0; j < nc; j++ {
 			sig_ij3 := Pow((components.data[i].sig+components.data[j].sig)/2., 3)
-			e_kT := math.Sqrt(components.data[i].eps*components.data[j].eps) * (1 - Keps[i][j]) / C.T
+			e_kT := math.Sqrt(components.data[i].eps*components.data[j].eps) * (1 - components.Keps[i][j]) / C.T
 			m2esig3 += C.x_[i] * C.x_[j] * components.data[i].m * components.data[j].m * e_kT * sig_ij3
 			m2e2sig3 += C.x_[i] * C.x_[j] * components.data[i].m * components.data[j].m * e_kT * e_kT * sig_ij3
 		}
@@ -374,7 +372,7 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult, err error) {
 	for k := 0; k < nc; k++ {
 		for j := 0; j < nc; j++ {
 			sig3 := Pow((components.data[k].sig+components.data[j].sig)/2, 3)
-			ekT := math.Sqrt(components.data[k].eps*components.data[j].eps) * (1 - Keps[k][j]) / C.T
+			ekT := math.Sqrt(components.data[k].eps*components.data[j].eps) * (1 - components.Keps[k][j]) / C.T
 			m2ekTsig3x[k] += 2 * components.data[k].m * C.x_[j] * components.data[j].m * ekT * sig3
 			m2ekT2sig3x[k] += 2 * components.data[k].m * C.x_[j] * components.data[j].m * Pow(ekT, 2) * sig3
 		}
@@ -440,14 +438,14 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult, err error) {
 		Aassocx[idx] += 2 * (math.Log(X1) - X1/2. + 1./2.)
 		// fmt.Printf("%v\n", Aassocx) // complete
 		// fmt.Printf("%v\n", lnphi) // complete
-		fmt.Printf("%v %v\n", Aassoc, Aassocx)
+		// fmt.Printf("%v %v\n", Aassoc, Aassocx)
 		for k := 0; k < nc; k++ {
 			lnphi[k] += Aassoc + Aassocx[k]
 			for j := 0; j < nc; j++ {
 				lnphi[k] += -C.x_[j] * Aassocx[j]
 			}
 		}
-		fmt.Printf("%v\n", lnphi)
+		// fmt.Printf("%v\n", lnphi)
 	} else if ncas >= 2 {
 		// DELx = [ [ [0]*ncP for j in range(ncP) ] for i in range(ncP) ]
 		DELx := make([][][]float64, nc)
@@ -556,12 +554,12 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult, err error) {
 	components.phi = phi
 	components.Z = res.Z
 
-	elapsed := time.Since(start)
+	// elapsed := time.Since(start)
 
-	fmt.Println("--- PC-SAFT calculation results ---")
-	fmt.Printf("time : %v\n", elapsed)
-	fmt.Printf("phi : %v\n", res.Phi)
-	fmt.Printf("Zhc : %v\nZdisp : %v\nZassoc : %v\nZpolar : %v\n", Zhc, Zdisp, Zassoc, Zpolar)
-	fmt.Println("-----------------------------------")
+	// fmt.Println("--- PC-SAFT calculation results ---")
+	// fmt.Printf("time : %v\n", elapsed)
+	// fmt.Printf("phi : %v\n", res.Phi)
+	// fmt.Printf("Zhc : %v\nZdisp : %v\nZassoc : %v\nZpolar : %v\n", Zhc, Zdisp, Zassoc, Zpolar)
+	// fmt.Println("-----------------------------------")
 	return
 }

@@ -12,9 +12,10 @@ type CrossAssociatedValues struct {
 }
 
 type FindVolumeInput struct {
-	P  float64
-	T  float64
-	z_ []float64 // x_ or y_
+	P     float64
+	T     float64
+	z_    []float64 // x_ or y_
+	state string    // V or L
 }
 
 func PrepareCrossParameter(components Comps) (res CrossAssociatedValues) {
@@ -78,6 +79,7 @@ func (components *Comps) Peos_P(in NewtonInput) (f float64) {
 	}
 	Peos := R * in.T / in.V0 * res.Z
 	f = Peos - in.P
+	Log(fmt.Sprintf("Peos_P : %v %v", Peos, in.P))
 	return f
 }
 
@@ -106,8 +108,16 @@ func (components *Comps) FindV_newton(in NewtonInput) (Vres float64, err error) 
 
 func (components *Comps) GetVolume(in FindVolumeInput) (V float64) {
 	// initial guess with ideal gas equation
-	V0 := R * in.T / in.P
+	Vvap, Vliq := components.PR_vol(in.P, in.T, in.z_)
+	var V0 float64
+	if in.state == "V" {
+		V0 = Vvap
+	} else {
+		V0 = Vliq
+	}
+	Log(fmt.Sprintf("GetVolume : %v", V0))
 	V, err := components.FindV_newton(NewtonInput{V0, in.P, in.T, in.z_})
+	Log(fmt.Sprintf("After Find V_newton : %v", V))
 	if err != nil {
 		panic(err)
 	}

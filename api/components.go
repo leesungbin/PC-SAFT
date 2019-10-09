@@ -22,6 +22,7 @@ type Comps struct {
 	data []Component
 	phi  []float64
 	Z    float64
+	Keps [][]float64
 }
 
 var Ethane = Component{"ethane", 30.070, 305.40, 48.800, 0.099, 184.60, 1.6069, 3.5206, 191.42, 0.000000, 0.00, 0.000, 0.00000}

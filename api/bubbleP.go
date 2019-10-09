@@ -12,8 +12,10 @@ type CalculationInput struct {
 }
 type CalculationResult struct {
 	P float64
-	y []float64
+	T float64
 	V float64
+	x []float64
+	y []float64
 }
 type Result struct {
 	P float64
@@ -42,10 +44,13 @@ func (components *Comps) BublP(in CalculationInput) (res CalculationResult) {
 	y_ := initRes.y
 	for i := 0; i < maxit; i++ {
 
-		fvi := FindVolumeInput{P, in.T, in.x_}
-		V0 := components.GetVolume(fvi)
-		fL := components.Fugacity(V0, P, in.x_)
-		fV := components.Fugacity(V0, P, y_)
+		fvi_L := FindVolumeInput{P, in.T, in.x_, "L"}
+		V_L := components.GetVolume(fvi_L)
+		fL := components.Fugacity(V_L, P, in.x_)
+
+		fvi_V := FindVolumeInput{P, in.T, in.y_, "V"}
+		V_V := components.GetVolume(fvi_V)
+		fV := components.Fugacity(V_V, P, in.y_)
 
 		// adjust y composition
 		nc := len(components.data)
