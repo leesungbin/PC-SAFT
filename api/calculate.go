@@ -113,7 +113,7 @@ func (components *Comps) GetVolume(in FindVolumeInput) (V float64) {
 	if in.state == "V" {
 		V0 = Vvap
 	} else {
-		V0 = Vliq
+		V0 = Vliq * 0.99
 	}
 	Log(fmt.Sprintf("GetVolume : %v", V0))
 	V, err := components.FindV_newton(NewtonInput{V0, in.P, in.T, in.z_})

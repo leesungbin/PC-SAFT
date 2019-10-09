@@ -54,25 +54,24 @@ func PassWithAccuracy4(compare float64, want float64) bool {
 var findVnewtonInput = NewtonInput{0.0001157378925614143, 9.422949332244094, 338.7, []float64{0.1, 0.4, 0.5}}
 var findVnewtonOutput = 0.00012126259852862196
 
-var TestComponents_FindV_newton_Input = NewtonInput{0.0013702439054573965, 18.065865443773628, 338.7, []float64{0.2, 0.3, 0.5}}
-var TestComponents_FindV_newton_Output = 0.0013851730855810051
+var NNN_FindV_newton_Input = NewtonInput{0.00010914379164188678, Pressure, Temperature, Composition_NNN}
+var NNN_FindV_newton_Output = 0.00011453205172139417
 
 func Test_FindV_newton(t *testing.T) {
-	Vres, err := NNN_ethane_nHexane_cyclohexane.FindV_newton(TestComponents_FindV_newton_Input)
+	Vres, err := NNN_ethane_nHexane_cyclohexane.FindV_newton(NNN_FindV_newton_Input)
 	if err != nil {
 		t.Errorf("error panic : %v", err)
 	} else {
-		if !PassWithAccuracy4(Vres, TestComponents_FindV_newton_Output) {
-			t.Errorf("got %v, expected %v\n", Vres, TestComponents_FindV_newton_Output)
+		if !PassWithAccuracy4(Vres, NNN_FindV_newton_Output) {
+			t.Errorf("got %v, expected %v\n", Vres, NNN_FindV_newton_Output)
 		}
 	}
 }
 
-var Peos_POutput = 222.49341754650348
-
 func Test_Peos_P(t *testing.T) {
-	f := NNN_ethane_nHexane_cyclohexane.Peos_P(findVnewtonInput)
-	if !PassWithAccuracy4(f, Peos_POutput) {
-		t.Errorf("got %v, expected %v\n", f, Peos_POutput)
+	got := NNN_ethane_nHexane_cyclohexane.Peos_P(NNN_FindV_newton_Input)
+	want := 216.21032034626552
+	if !PassWithAccuracy4(got, want) {
+		t.Errorf("got %v, expected %v\n", got, want)
 	}
 }

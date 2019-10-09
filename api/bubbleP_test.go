@@ -33,6 +33,7 @@ var want_BublP = CalculationResult{P: 11.91104, y: []float64{0.9311, 0.0318, 0.0
 
 var Composition_NNN = []float64{0.2, 0.3, 0.5}
 var Temperature = 338.7
+var Pressure = 18.065865443773628
 
 func Test_BublP_init(t *testing.T) {
 	got := NNN_ethane_nHexane_cyclohexane.BublP_init(Composition_NNN, Temperature)
