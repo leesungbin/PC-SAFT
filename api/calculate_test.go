@@ -104,7 +104,7 @@ func Test_Fugacity(t *testing.T) {
 	}
 }
 
-var NNN_GetVolume_Input = FindVolumeInput{Pressure, Temperature, Composition_NNN, "L"}
+var NNN_GetVolume_Input = GetVolumeInput{Pressure, Temperature, Composition_NNN, "L"}
 
 func Test_GetVolume(t *testing.T) {
 	got, err := NNN_ethane_nHexane_cyclohexane.GetVolume(NNN_GetVolume_Input)

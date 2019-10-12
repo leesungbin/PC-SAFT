@@ -11,7 +11,7 @@ type CrossAssociatedValues struct {
 	kAB [][]float64
 }
 
-type FindVolumeInput struct {
+type GetVolumeInput struct {
 	P     float64
 	T     float64
 	z_    []float64 // x_ or y_
@@ -109,7 +109,7 @@ func (components *Comps) FindV_newton(in NewtonInput) (Vres float64, err error) 
 	return V, nil
 }
 
-func (components *Comps) GetVolume(in FindVolumeInput) (V float64, err error) {
+func (components *Comps) GetVolume(in GetVolumeInput) (V float64, err error) {
 	Vvap, Vliq := components.PR_vol(in.P, in.T, in.z_)
 
 	var V0 float64

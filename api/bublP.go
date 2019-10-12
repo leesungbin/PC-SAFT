@@ -5,20 +5,22 @@ import (
 	"math"
 )
 
-type BublPInput struct {
+type BP_Input struct {
 	T  float64
 	x_ []float64
 }
-type BublPResult struct {
-	P float64
-	y []float64
+type BP_Result struct {
+	P   float64
+	y_  []float64
+	V_V float64
+	V_L float64
 }
-type Result struct {
+type py_init struct {
 	P float64
 	y []float64
 }
 
-func (components *Comps) BublP_init(x_ []float64, T float64) (res Result) {
+func (components *Comps) BublP_init(T float64, x_ []float64) (res py_init) {
 	res.y = make([]float64, len(components.data))
 	Psat := make([]float64, len(components.data))
 	for i, c := range components.data {
@@ -33,19 +35,20 @@ func (components *Comps) BublP_init(x_ []float64, T float64) (res Result) {
 	return
 }
 
-func (components *Comps) BublP(in BublPInput) (res BublPResult) {
+func (components *Comps) BublP(in BP_Input) (res BP_Result) {
 	var i int
 	maxit := 3000
-	initRes := components.BublP_init(in.x_, in.T)
+	initRes := components.BublP_init(in.T, in.x_)
 	P := initRes.P
 	y_ := initRes.y
+	var V_V, V_L float64
 	for i = 0; i < maxit; i++ {
-		fvi_L := FindVolumeInput{P, in.T, in.x_, "L"}
-		V_L, _ := components.GetVolume(fvi_L)
+		fvi_L := GetVolumeInput{P, in.T, in.x_, "L"}
+		V_L, _ = components.GetVolume(fvi_L)
 		phi_L, fug_L := components.Fugacity(NewtonInput{V_L, P, in.T, in.x_})
 
-		fvi_V := FindVolumeInput{P, in.T, y_, "V"}
-		V_V, _ := components.GetVolume(fvi_V)
+		fvi_V := GetVolumeInput{P, in.T, y_, "V"}
+		V_V, _ = components.GetVolume(fvi_V)
 		phi_V, fug_V := components.Fugacity(NewtonInput{V_V, P, in.T, y_})
 
 		// adjust y composition
@@ -69,9 +72,9 @@ func (components *Comps) BublP(in BublPInput) (res BublPResult) {
 		P = Pnew
 		y_ = ynew
 		if math.Abs(V_V-V_L)/V_V < 1e-5 { // for single phase
-			return BublPResult{P: P, y: y_}
+			return BP_Result{P, y_, V_V, V_L}
 		}
 	}
 	fmt.Printf("bubbleP calculation iterated # : %d\n", i)
-	return BublPResult{P: P, y: y_}
+	return BP_Result{P, y_, V_V, V_L}
 }
