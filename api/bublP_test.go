@@ -10,8 +10,8 @@ var want_BublP_init = py_init{
 }
 
 // Volume is not added to result
-var want_BublP = BP_Result{P: 11.911044412248602, y: []float64{0.931106962189395, 0.031805774449269755, 0.037087479901090147}}
-var want_BublP_NNP = BP_Result{P: 38.35158864951551, y: []float64{0.9531677842868514, 0.02934545182397382, 0.01748647899926908}}
+var want_BublP = BP_Result{P: 11.911044412248602, y_: []float64{0.931106962189395, 0.031805774449269755, 0.037087479901090147}}
+var want_BublP_NNP = BP_Result{P: 38.35158864951551, y_: []float64{0.9531677842868514, 0.02934545182397382, 0.01748647899926908}}
 var Composition_NNN = []float64{0.2, 0.3, 0.5}
 var Composition_NNP = []float64{0.5, 0.3, 0.2}
 
@@ -39,8 +39,8 @@ func Test_BublP(t *testing.T) {
 	if !PassWithAccuracyN(1, got.P, want_BublP.P) {
 		t.Errorf("Expected %v got %v", want_BublP, got)
 	}
-	for i, v := range got.y {
-		if !PassWithAccuracyN(1, v, want_BublP.y[i]) {
+	for i, v := range got.y_ {
+		if !PassWithAccuracyN(1, v, want_BublP.y_[i]) {
 			t.Errorf("Expected %v got %v", want_BublP, got)
 		}
 	}
@@ -49,8 +49,8 @@ func Test_BublP(t *testing.T) {
 	if !PassWithAccuracyN(1, got.P, want_BublP_NNP.P) {
 		t.Errorf("Expected %v got %v", want_BublP_NNP, got)
 	}
-	for i, v := range got.y {
-		if !PassWithAccuracyN(1, v, want_BublP_NNP.y[i]) {
+	for i, v := range got.y_ {
+		if !PassWithAccuracyN(1, v, want_BublP_NNP.y_[i]) {
 			t.Errorf("Expected %v got %v", want_BublP_NNP, got)
 		}
 	}
