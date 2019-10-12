@@ -5,11 +5,9 @@ import (
 	"math"
 )
 
-type CalculationInput struct {
+type BublPInput struct {
 	T  float64
-	P  float64
 	x_ []float64
-	y_ []float64
 }
 type BublPResult struct {
 	P float64
@@ -35,7 +33,7 @@ func (components *Comps) BublP_init(x_ []float64, T float64) (res Result) {
 	return
 }
 
-func (components *Comps) BublP(in CalculationInput) (res BublPResult) {
+func (components *Comps) BublP(in BublPInput) (res BublPResult) {
 	var i int
 	maxit := 3000
 	initRes := components.BublP_init(in.x_, in.T)
