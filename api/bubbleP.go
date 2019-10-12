@@ -45,19 +45,19 @@ func (components *Comps) BublP(in CalculationInput) (res CalculationResult) {
 	for i := 0; i < maxit; i++ {
 
 		fvi_L := FindVolumeInput{P, in.T, in.x_, "L"}
-		V_L := components.GetVolume(fvi_L)
-		fL := components.Fugacity(V_L, P, in.x_)
+		V_L, _ := components.GetVolume(fvi_L)
+		phi_L, fL := components.Fugacity(NewtonInput{V_L, P, in.T, in.x_})
 
 		fvi_V := FindVolumeInput{P, in.T, in.y_, "V"}
-		V_V := components.GetVolume(fvi_V)
-		fV := components.Fugacity(V_V, P, in.y_)
+		V_V, _ := components.GetVolume(fvi_V)
+		phi_V, fV := components.Fugacity(NewtonInput{V_V, P, in.T, in.y_})
 
 		// adjust y composition
 		nc := len(components.data)
 		ynew := make([]float64, nc)
 		sumy := 0.
 		for j := 0; j < nc; j++ {
-			ynew[j] = y_[j] * fL[j] / fV[j]
+			ynew[j] = y_[j] * phi_L[j] / phi_V[j]
 			sumy += ynew[j]
 		}
 		Pnew := P * sumy

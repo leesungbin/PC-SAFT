@@ -20,8 +20,8 @@ type Component struct {
 
 type Comps struct {
 	data []Component
-	phi  []float64
-	Z    float64
+	// phi  []float64
+	// Z    float64
 	Keps [][]float64
 }
 

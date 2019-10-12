@@ -551,8 +551,8 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult, err error) {
 	}
 	res.Phi = phi
 
-	components.phi = phi
-	components.Z = res.Z
+	// components.phi = phi
+	// components.Z = res.Z
 
 	// elapsed := time.Since(start)
 
