@@ -253,7 +253,8 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult, err error) {
 
 		Zassoc = 0
 		for i := 0; i < nc; i++ {
-			Zassoc += C.x_[i] * 2 * (1/X[i] - 1./2.) * rho_num * DX.At(i, 0)
+			Zassoc += C.x_[i] * 2 * (1/X[i] - 1./2.) * rho_num * DX.At(i, 0) // matrix
+			// Zassoc += C.x_[i] * 2 * (1/X[i] - 1./2.) * rho_num * DX[i]
 		}
 	}
 
