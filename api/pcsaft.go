@@ -27,7 +27,7 @@ const R float64 = 8.314e-5 // (m3.bar/mol/K)
 // PCsaft equation of state
 func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult, err error) {
 	// start := time.Now()
-	fmt.Printf("PCsaft input : %v\n", C)
+	// fmt.Printf("PCsaft input : %v\n", C)
 	nc := len(components.data) // # of components
 	rho_m := 1 / C.V           // molar density
 	rho_num := rho_m * N_av    // number density
@@ -561,7 +561,7 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult, err error) {
 	// fmt.Println("--- PC-SAFT calculation results ---")
 	// fmt.Printf("time : %v\n", elapsed)
 	// fmt.Printf("phi : %v\n", res.Phi)
-	fmt.Printf("PCsaft res : %v\nZhc : %v, Zdisp : %v, Zassoc : %v, Zpolar : %v\n", Z, Zhc, Zdisp, Zassoc, Zpolar)
+	// fmt.Printf("PCsaft res : %v\nZhc : %v, Zdisp : %v, Zassoc : %v, Zpolar : %v\n", Z, Zhc, Zdisp, Zassoc, Zpolar)
 	// fmt.Println("-----------------------------------")
 	return
 }

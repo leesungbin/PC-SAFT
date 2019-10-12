@@ -86,14 +86,16 @@ func (components *Comps) Peos_P(in NewtonInput) (f float64) {
 }
 
 func (components *Comps) FindV_newton(in NewtonInput) (Vres float64, err error) {
+	var f float64
 	max_iter := 100
 	V := in.V
 	dV := V * 1e-5
 	// fmt.Printf("FindV_newton : V, dV : %v %v \n", V, dV)
-	f := components.Peos_P(in)
 	for i := 0; i < max_iter; i++ {
 		// fmt.Printf("Peos-P : %v\n	converged rate : %v\n", f, f/in.P)
-		if math.Abs(f/in.P) < 1e-5 { // 정확도의 부정확성
+		f = components.Peos_P(NewtonInput{V, in.P, in.T, in.z_})
+		if math.Abs(f/in.P) < 1e-5 {
+			fmt.Printf("iterated for %d times\nfindV_newton end : V, : %v\nconverged rate : %v\n", i, V, f/in.P)
 			return V, nil
 		}
 		V = V + dV
@@ -102,11 +104,11 @@ func (components *Comps) FindV_newton(in NewtonInput) (Vres float64, err error) 
 		if math.Abs(dfdV*V/in.P) < 1e-5 {
 			return V, errors.New("Convergence error")
 		}
-		delV := -f / dfdV
+		delV := -f / dfdV * 0.95
 		V += delV
-		f = f_next
+		// f = f_next
 	}
-	fmt.Printf("findV_newton end : V, : %v\nconverged rate : %v\n", V, f/in.P)
+	fmt.Printf("iterated for %d times\nfindV_newton end : V, : %v\nconverged rate : %v\n", max_iter, V, f/in.P)
 	return V, nil
 }
 

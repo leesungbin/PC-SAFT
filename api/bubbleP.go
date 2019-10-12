@@ -11,11 +11,8 @@ type CalculationInput struct {
 	x_ []float64
 	y_ []float64
 }
-type CalculationResult struct {
+type BublPResult struct {
 	P float64
-	T float64
-	V float64
-	x []float64
 	y []float64
 }
 type Result struct {
@@ -38,12 +35,13 @@ func (components *Comps) BublP_init(x_ []float64, T float64) (res Result) {
 	return
 }
 
-func (components *Comps) BublP(in CalculationInput) (res CalculationResult) {
+func (components *Comps) BublP(in CalculationInput) (res BublPResult) {
+	var i int
 	maxit := 3000
 	initRes := components.BublP_init(in.x_, in.T)
 	P := initRes.P
 	y_ := initRes.y
-	for i := 0; i < maxit; i++ {
+	for i = 0; i < maxit; i++ {
 		fvi_L := FindVolumeInput{P, in.T, in.x_, "L"}
 		V_L, _ := components.GetVolume(fvi_L)
 		phi_L, fug_L := components.Fugacity(NewtonInput{V_L, P, in.T, in.x_})
@@ -51,14 +49,13 @@ func (components *Comps) BublP(in CalculationInput) (res CalculationResult) {
 		fvi_V := FindVolumeInput{P, in.T, y_, "V"}
 		V_V, _ := components.GetVolume(fvi_V)
 		phi_V, fug_V := components.Fugacity(NewtonInput{V_V, P, in.T, y_})
-		fmt.Printf("@@@working\n")
 
 		// adjust y composition
 		nc := len(components.data)
 		ynew := make([]float64, nc)
 		sumy := 0.
 		for j := 0; j < nc; j++ {
-			ynew[j] = y_[j] * phi_L[j] / phi_V[j]
+			ynew[j] = in.x_[j] * phi_L[j] / phi_V[j]
 			sumy += ynew[j]
 		}
 		Pnew := P * sumy
@@ -73,6 +70,10 @@ func (components *Comps) BublP(in CalculationInput) (res CalculationResult) {
 		}
 		P = Pnew
 		y_ = ynew
+		if math.Abs(V_V-V_L)/V_V < 1e-5 { // for single phase
+			return BublPResult{P: P, y: y_}
+		}
 	}
-	return CalculationResult{P: P, y: y_}
+	fmt.Printf("bubbleP calculation iterated # : %d\n", i)
+	return BublPResult{P: P, y: y_}
 }

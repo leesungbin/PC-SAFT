@@ -51,6 +51,18 @@ func PassWithAccuracy4(compare float64, want float64) bool {
 	return false
 }
 
+// 0.000...1 : 0의 갯수 : N개( N >= 1)
+func PassWithAccuracyN(N int, compare, want float64) bool {
+	if want == 0 {
+		return math.Abs(compare-want) < 1e-10
+	}
+	res := math.Abs((compare - want) / want)
+	if res < Pow(0.1, float64(N+1)) {
+		return true
+	}
+	return false
+}
+
 var NNN_FindV_newton_Input = NewtonInput{0.00010914379164188678, Pressure, Temperature, Composition_NNN}
 var NNN_FindV_newton_Output = 0.00011453205172139417
 
