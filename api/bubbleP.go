@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"math"
 )
 
@@ -43,14 +44,14 @@ func (components *Comps) BublP(in CalculationInput) (res CalculationResult) {
 	P := initRes.P
 	y_ := initRes.y
 	for i := 0; i < maxit; i++ {
-
 		fvi_L := FindVolumeInput{P, in.T, in.x_, "L"}
 		V_L, _ := components.GetVolume(fvi_L)
-		phi_L, fL := components.Fugacity(NewtonInput{V_L, P, in.T, in.x_})
+		phi_L, fug_L := components.Fugacity(NewtonInput{V_L, P, in.T, in.x_})
 
-		fvi_V := FindVolumeInput{P, in.T, in.y_, "V"}
+		fvi_V := FindVolumeInput{P, in.T, y_, "V"}
 		V_V, _ := components.GetVolume(fvi_V)
-		phi_V, fV := components.Fugacity(NewtonInput{V_V, P, in.T, in.y_})
+		phi_V, fug_V := components.Fugacity(NewtonInput{V_V, P, in.T, y_})
+		fmt.Printf("@@@working\n")
 
 		// adjust y composition
 		nc := len(components.data)
@@ -63,7 +64,7 @@ func (components *Comps) BublP(in CalculationInput) (res CalculationResult) {
 		Pnew := P * sumy
 		converged := true
 		for j := 0; j < nc; j++ {
-			if math.Abs(fL[j]-fV[j]) > 1e-5 {
+			if math.Abs(fug_L[j]-fug_V[j]) > 1e-5 {
 				converged = false
 			}
 		}

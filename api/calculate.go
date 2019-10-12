@@ -73,7 +73,9 @@ type NewtonInput struct {
 }
 
 func (components *Comps) Peos_P(in NewtonInput) (f float64) {
+	// fmt.Printf("	Peos_P input : %v\n", in)
 	res, err := components.PCsaft(PCsaftInput{in.V, in.T, in.z_})
+	// fmt.Printf("		PCsaft res : %v\n", res)
 	if err != nil {
 		fmt.Printf("Peos_P got error while PCsaft : %v\n", err)
 	}
@@ -87,15 +89,15 @@ func (components *Comps) FindV_newton(in NewtonInput) (Vres float64, err error) 
 	max_iter := 100
 	V := in.V
 	dV := V * 1e-5
-	fmt.Printf("FindV_newton : V, dV : %v %v \n", V, dV)
+	// fmt.Printf("FindV_newton : V, dV : %v %v \n", V, dV)
 	f := components.Peos_P(in)
 	for i := 0; i < max_iter; i++ {
-		fmt.Printf("Peos-P : %v\n", f)
-		if math.Abs(f/in.P) < 1e-5 {
+		// fmt.Printf("Peos-P : %v\n	converged rate : %v\n", f, f/in.P)
+		if math.Abs(f/in.P) < 1e-5 { // 정확도의 부정확성
 			return V, nil
 		}
-		in.V = V + dV
-		f_next := components.Peos_P(in)
+		V = V + dV
+		f_next := components.Peos_P(NewtonInput{V, in.P, in.T, in.z_})
 		dfdV := (f_next - f) / dV
 		if math.Abs(dfdV*V/in.P) < 1e-5 {
 			return V, errors.New("Convergence error")
@@ -104,14 +106,12 @@ func (components *Comps) FindV_newton(in NewtonInput) (Vres float64, err error) 
 		V += delV
 		f = f_next
 	}
-	fmt.Printf("findV_newton end : V : %v\n", V)
+	fmt.Printf("findV_newton end : V, : %v\nconverged rate : %v\n", V, f/in.P)
 	return V, nil
 }
 
 func (components *Comps) GetVolume(in FindVolumeInput) (V float64, err error) {
-	// initial guess with ideal gas equation
 	Vvap, Vliq := components.PR_vol(in.P, in.T, in.z_)
-	fmt.Printf("Vvap, Vliq : %v %v\n", Vvap, Vliq)
 
 	var V0 float64
 	if in.state == "V" {
@@ -119,9 +119,9 @@ func (components *Comps) GetVolume(in FindVolumeInput) (V float64, err error) {
 	} else {
 		V0 = Vliq * 0.99 // set scalVl0 = 0.99
 	}
-	Log(fmt.Sprintf("GetVolume : %v", V0))
+	// Log(fmt.Sprintf("GetVolume : %v", V0))
 	V, err = components.FindV_newton(NewtonInput{V0, in.P, in.T, in.z_})
-	Log(fmt.Sprintf("After Find V_newton : %v", V))
+	// Log(fmt.Sprintf("After Find V_newton : %v", V))
 	if err != nil {
 		return V, errors.New(fmt.Sprintf("%v\n", err))
 	}

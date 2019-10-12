@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"math"
 
 	"gonum.org/v1/gonum/mat"
@@ -26,6 +27,7 @@ const R float64 = 8.314e-5 // (m3.bar/mol/K)
 // PCsaft equation of state
 func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult, err error) {
 	// start := time.Now()
+	fmt.Printf("PCsaft input : %v\n", C)
 	nc := len(components.data) // # of components
 	rho_m := 1 / C.V           // molar density
 	rho_num := rho_m * N_av    // number density
@@ -310,7 +312,7 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult, err error) {
 	}
 	Z := 1. + Zhc + Zdisp + Zassoc + Zpolar // calculated
 	if Z < 0 {
-		return res, errors.New("Z < 0\n")
+		return res, errors.New(fmt.Sprintf("Z < 0\nZhc : %v, Zdisp : %v, Zassoc : %v, Zpolar : %v\n", Zhc, Zdisp, Zassoc, Zpolar))
 	}
 	res.Z = Z // calculated compressibility factor (Z)
 
@@ -559,7 +561,7 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult, err error) {
 	// fmt.Println("--- PC-SAFT calculation results ---")
 	// fmt.Printf("time : %v\n", elapsed)
 	// fmt.Printf("phi : %v\n", res.Phi)
-	// fmt.Printf("Zhc : %v\nZdisp : %v\nZassoc : %v\nZpolar : %v\n", Zhc, Zdisp, Zassoc, Zpolar)
+	fmt.Printf("PCsaft res : %v\nZhc : %v, Zdisp : %v, Zassoc : %v, Zpolar : %v\n", Z, Zhc, Zdisp, Zassoc, Zpolar)
 	// fmt.Println("-----------------------------------")
 	return
 }

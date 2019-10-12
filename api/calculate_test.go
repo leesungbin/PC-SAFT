@@ -51,11 +51,8 @@ func PassWithAccuracy4(compare float64, want float64) bool {
 	return false
 }
 
-var findVnewtonInput = NewtonInput{0.0001157378925614143, 9.422949332244094, 338.7, []float64{0.1, 0.4, 0.5}}
-var findVnewtonOutput = 0.00012126259852862196
-
 var NNN_FindV_newton_Input = NewtonInput{0.00010914379164188678, Pressure, Temperature, Composition_NNN}
-var NNN_FindV_newton_Output = 0.00011
+var NNN_FindV_newton_Output = 0.00011453205172139417
 
 func Test_FindV_newton(t *testing.T) {
 	Vres, err := NNN_ethane_nHexane_cyclohexane.FindV_newton(NNN_FindV_newton_Input)
@@ -92,5 +89,15 @@ func Test_Fugacity(t *testing.T) {
 		if !PassWithAccuracy4(got_fug[i], want_fug[i]) {
 			t.Errorf("phi : got %v, expected %v\n", got_phi, want_fug)
 		}
+	}
+}
+
+var NNN_GetVolume_Input = FindVolumeInput{Pressure, Temperature, Composition_NNN, "L"}
+
+func Test_GetVolume(t *testing.T) {
+	got, err := NNN_ethane_nHexane_cyclohexane.GetVolume(NNN_GetVolume_Input)
+	want := 0.00011453205172139417
+	if err != nil || !PassWithAccuracy4(got, want) {
+		t.Errorf("err: %v\ngot %v, expected %v\n", err, got, want)
 	}
 }

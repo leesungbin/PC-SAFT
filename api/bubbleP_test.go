@@ -29,7 +29,7 @@ var want_BublP_init = Result{
 	18.065865443773628,
 	[]float64{0.9669884021380635, 0.015248381227162324, 0.017763216634774145},
 }
-var want_BublP = CalculationResult{P: 11.91104, y: []float64{0.9311, 0.0318, 0.0371}}
+var want_BublP = CalculationResult{P: 11.911044412248602, y: []float64{0.931106962189395, 0.031805774449269755, 0.037087479901090147}}
 
 var Composition_NNN = []float64{0.2, 0.3, 0.5}
 var Temperature = 338.7
