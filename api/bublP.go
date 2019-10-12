@@ -35,7 +35,7 @@ func (components *Comps) BublP_init(T float64, x_ []float64) (res py_init) {
 	return
 }
 
-func (components *Comps) BublP(in BP_Input) (res BP_Result) {
+func (components *Comps) BublP(in BP_Input) (res BP_Result, err error) {
 	var i int
 	maxit := 3000
 	initRes := components.BublP_init(in.T, in.x_)
@@ -44,11 +44,11 @@ func (components *Comps) BublP(in BP_Input) (res BP_Result) {
 	var V_V, V_L float64
 	for i = 0; i < maxit; i++ {
 		fvi_L := GetVolumeInput{P, in.T, in.x_, "L"}
-		V_L, _ = components.GetVolume(fvi_L)
+		V_L, err = components.GetVolume(fvi_L)
 		phi_L, fug_L := components.Fugacity(NewtonInput{V_L, P, in.T, in.x_})
 
 		fvi_V := GetVolumeInput{P, in.T, y_, "V"}
-		V_V, _ = components.GetVolume(fvi_V)
+		V_V, err = components.GetVolume(fvi_V)
 		phi_V, fug_V := components.Fugacity(NewtonInput{V_V, P, in.T, y_})
 
 		// adjust y composition
@@ -72,9 +72,9 @@ func (components *Comps) BublP(in BP_Input) (res BP_Result) {
 		P = Pnew
 		y_ = ynew
 		if math.Abs(V_V-V_L)/V_V < 1e-5 { // for single phase
-			return BP_Result{P, y_, V_V, V_L}
+			return BP_Result{P, y_, V_V, V_L}, nil
 		}
 	}
 	fmt.Printf("bubbleP calculation iterated # : %d\n", i)
-	return BP_Result{P, y_, V_V, V_L}
+	return BP_Result{P, y_, V_V, V_L}, nil
 }

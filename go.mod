@@ -1,6 +1,6 @@
 module github.com/leesungbin/PC-SAFT
 
-go 1.12
+go 1.13
 
 require (
 	github.com/lib/pq v1.2.0

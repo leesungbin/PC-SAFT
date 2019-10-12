@@ -32,7 +32,7 @@ func Test_BublP_init(t *testing.T) {
 
 func Test_BublP(t *testing.T) {
 	// start := time.Now()
-	got := NNN_ethane_nHexane_cyclohexane.BublP(BP_Input{T: Temperature, x_: Composition_NNN})
+	got, _ := NNN_ethane_nHexane_cyclohexane.BublP(BP_Input{T: Temperature, x_: Composition_NNN})
 	// elapsed := time.Since(start)
 	// t.Errorf("time required : %v\n", elapsed) // average 1.6~2 ms, python보다 10배 빠름
 	// 오차 1% 미만
@@ -45,7 +45,7 @@ func Test_BublP(t *testing.T) {
 		}
 	}
 
-	got = NNP_ethane_nHexane_ethanol.BublP(BP_Input{Temperature, Composition_NNP})
+	got, _ = NNP_ethane_nHexane_ethanol.BublP(BP_Input{Temperature, Composition_NNP})
 	if !PassWithAccuracyN(1, got.P, want_BublP_NNP.P) {
 		t.Errorf("Expected %v got %v", want_BublP_NNP, got)
 	}
