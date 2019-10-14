@@ -2,8 +2,7 @@ package test
 
 import (
 	"testing"
-
-	. "github.com/leesungbin/PC-SAFT/api"
+	// . "github.com/leesungbin/PC-SAFT/api"
 )
 
 func Test_PR_ab(t *testing.T) {
