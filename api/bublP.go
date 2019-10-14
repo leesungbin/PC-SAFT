@@ -10,10 +10,10 @@ type BP_Input struct {
 	x_ []float64
 }
 type BP_Result struct {
-	P   float64
-	y_  []float64
-	V_V float64
-	V_L float64
+	P   float64   `json:"P"`
+	Y_  []float64 `json:"y"`
+	V_V float64   `json:"Vvap"`
+	V_L float64   `json:"Vliq"`
 }
 type py_init struct {
 	P float64

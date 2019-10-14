@@ -8,10 +8,10 @@ type DP_Input struct {
 }
 
 type DP_Result struct {
-	P   float64
-	x_  []float64
-	V_V float64
-	V_L float64
+	P   float64   `json:"P"`
+	X_  []float64 `json:"x"`
+	V_V float64   `json:"Vvap"`
+	V_L float64   `json:"Vliq"`
 }
 
 type px_init struct {

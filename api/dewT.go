@@ -8,10 +8,10 @@ type DT_Input struct {
 }
 
 type DT_Result struct {
-	T   float64
-	x_  []float64
-	V_V float64
-	V_L float64
+	T   float64   `json:"T"`
+	X_  []float64 `json:"x"`
+	V_V float64   `json:"Vvap"`
+	V_L float64   `json:"Vliq"`
 }
 
 type tx_init struct {

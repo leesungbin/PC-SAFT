@@ -8,12 +8,12 @@ type BT_Input struct {
 }
 
 type BT_Result struct {
-	T  float64
-	y_ []float64
+	T  float64   `json:"T"`
+	Y_ []float64 `json:"y"`
 	// Volume of vapor
-	V_V float64
+	V_V float64 `json:"Vvap"`
 	// Volume of liquid
-	V_L float64
+	V_L float64 `json:"Vliq"`
 }
 
 type ty_init struct {
