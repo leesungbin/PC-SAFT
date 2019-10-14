@@ -1,16 +1,18 @@
-package api
+package test
 
 import (
 	"math"
 	"testing"
+
+	. "github.com/leesungbin/PC-SAFT/api"
 )
 
 var want_NP_benzene_water = CrossAssociatedValues{
-	eAB: [][]float64{
+	E_AB: [][]float64{
 		[]float64{0.0, 1353.35},
 		[]float64{1353.35, 2706.7},
 	},
-	kAB: [][]float64{
+	K_AB: [][]float64{
 		[]float64{0.0, 0.0},
 		[]float64{0.0, 0.08924},
 	},
@@ -18,22 +20,22 @@ var want_NP_benzene_water = CrossAssociatedValues{
 
 func Test_PrepareCrossParameter(t *testing.T) {
 	input := Comps{}
-	input.data = []Component{Benzene, Water_polar}
+	input.Data = []Component{Benzene, Water_polar}
 	got := PrepareCrossParameter(input)
 
-	for i, v := range got.eAB {
+	for i, v := range got.E_AB {
 		for j, w := range v {
-			if !PassWithAccuracy4(w, want_NP_benzene_water.eAB[i][j]) {
-				t.Errorf("%.4f %.4f", w, want_NP_benzene_water.eAB[i][j])
-				t.Errorf("water & benzene eAB expected %v but got %v, erorr at eAB[%d][%d]", want_NP_benzene_water.eAB, got.eAB, i, j)
+			if !PassWithAccuracy4(w, want_NP_benzene_water.E_AB[i][j]) {
+				t.Errorf("%.4f %.4f", w, want_NP_benzene_water.E_AB[i][j])
+				t.Errorf("water & benzene eAB expected %v but got %v, erorr at eAB[%d][%d]", want_NP_benzene_water.E_AB, got.E_AB, i, j)
 			}
 		}
 	}
-	for i, v := range got.kAB {
+	for i, v := range got.K_AB {
 		for j, w := range v {
-			if !PassWithAccuracy4(w, want_NP_benzene_water.kAB[i][j]) {
-				t.Errorf("%.4f %.4f", w, want_NP_benzene_water.kAB[i][j])
-				t.Errorf("water & benzene kAB expected %v but got %v, erorr at kAB[%d][%d]", want_NP_benzene_water.kAB, got.kAB, i, j)
+			if !PassWithAccuracy4(w, want_NP_benzene_water.K_AB[i][j]) {
+				t.Errorf("%.4f %.4f", w, want_NP_benzene_water.K_AB[i][j])
+				t.Errorf("water & benzene kAB expected %v but got %v, erorr at kAB[%d][%d]", want_NP_benzene_water.K_AB, got.K_AB, i, j)
 			}
 		}
 	}
@@ -63,7 +65,7 @@ func PassWithAccuracyN(N int, compare, want float64) bool {
 	return false
 }
 
-var NNN_FindV_newton_Input = NewtonInput{0.00010914379164188678, Pressure, Temperature, Composition_NNN}
+var NNN_FindV_newton_Input = NewtonInput{V: 0.00010914379164188678, P: Pressure, T: Temperature, Z_: Composition_NNN}
 var NNN_FindV_newton_Output = 0.00011453205172139417
 
 func Test_FindV_newton(t *testing.T) {
@@ -85,7 +87,7 @@ func Test_Peos_P(t *testing.T) {
 	}
 }
 
-var NNN_Fugacity_newton_Input = NewtonInput{0.00011453205172139417, Pressure, Temperature, Composition_NNN}
+var NNN_Fugacity_newton_Input = NewtonInput{V: 0.00011453205172139417, P: Pressure, T: Temperature, Z_: Composition_NNN}
 var NNN_Fugacity_Output_phi = []float64{2.9332610259971834, 0.05301216759321054, 0.037263385443932213}
 var NNN_Fugacity_Output_fug = []float64{10.5983798014261, 0.28731320598651555, 0.3365976537047761}
 
@@ -104,7 +106,7 @@ func Test_Fugacity(t *testing.T) {
 	}
 }
 
-var NNN_GetVolume_Input = GetVolumeInput{Pressure, Temperature, Composition_NNN, "L"}
+var NNN_GetVolume_Input = GetVolumeInput{P: Pressure, T: Temperature, Z_: Composition_NNN, State: "L"}
 
 func Test_GetVolume(t *testing.T) {
 	got, err := NNN_ethane_nHexane_cyclohexane.GetVolume(NNN_GetVolume_Input)

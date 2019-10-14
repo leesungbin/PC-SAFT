@@ -19,10 +19,10 @@ type Component struct {
 }
 
 type Comps struct {
-	data []Component
+	Data []Component `json:"data"`
 	// phi  []float64
 	// Z    float64
-	Keps [][]float64
+	Keps [][]float64 `json:"Keps"`
 }
 
 var Ethane = Component{"ethane", 30.070, 305.40, 48.800, 0.099, 184.60, 1.6069, 3.5206, 191.42, 0.000000, 0.00, 0.000, 0.00000}
@@ -32,5 +32,5 @@ var Ethanol_polar = Component{"ethanol (polar)", 46.069, 513.9, 61.4, 0.644, 351
 var Water_polar = Component{"water (polar)", 18.015, 647.3, 221.2, 0.344, 373.15, 1.0405, 2.9657, 175.15, 0.08924, 2706.7, 1.85, 0.66245}
 var Benzene = Component{"benzene", 78.114, 562.2, 48.9, 0.212, 353.2, 2.4653, 3.6478, 287.35, 0.0, 0.0, 0.0, 0.0}
 
-var NNN_ethane_nHexane_cyclohexane = &Comps{data: []Component{Ethane, Nhexane, Cyclohexane}}
-var NNP_ethane_nHexane_ethanol = &Comps{data: []Component{Ethane, Nhexane, Ethanol_polar}}
+var NNN_ethane_nHexane_cyclohexane = &Comps{Data: []Component{Ethane, Nhexane, Cyclohexane}}
+var NNP_ethane_nHexane_ethanol = &Comps{Data: []Component{Ethane, Nhexane, Ethanol_polar}}

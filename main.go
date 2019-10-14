@@ -10,6 +10,8 @@ import (
 
 	"database/sql"
 
+	"strings"
+
 	_ "github.com/lib/pq"
 )
 
@@ -39,11 +41,13 @@ func main() {
 
 func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	db := s.db
-	switch r.URL.Path {
+	url := strings.Split(r.URL.Path, "/")
+	fmt.Printf("%v\n", url)
+	switch url[1] {
 	default:
 		fmt.Fprintf(w, "PC-SAFT api server")
 		return
-	case "/init":
+	case "init":
 		success := schema.AddPreparedDB(db)
 		if success {
 			fmt.Fprintf(w, "Prepared DB added successfully.")
@@ -51,7 +55,8 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "Failed to add prepared DB.")
 		}
 		return
-	case "/calculate":
-		fmt.Fprintf(w, "다음 차례")
+	case "version":
+		fmt.Fprintf(w, "{\"version\":\"1.0\"}")
+		return
 	}
 }

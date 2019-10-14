@@ -5,14 +5,14 @@ import (
 )
 
 func (components *Comps) PR_ab(T float64, z []float64) (amix, bmix float64) {
-	nc := len(components.data)
+	nc := len(components.Data)
 	a := make([]float64, nc)
 	b := make([]float64, nc)
 	for i := 0; i < nc; i++ {
-		kapa := 0.37464 + 1.54226*components.data[i].omega - 0.26992*Pow(components.data[i].omega, 2)
-		alpha := Pow((1 + kapa*(1-math.Sqrt(T/components.data[i].Tc))), 2)
-		a[i] = 0.45724 * R * R * Pow(components.data[i].Tc, 2) / components.data[i].Pc * alpha
-		b[i] = 0.07780 * R * components.data[i].Tc / components.data[i].Pc
+		kapa := 0.37464 + 1.54226*components.Data[i].Omega - 0.26992*Pow(components.Data[i].Omega, 2)
+		alpha := Pow((1 + kapa*(1-math.Sqrt(T/components.Data[i].Tc))), 2)
+		a[i] = 0.45724 * R * R * Pow(components.Data[i].Tc, 2) / components.Data[i].Pc * alpha
+		b[i] = 0.07780 * R * components.Data[i].Tc / components.Data[i].Pc
 	}
 	for i := 0; i < nc; i++ {
 		bmix += z[i] * b[i]

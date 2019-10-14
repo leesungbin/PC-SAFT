@@ -3,8 +3,8 @@ package api
 import "math"
 
 type BT_Input struct {
-	P  float64
-	x_ []float64
+	P  float64   `json:"P"`
+	X_ []float64 `json:"x"`
 }
 
 type BT_Result struct {
@@ -16,24 +16,24 @@ type BT_Result struct {
 	V_L float64 `json:"Vliq"`
 }
 
-type ty_init struct {
-	T  float64
-	y_ []float64
-	Bp []float64
+type TY_init struct {
+	T  float64   `json:"T"`
+	Y_ []float64 `json:"y"`
+	Bp []float64 `json:"B_p"`
 }
 
-func (components *Comps) BublT_init(P float64, x_ []float64) (res ty_init) {
-	nc := len(components.data)
+func (components *Comps) BublT_init(P float64, x_ []float64) (res TY_init) {
+	nc := len(components.Data)
 	Ap := make([]float64, nc)
 	res.Bp = make([]float64, nc)
 	Ps := make([]float64, nc)
 
-	res.y_ = make([]float64, nc)
+	res.Y_ = make([]float64, nc)
 	res.T = 0.
 
 	for i := 0; i < nc; i++ {
-		B := (math.Log(components.data[i].Pc) - math.Log(1.013)) / (1./components.data[i].Tb - 1./components.data[i].Tc)
-		A := math.Log(1.013) + B/components.data[i].Tb
+		B := (math.Log(components.Data[i].Pc) - math.Log(1.013)) / (1./components.Data[i].Tb - 1./components.Data[i].Tc)
+		A := math.Log(1.013) + B/components.Data[i].Tb
 		Tbp := B / (A - math.Log(P))
 		Ap[i] = A
 		res.Bp[i] = B
@@ -42,29 +42,29 @@ func (components *Comps) BublT_init(P float64, x_ []float64) (res ty_init) {
 
 	for i := 0; i < nc; i++ {
 		Ps[i] = math.Exp(Ap[i] - res.Bp[i]/res.T)
-		res.y_[i] = x_[i] * Ps[i] / P
+		res.Y_[i] = x_[i] * Ps[i] / P
 	}
 	return
 }
 
 func (components *Comps) BublT(in BT_Input) (res BT_Result) {
-	nc := len(components.data)
+	nc := len(components.Data)
 
-	initRes := components.BublT_init(in.P, in.x_)
+	initRes := components.BublT_init(in.P, in.X_)
 	T := initRes.T
-	y_ := initRes.y_
+	y_ := initRes.Y_
 	B := 0.
 	for i := 0; i < nc; i++ {
-		B += in.x_[i] * initRes.Bp[i]
+		B += in.X_[i] * initRes.Bp[i]
 	}
 
 	// Volume of Vapor & Liquid
 	var V_V, V_L float64
 	maxit := 3000
 	for i := 0; i < maxit; i++ {
-		fvi_L := GetVolumeInput{in.P, T, in.x_, "L"}
+		fvi_L := GetVolumeInput{in.P, T, in.X_, "L"}
 		V_L, _ = components.GetVolume(fvi_L)
-		phi_L, fug_L := components.Fugacity(NewtonInput{V_L, in.P, T, in.x_})
+		phi_L, fug_L := components.Fugacity(NewtonInput{V_L, in.P, T, in.X_})
 
 		fvi_V := GetVolumeInput{in.P, T, y_, "V"}
 		V_V, _ = components.GetVolume(fvi_V)
@@ -73,7 +73,7 @@ func (components *Comps) BublT(in BT_Input) (res BT_Result) {
 		ynew := make([]float64, nc)
 		sumy := 0.
 		for j := 0; j < nc; j++ {
-			ynew[j] = in.x_[j] * (phi_L[j] / phi_V[j])
+			ynew[j] = in.X_[j] * (phi_L[j] / phi_V[j])
 			sumy += ynew[j]
 		}
 

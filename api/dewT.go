@@ -3,8 +3,8 @@ package api
 import "math"
 
 type DT_Input struct {
-	P  float64
-	y_ []float64
+	P  float64   `json:"P"`
+	Y_ []float64 `json:"y"`
 }
 
 type DT_Result struct {
@@ -14,21 +14,21 @@ type DT_Result struct {
 	V_L float64   `json:"Vliq"`
 }
 
-type tx_init struct {
-	T  float64
-	x_ []float64
-	Bp []float64
+type TX_init struct {
+	T  float64   `json:"T"`
+	X_ []float64 `json:"x"`
+	Bp []float64 `json:"B_p"`
 }
 
-func (components *Comps) DewT_init(P float64, y_ []float64) (res tx_init) {
-	nc := len(components.data)
+func (components *Comps) DewT_init(P float64, y_ []float64) (res TX_init) {
+	nc := len(components.Data)
 	Ap := make([]float64, nc)
 	res.Bp = make([]float64, nc)
 	Ps := make([]float64, nc)
 
 	for i := 0; i < nc; i++ {
-		B := (math.Log(components.data[i].Pc) - math.Log(1.013)) / (1./components.data[i].Tb - 1./components.data[i].Tc)
-		A := math.Log(1.013) + B/components.data[i].Tb
+		B := (math.Log(components.Data[i].Pc) - math.Log(1.013)) / (1./components.Data[i].Tb - 1./components.Data[i].Tc)
+		A := math.Log(1.013) + B/components.Data[i].Tb
 		Tbp := B / (A - math.Log(P))
 		Ap[i] = A
 		res.Bp[i] = B
@@ -36,24 +36,24 @@ func (components *Comps) DewT_init(P float64, y_ []float64) (res tx_init) {
 		res.T += y_[i] * Tbp
 	}
 
-	res.x_ = make([]float64, nc)
+	res.X_ = make([]float64, nc)
 	for i := 0; i < nc; i++ {
 		Ps[i] = math.Exp(Ap[i] - res.Bp[i]/res.T)
-		res.x_[i] = y_[i] * P / Ps[i]
+		res.X_[i] = y_[i] * P / Ps[i]
 	}
 	return
 }
 
 func (components *Comps) DewT(in DT_Input) (res DT_Result) {
-	nc := len(components.data)
+	nc := len(components.Data)
 
-	initRes := components.DewT_init(in.P, in.y_)
+	initRes := components.DewT_init(in.P, in.Y_)
 	T := initRes.T
-	x_ := initRes.x_
+	x_ := initRes.X_
 
 	B := 0.
 	for i := 0; i < nc; i++ {
-		B += in.y_[i] * initRes.Bp[i]
+		B += in.Y_[i] * initRes.Bp[i]
 	}
 
 	var V_V, V_L float64
@@ -63,15 +63,15 @@ func (components *Comps) DewT(in DT_Input) (res DT_Result) {
 		V_L, _ := components.GetVolume(gvi_L)
 		phi_L, fug_L := components.Fugacity(NewtonInput{V_L, in.P, T, x_})
 
-		gvi_V := GetVolumeInput{in.P, T, in.y_, "V"}
+		gvi_V := GetVolumeInput{in.P, T, in.Y_, "V"}
 		V_V, _ := components.GetVolume(gvi_V)
-		phi_V, fug_V := components.Fugacity(NewtonInput{V_V, in.P, T, in.y_})
+		phi_V, fug_V := components.Fugacity(NewtonInput{V_V, in.P, T, in.Y_})
 
 		xnew := make([]float64, nc)
 		sumx := 0.
 
 		for j := 0; j < nc; j++ {
-			xnew[j] = in.y_[j] * (phi_V[j] / phi_L[j])
+			xnew[j] = in.Y_[j] * (phi_V[j] / phi_L[j])
 			sumx += xnew[j]
 		}
 
