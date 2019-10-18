@@ -96,7 +96,22 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					id        int
 					component Component
 				)
-				if err := rows.Scan(&id, &component.Name, &component.Mw, &component.Tc, &component.Pc, &component.Omega, &component.Tb, &component.M, &component.Sig, &component.Eps, &component.K, &component.E, &component.D, &component.X); err != nil {
+				if err := rows.Scan(
+					&id,
+					&component.Name,
+					&component.Mw,
+					&component.Tc,
+					&component.Pc,
+					&component.Omega,
+					&component.Tb,
+					&component.M,
+					&component.Sig,
+					&component.Eps,
+					&component.K,
+					&component.E,
+					&component.D,
+					&component.X,
+				); err != nil {
 					fmt.Printf("err : %v\n", err)
 				}
 				// fmt.Printf("component : %v\n", component)
@@ -105,7 +120,7 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			res, err := comps.BublP(BP_Input{T: T, X_: x})
 			// fmt.Printf("%v\n", comps)
 			data, _ := json.Marshal(res)
-			fmt.Fprintf(w, "{\"data\" : %s\n}", data)
+			fmt.Fprintf(w, "{\n\"data\" : %s\n}", data)
 
 		} else {
 			fmt.Fprintf(w, "{\"msg\":\"GET request is not supported\"}")
