@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -75,6 +74,6 @@ func (components *Comps) BublP(in BP_Input) (res BP_Result, err error) {
 			return BP_Result{P, y_, V_V, V_L}, nil
 		}
 	}
-	fmt.Printf("bubbleP calculation iterated # : %d\n", i)
+	// fmt.Printf("bubbleP calculation iterated # : %d\n", i)
 	return BP_Result{P, y_, V_V, V_L}, nil
 }

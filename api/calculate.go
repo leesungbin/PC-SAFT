@@ -93,7 +93,7 @@ func (components *Comps) FindV_newton(in NewtonInput) (Vres float64, err error) 
 	for i := 0; i < max_iter; i++ {
 		f = components.Peos_P(NewtonInput{V, in.P, in.T, in.Z_})
 		if math.Abs(f/in.P) < 1e-2 { // 정확도 1e-5까지 가는 경우가 잘 없다.
-			fmt.Printf("iterated for %d times\nfindV_newton end : V, : %v\nconverged rate : %v\n", i, V, f/in.P)
+			// fmt.Printf("iterated for %d times\nfindV_newton end : V, : %v\nconverged rate : %v\n", i, V, f/in.P)
 			return V, nil
 		}
 		V = V + dV
@@ -105,7 +105,7 @@ func (components *Comps) FindV_newton(in NewtonInput) (Vres float64, err error) 
 		delV := -f / dfdV * 0.95
 		V += delV
 	}
-	fmt.Printf("iterated for %d times\nfindV_newton end : V, : %v\nconverged rate : %v\n", max_iter, V, f/in.P)
+	// fmt.Printf("iterated for %d times\nfindV_newton end : V, : %v\nconverged rate : %v\n", max_iter, V, f/in.P)
 	return V, nil
 }
 
