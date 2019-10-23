@@ -12,12 +12,10 @@ import (
 	. "github.com/leesungbin/PC-SAFT/api"
 	"github.com/leesungbin/PC-SAFT/env"
 	"github.com/leesungbin/PC-SAFT/schema"
-	"github.com/leesungbin/PC-SAFT/ternary"
 
 	"strings"
 
 	_ "github.com/lib/pq"
-	
 )
 
 type Service struct {
@@ -107,20 +105,16 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				// fmt.Printf("component : %v\n", component)
 				comps.Data[i] = component
 			}
-			if nc != 3 {
-				res, err := comps.BublP(BP_Input{T: T, X_: x})
-				// fmt.Printf("%v\n", comps)
-				if err != nil {
-					fmt.Fprintf(w, "{\n\"status\": 0\n")
-				}
-				data, _ := json.Marshal(res)
-				if err != nil {
-					fmt.Fprintf(w, "{\n\"status\": 1\n")
-				}
-				fmt.Fprintf(w, "{\n\"data\" : %s\n}", data)
-			} else { // ternary calculation
-
+			res, err := comps.BublP(BP_Input{T: T, X_: x})
+			// fmt.Printf("%v\n", comps)
+			if err != nil {
+				fmt.Fprintf(w, "{\n\"status\": 0}\n")
 			}
+			data, _ := json.Marshal(res)
+			if err != nil {
+				fmt.Fprintf(w, "{\n\"status\": \"marshal failed\"}\n")
+			}
+			fmt.Fprintf(w, "{\n\"data\" : %s\n}", data)
 
 		} else {
 			fmt.Fprintf(w, "{\"msg\":\"GET request is not supported\"}")

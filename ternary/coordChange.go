@@ -12,7 +12,7 @@ import (
 B  -  C
 (a,b,c)
 */
-func xy2abc(x, y float64) (a, b, c float64, err error) {
+func Xy2abc(x, y float64) (a, b, c float64, err error) {
 	sq3 := math.Sqrt(3)
 	if y < 0 {
 		err = errors.New("y < BC line\n")
@@ -29,7 +29,7 @@ func xy2abc(x, y float64) (a, b, c float64, err error) {
 	return
 }
 
-func abc2xy(a, b, c float64) (x, y float64, err error) {
+func Abc2xy(a, b, c float64) (x, y float64, err error) {
 	sq3 := math.Sqrt(3)
 	if a+b+c < 0.9999 || a+b+c > 1.0001 {
 		err = errors.New("a+b+c != 1\n")

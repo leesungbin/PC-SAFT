@@ -102,7 +102,7 @@ func (components *Comps) FindV_newton(in NewtonInput) (Vres float64, err error) 
 		if math.Abs(dfdV*V/in.P) < 1e-5 {
 			return V, errors.New("Convergence error")
 		}
-		delV := -f / dfdV * 0.95
+		delV := -f / dfdV * 0.5
 		V += delV
 	}
 	// fmt.Printf("iterated for %d times\nfindV_newton end : V, : %v\nconverged rate : %v\n", max_iter, V, f/in.P)

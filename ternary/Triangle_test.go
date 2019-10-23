@@ -5,6 +5,6 @@ import (
 )
 
 func Test_Cover(t *testing.T) {
-	Cover()
-	t.Errorf("hi\n")
+	data := Cover()
+	t.Errorf("%v\n", data)
 }
