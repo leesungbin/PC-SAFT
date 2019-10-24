@@ -12,6 +12,8 @@ elif [ $COMMAND = "db:migrate" ]; then
     psql $POSTGRES_URL -f schema/schema.sql
 # elif [ $COMMAND = "db:default" ]; then
 #     python3 ./schema/data_parsing.py
+elif [ $COMMAND = "serve" ]; then
+    ./main
 else
     echo "Unsupported Command: $COMMAND"
 fi
