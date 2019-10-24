@@ -24,5 +24,4 @@ func Test_abc2xy(t *testing.T) {
 		t.Errorf("error: %v\n", err)
 	}
 	fmt.Printf("%f %f\n", x, y)
-
 }
