@@ -9,8 +9,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-
-	"github.com/leesungbin/PC-SAFT/env"
 )
 
 type Component struct {
@@ -80,7 +78,7 @@ func AddPreparedDB(db *sql.DB) bool {
 				fmt.Println("Successfully deleted.")
 			}
 		}
-		components := listOfFiles(env.GetAppEnv().DEFAULT_DATA_PATH)
+		components := listOfFiles("../components")
 		query := "INSERT INTO component VALUES "
 		for i, comp := range components {
 			// fmt.Printf("%s %v\n", comp.Name, comp.Data)

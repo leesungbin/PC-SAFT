@@ -122,13 +122,16 @@ func (components *Comps) GetVolume(in GetVolumeInput) (V float64, err error) {
 	V, err = components.FindV_newton(NewtonInput{V0, in.P, in.T, in.Z_})
 	// Log(fmt.Sprintf("After Find V_newton : %v", V))
 	if err != nil {
-		return V, errors.New(fmt.Sprintf("%v\n", err))
+		return V, errors.New(err.Error())
 	}
 	return V, nil
 }
 
-func (components *Comps) Fugacity(in NewtonInput) (phi, fug []float64) {
-	res, _ := components.PCsaft(PCsaftInput{in.V, in.T, in.Z_})
+func (components *Comps) Fugacity(in NewtonInput) (phi, fug []float64, err error) {
+	res, err := components.PCsaft(PCsaftInput{in.V, in.T, in.Z_})
+	if err != nil {
+		return phi, fug, err
+	}
 	if len(res.Phi) == 1 && (res.Phi)[0] == 0 {
 		fmt.Println("0 fugacity")
 		fug = []float64{0}
@@ -139,5 +142,5 @@ func (components *Comps) Fugacity(in NewtonInput) (phi, fug []float64) {
 		}
 	}
 
-	return res.Phi, fug
+	return res.Phi, fug, nil
 }

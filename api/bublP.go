@@ -43,12 +43,25 @@ func (components *Comps) BublP(in BP_Input) (res BP_Result, err error) {
 	var V_V, V_L float64
 	for i = 0; i < maxit; i++ {
 		fvi_L := GetVolumeInput{P, in.T, in.X_, "L"}
-		V_L, err = components.GetVolume(fvi_L)
-		phi_L, fug_L := components.Fugacity(NewtonInput{V_L, P, in.T, in.X_})
+		V_L, err_l1 := components.GetVolume(fvi_L)
+		if err_l1 != nil {
+			return BP_Result{}, err_l1
+		}
+
+		phi_L, fug_L, err_l2 := components.Fugacity(NewtonInput{V_L, P, in.T, in.X_})
+		if err_l1 != nil {
+			return BP_Result{}, err_l2
+		}
 
 		fvi_V := GetVolumeInput{P, in.T, y_, "V"}
-		V_V, err = components.GetVolume(fvi_V)
-		phi_V, fug_V := components.Fugacity(NewtonInput{V_V, P, in.T, y_})
+		V_V, err_v1 := components.GetVolume(fvi_V)
+		if err_v1 != nil {
+			return BP_Result{}, err_v1
+		}
+		phi_V, fug_V, err_v2 := components.Fugacity(NewtonInput{V_V, P, in.T, y_})
+		if err_v2 != nil {
+			return BP_Result{}, err_v2
+		}
 
 		// adjust y composition
 		nc := len(components.Data)

@@ -108,14 +108,15 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			res, err := comps.BublP(BP_Input{T: T, X_: x})
 			// fmt.Printf("%v\n", comps)
 			if err != nil {
-				fmt.Fprintf(w, "{\n\"status\": 0}\n")
+				fmt.Fprintf(w, "{\n\"status\": 0, \"error\": \"%s\"\n}", err)
+				return
 			}
 			data, _ := json.Marshal(res)
 			if err != nil {
 				fmt.Fprintf(w, "{\n\"status\": \"marshal failed\"}\n")
+				return
 			}
 			fmt.Fprintf(w, "{\n\"data\" : %s\n}", data)
-
 		} else {
 			fmt.Fprintf(w, "{\"msg\":\"GET request is not supported\"}")
 		}

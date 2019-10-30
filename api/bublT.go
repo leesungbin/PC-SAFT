@@ -64,11 +64,11 @@ func (components *Comps) BublT(in BT_Input) (res BT_Result) {
 	for i := 0; i < maxit; i++ {
 		fvi_L := GetVolumeInput{in.P, T, in.X_, "L"}
 		V_L, _ = components.GetVolume(fvi_L)
-		phi_L, fug_L := components.Fugacity(NewtonInput{V_L, in.P, T, in.X_})
+		phi_L, fug_L, _ := components.Fugacity(NewtonInput{V_L, in.P, T, in.X_})
 
 		fvi_V := GetVolumeInput{in.P, T, y_, "V"}
 		V_V, _ = components.GetVolume(fvi_V)
-		phi_V, fug_V := components.Fugacity(NewtonInput{V_V, in.P, T, y_})
+		phi_V, fug_V, _ := components.Fugacity(NewtonInput{V_V, in.P, T, y_})
 
 		ynew := make([]float64, nc)
 		sumy := 0.

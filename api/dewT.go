@@ -61,11 +61,11 @@ func (components *Comps) DewT(in DT_Input) (res DT_Result) {
 	for i := 0; i < maxit; i++ {
 		gvi_L := GetVolumeInput{in.P, T, x_, "L"}
 		V_L, _ := components.GetVolume(gvi_L)
-		phi_L, fug_L := components.Fugacity(NewtonInput{V_L, in.P, T, x_})
+		phi_L, fug_L, _ := components.Fugacity(NewtonInput{V_L, in.P, T, x_})
 
 		gvi_V := GetVolumeInput{in.P, T, in.Y_, "V"}
 		V_V, _ := components.GetVolume(gvi_V)
-		phi_V, fug_V := components.Fugacity(NewtonInput{V_V, in.P, T, in.Y_})
+		phi_V, fug_V, _ := components.Fugacity(NewtonInput{V_V, in.P, T, in.Y_})
 
 		xnew := make([]float64, nc)
 		sumx := 0.
