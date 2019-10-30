@@ -37,7 +37,7 @@ func main() {
 		s = &Service{db: db}
 	}
 
-	port := fmt.Sprintf(":%s", env.APP_PORT)
+	port := fmt.Sprintf(":%s", env.PORT)
 	fmt.Printf("PORT%s\n", port)
 	log.Fatal(http.ListenAndServe(port, s))
 
