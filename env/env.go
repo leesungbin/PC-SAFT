@@ -6,19 +6,22 @@ import (
 )
 
 type SaftEnv struct {
-	APP_NAME          string
-	PORT              string
-	POSTGRES_URL      string
-	DEFAULT_DATA_PATH string
-	POSTGRES_DBNAME   string
+	APP_NAME        string
+	PORT            string
+	POSTGRES_URL    string
+	POSTGRES_DBNAME string
+	USER            string
+	PASS            string
 }
 
 func GetAppEnv() SaftEnv {
 	return SaftEnv{
-		APP_NAME:          getLocalEnv("APP_NAME"),
-		PORT:              getLocalEnv("PORT"),
-		POSTGRES_URL:      getLocalEnv("POSTGRES_URL"),
-		DEFAULT_DATA_PATH: getLocalEnv("DEFAULT_DATA_PATH"),
+		APP_NAME:        getLocalEnv("APP_NAME"),
+		PORT:            getLocalEnv("PORT"),
+		POSTGRES_URL:    getLocalEnv("POSTGRES_URL"),
+		POSTGRES_DBNAME: getLocalEnv("POSTGRES_DBNAME"),
+		USER:            getLocalEnv("USER"),
+		PASS:            getLocalEnv("PASS"),
 	}
 }
 
