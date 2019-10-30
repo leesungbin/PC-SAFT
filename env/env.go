@@ -17,7 +17,7 @@ type SaftEnv struct {
 func GetAppEnv() SaftEnv {
 	return SaftEnv{
 		APP_NAME:        getLocalEnv("APP_NAME"),
-		PORT:            getLocalEnv("PORT"),
+		APP_PORT:        getLocalEnv("APP_PORT"),
 		POSTGRES_URL:    getLocalEnv("POSTGRES_URL"),
 		POSTGRES_DBNAME: getLocalEnv("POSTGRES_DBNAME"),
 		USER:            getLocalEnv("USER"),
