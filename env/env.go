@@ -7,7 +7,7 @@ import (
 
 type SaftEnv struct {
 	APP_NAME        string
-	PORT            string
+	APP_PORT        string
 	POSTGRES_URL    string
 	POSTGRES_DBNAME string
 	USER            string
