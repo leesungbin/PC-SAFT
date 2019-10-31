@@ -12,6 +12,7 @@ type SaftEnv struct {
 	POSTGRES_DBNAME string
 	USER            string
 	PASS            string
+	DEBUG           string
 }
 
 func GetAppEnv() SaftEnv {
@@ -22,6 +23,7 @@ func GetAppEnv() SaftEnv {
 		POSTGRES_DBNAME: getLocalEnv("POSTGRES_DBNAME"),
 		USER:            getLocalEnv("USER"),
 		PASS:            getLocalEnv("PASS"),
+		DEBUG:           getLocalEnv("DEBUG"),
 	}
 }
 
