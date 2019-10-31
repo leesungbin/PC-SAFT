@@ -28,7 +28,8 @@ func main() {
 	// values := fmt.Sprintln(env)
 	// fmt.Println(values)
 	// prop := fmt.Sprintf("dbname=%s sslmode=disable", env.POSTGRES_DBNAME)
-	db, err := sql.Open("postgres", "dbname=pcsaft sslmode=disable")
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", env.POSTGRES_URL, env.USER, env.PASS, env.POSTGRES_DBNAME)
+	db, err := sql.Open("postgres", dsn)
 
 	if err != nil {
 		fmt.Println("db connection failed")
