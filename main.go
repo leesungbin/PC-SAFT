@@ -6,12 +6,13 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"database/sql"
 
 	. "github.com/leesungbin/PC-SAFT/api"
 	"github.com/leesungbin/PC-SAFT/env"
-	"github.com/leesungbin/PC-SAFT/parsing"
+	"github.com/leesungbin/PC-SAFT/pp"
 	"github.com/leesungbin/PC-SAFT/ternary"
 
 	"strings"
@@ -118,6 +119,7 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 
+	// only for ternary equilibrium
 	case "equil":
 		if r.Method == "POST" {
 			r.ParseForm()
@@ -154,16 +156,61 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 
 			if res_parse.T != 0. {
-				ternary.Cover()
-				resChan := make([]BP_Result)
+				plots := ternary.Cover()
+				nc := len(plots)
+				resChan := make([]chan BP_Result, nc)
+				equilData := make([]BP_Result, nc)
+				for i := 0; i < len(plots); i++ {
+					resChan[i] = make(chan BP_Result)
+				}
 
+				// parrallel processing
+				for i, plot := range plots {
+					go func(idx int) {
+						a, b, c, _ := ternary.Xy2abc(plot.X, plot.Y)
+
+						var timeout_channel chan bool
+						go func(res chan BP_Result) {
+							r, e := comps.BublP(BP_Input{T: res_parse.T, X_: []float64{a, b, c}})
+							// when calculation error occurs,
+							if e != nil {
+								// return empty result
+								resChan[idx] <- BP_Result{}
+							} else {
+								resChan[idx] <- r
+								timeout_channel <- false
+							}
+						}(resChan[idx])
+
+						// check timeout
+						select {
+						case _ = <-timeout_channel:
+							return
+
+							// when calculation timeout
+						case <-time.After(4 * time.Second):
+							// return empty result
+							resChan[idx] <- BP_Result{}
+							return
+						}
+					}(i)
+				}
+
+				for i := 0; i < nc; i++ {
+					equilData[i] = <-resChan[i]
+				}
+				res_json := map[string][]BP_Result{"data": equilData}
+				print, _ := json.Marshal(res_json)
+				fmt.Fprintf(w, "%s", print)
 			} else if res_parse.P != 0. {
-				resChan := make([]BT_Result)
+				plots := ternary.Cover()
+				resChan := make([]chan BT_Result, len(plots))
+				for i := 0; i < len(plots); i++ {
+					resChan[i] = make(chan BT_Result)
+				}
 			} else {
 				// error input
 			}
-
-			res_parse.Nc
 
 		}
 		return
