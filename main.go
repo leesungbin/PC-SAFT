@@ -65,9 +65,7 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 
 	case "version":
-		res_json := map[string]string{
-			"version": "1.0",
-		}
+		res_json := map[string]string{"version": "1.0"}
 		print, _ := json.Marshal(res_json)
 		fmt.Fprintf(w, "%s", print)
 		return
@@ -77,15 +75,14 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			r.ParseForm()
 			form := r.Form
 			res_parse, err_parse := parser.Post(form)
+
 			if err_parse != nil {
-				res_json := map[string]interface{}{
-					"status": 400,
-					"error":  err_parse,
-				}
+				res_json := map[string]interface{}{"status": 400, "error": err_parse}
 				print, _ := json.Marshal(res_json)
 				fmt.Fprintf(w, "%s", print)
 				return
 			}
+
 			rows, err := db.Query(res_parse.SelectQuery)
 			if err != nil {
 				fmt.Printf("%v\n", err)
@@ -107,24 +104,29 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 				comps.Data[i] = component
 			}
+
 			res, err := comps.BublP(BP_Input{T: res_parse.T, X_: res_parse.X_})
 			if err != nil {
-				res_json := map[string]interface{}{
-					"status": 0,
-					"error":  err,
-				}
+				res_json := map[string]interface{}{"status": 0, "error": err}
 				print, _ := json.Marshal(res_json)
 				fmt.Fprintf(w, "%s", print)
 				return
 			}
+
 			data, _ := json.Marshal(res)
 			if err != nil {
-				fmt.Fprintf(w, "{\n\"status\": \"marshal failed\"}\n")
+				res_json := map[string]string{"status": "marshal failed"}
+				print, _ := json.Marshal(res_json)
+				fmt.Fprintf(w, "%s", print)
 				return
 			}
-			fmt.Fprintf(w, "{\n\"data\" : %s\n}", data)
+			res_json := map[string]interface{}{"data": data}
+			print, _ := json.Marshal(res_json)
+			fmt.Fprintf(w, "%s", print)
 		} else {
-			fmt.Fprintf(w, "{\"msg\":\"GET request is not supported\"}")
+			res_json := map[string]string{"msg": "GET request is not supprted"}
+			print, _ := json.Marshal(res_json)
+			fmt.Fprintf(w, "%s", print)
 		}
 		return
 	case "equil":
