@@ -31,6 +31,7 @@ func main() {
 	db, err := sql.Open("postgres", "dbname=pcsaft sslmode=disable")
 
 	if err != nil {
+		fmt.Println("db connection failed")
 		panic(err)
 	} else {
 		fmt.Println("db connected.")
