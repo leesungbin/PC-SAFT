@@ -12,7 +12,7 @@ import (
 
 	. "github.com/leesungbin/PC-SAFT/api"
 	"github.com/leesungbin/PC-SAFT/env"
-	"github.com/leesungbin/PC-SAFT/pp"
+	"github.com/leesungbin/PC-SAFT/parser"
 	"github.com/leesungbin/PC-SAFT/ternary"
 
 	"strings"
@@ -70,7 +70,7 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "POST" {
 			r.ParseForm()
 			form := r.Form
-			res_parse, err_parse := parsing.Post(form)
+			res_parse, err_parse := parser.Post(form)
 
 			if err_parse != nil {
 				res_json := map[string]interface{}{"status": 400, "error": err_parse}
@@ -124,7 +124,7 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "POST" {
 			r.ParseForm()
 			form := r.Form
-			res_parse, err_parse := parsing.Post(form)
+			res_parse, err_parse := parser.Post(form)
 
 			if err_parse != nil {
 				res_json := map[string]interface{}{"status": 400, "error": err_parse}
