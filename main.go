@@ -11,7 +11,6 @@ import (
 	. "github.com/leesungbin/PC-SAFT/api"
 	"github.com/leesungbin/PC-SAFT/env"
 	"github.com/leesungbin/PC-SAFT/parser"
-	"github.com/leesungbin/PC-SAFT/schema"
 
 	"strings"
 
@@ -54,16 +53,14 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	default:
 		fmt.Fprintf(w, "PC-SAFT api server")
 		return
-
-	case "init":
-		success := schema.AddPreparedDB(db)
-		if success {
-			fmt.Fprintf(w, "Prepared DB added successfully.")
-		} else {
-			fmt.Fprintf(w, "Failed to add prepared DB.")
-		}
-		return
-
+	// case "init":
+	// 	success := schema.AddPreparedDB(db)
+	// 	if success {
+	// 		fmt.Fprintf(w, "Prepared DB added successfully.")
+	// 	} else {
+	// 		fmt.Fprintf(w, "Failed to add prepared DB.")
+	// 	}
+	// 	return
 	case "version":
 		res_json := map[string]string{"version": "1.0"}
 		print, _ := json.Marshal(res_json)
@@ -120,7 +117,7 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintf(w, "%s", print)
 				return
 			}
-			res_json := map[string]interface{}{"data": data}
+			res_json := map[string]interface{}{"data": fmt.Sprintf("\"%s\"", data)}
 			print, _ := json.Marshal(res_json)
 			fmt.Fprintf(w, "%s", print)
 		} else {
