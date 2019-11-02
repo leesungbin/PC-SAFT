@@ -80,7 +80,7 @@ func Test_FindV_newton(t *testing.T) {
 }
 
 func Test_Peos_P(t *testing.T) {
-	got := NNN_ethane_nHexane_cyclohexane.Peos_P(NNN_FindV_newton_Input)
+	got, _ := NNN_ethane_nHexane_cyclohexane.Peos_P(NNN_FindV_newton_Input)
 	want := 216.21032034626552
 	if !PassWithAccuracy4(got, want) {
 		t.Errorf("got %v, expected %v\n", got, want)
@@ -92,7 +92,7 @@ var NNN_Fugacity_Output_phi = []float64{2.9332610259971834, 0.05301216759321054,
 var NNN_Fugacity_Output_fug = []float64{10.5983798014261, 0.28731320598651555, 0.3365976537047761}
 
 func Test_Fugacity(t *testing.T) {
-	got_phi, got_fug := NNN_ethane_nHexane_cyclohexane.Fugacity(NNN_Fugacity_newton_Input)
+	got_phi, got_fug, _ := NNN_ethane_nHexane_cyclohexane.Fugacity(NNN_Fugacity_newton_Input)
 	want_phi := NNN_Fugacity_Output_phi
 	want_fug := NNN_Fugacity_Output_fug
 

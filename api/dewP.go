@@ -2,24 +2,12 @@ package api
 
 import "math"
 
-type DP_Input struct {
-	T  float64   `json:"T"`
-	Y_ []float64 `json:"y"`
-}
-
-type DP_Result struct {
-	P   float64   `json:"P"`
-	X_  []float64 `json:"x"`
-	V_V float64   `json:"Vvap"`
-	V_L float64   `json:"Vliq"`
-}
-
 type PX_init struct {
 	P  float64   `json:"P"`
 	X_ []float64 `json:"x"`
 }
 
-func (components *Comps) DewP_init(T float64, y_ []float64) (res PX_init) {
+func DewP_init(components Comps, T float64, y_ []float64) (res PX_init) {
 	nc := len(components.Data)
 	Ps := make([]float64, nc)
 	res.X_ = make([]float64, nc)
@@ -39,9 +27,9 @@ func (components *Comps) DewP_init(T float64, y_ []float64) (res PX_init) {
 	return
 }
 
-func (components *Comps) DewP(in DP_Input) (res DP_Result) {
+func DewP(components Comps, in Eq_Input) (res Eq_Result) {
 	nc := len(components.Data)
-	initRes := components.DewP_init(in.T, in.Y_)
+	initRes := DewP_init(components, in.T, in.Y_)
 	P := initRes.P
 	x_ := initRes.X_
 
@@ -49,12 +37,12 @@ func (components *Comps) DewP(in DP_Input) (res DP_Result) {
 	maxit := 3000
 	for i := 0; i < maxit; i++ {
 		gvi_L := GetVolumeInput{P, in.T, x_, "L"}
-		V_L, _ = components.GetVolume(gvi_L)
-		phi_L, fug_L, _ := components.Fugacity(NewtonInput{V_L, P, in.T, x_})
+		V_L, _ = GetVolume(components, gvi_L)
+		phi_L, fug_L, _ := Fugacity(components, NewtonInput{V_L, P, in.T, x_})
 
 		gvi_V := GetVolumeInput{P, in.T, in.Y_, "V"}
-		V_V, _ = components.GetVolume(gvi_V)
-		phi_V, fug_V, _ := components.Fugacity(NewtonInput{V_V, P, in.T, in.Y_})
+		V_V, _ = GetVolume(components, gvi_V)
+		phi_V, fug_V, _ := Fugacity(components, NewtonInput{V_V, P, in.T, in.Y_})
 
 		xnew := make([]float64, nc)
 		sumx := 0.
@@ -77,8 +65,8 @@ func (components *Comps) DewP(in DP_Input) (res DP_Result) {
 		P = Pnew
 		x_ = xnew
 		if math.Abs(V_V-V_L)/V_V < 1e-5 {
-			return DP_Result{P, x_, V_V, V_L}
+			return Eq_Result{P, in.T, x_, in.Y_, V_V, V_L}
 		}
 	}
-	return DP_Result{P, x_, V_V, V_L}
+	return Eq_Result{P, in.T, x_, in.Y_, V_V, V_L}
 }

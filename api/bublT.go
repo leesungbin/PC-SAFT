@@ -1,20 +1,9 @@
 package api
 
-import "math"
-
-type BT_Input struct {
-	P  float64   `json:"P"`
-	X_ []float64 `json:"x"`
-}
-
-type BT_Result struct {
-	T  float64   `json:"T"`
-	Y_ []float64 `json:"y"`
-	// Volume of vapor
-	V_V float64 `json:"Vvap"`
-	// Volume of liquid
-	V_L float64 `json:"Vliq"`
-}
+import (
+	"errors"
+	"math"
+)
 
 type TY_init struct {
 	T  float64   `json:"T"`
@@ -22,7 +11,7 @@ type TY_init struct {
 	Bp []float64 `json:"B_p"`
 }
 
-func (components *Comps) BublT_init(P float64, x_ []float64) (res TY_init) {
+func BublT_init(components Comps, P float64, x_ []float64) (res TY_init) {
 	nc := len(components.Data)
 	Ap := make([]float64, nc)
 	res.Bp = make([]float64, nc)
@@ -47,10 +36,11 @@ func (components *Comps) BublT_init(P float64, x_ []float64) (res TY_init) {
 	return
 }
 
-func (components *Comps) BublT(in BT_Input) (res BT_Result) {
+func BublT(components Comps, in Eq_Input) (res Eq_Result, err error) {
+	var sumy float64
 	nc := len(components.Data)
 
-	initRes := components.BublT_init(in.P, in.X_)
+	initRes := BublT_init(components, in.P, in.X_)
 	T := initRes.T
 	y_ := initRes.Y_
 	B := 0.
@@ -63,15 +53,28 @@ func (components *Comps) BublT(in BT_Input) (res BT_Result) {
 	maxit := 3000
 	for i := 0; i < maxit; i++ {
 		fvi_L := GetVolumeInput{in.P, T, in.X_, "L"}
-		V_L, _ = components.GetVolume(fvi_L)
-		phi_L, fug_L, _ := components.Fugacity(NewtonInput{V_L, in.P, T, in.X_})
+		V_L, err_l1 := GetVolume(components, fvi_L)
+		if err_l1 != nil {
+			return Eq_Result{}, err_l1
+		}
+
+		phi_L, fug_L, err_l2 := Fugacity(components, NewtonInput{V_L, in.P, T, in.X_})
+		if err_l2 != nil {
+			return Eq_Result{}, err_l2
+		}
 
 		fvi_V := GetVolumeInput{in.P, T, y_, "V"}
-		V_V, _ = components.GetVolume(fvi_V)
-		phi_V, fug_V, _ := components.Fugacity(NewtonInput{V_V, in.P, T, y_})
+		V_V, err_v1 := GetVolume(components, fvi_V)
+		if err_v1 != nil {
+			return Eq_Result{}, err_v1
+		}
+		phi_V, fug_V, err_v2 := Fugacity(components, NewtonInput{V_V, in.P, T, y_})
+		if err_v2 != nil {
+			return Eq_Result{}, err_v2
+		}
 
 		ynew := make([]float64, nc)
-		sumy := 0.
+		sumy = 0.
 		for j := 0; j < nc; j++ {
 			ynew[j] = in.X_[j] * (phi_L[j] / phi_V[j])
 			sumy += ynew[j]
@@ -92,8 +95,11 @@ func (components *Comps) BublT(in BT_Input) (res BT_Result) {
 		y_ = ynew
 
 		if math.Abs(V_V-V_L)/V_V < 1e-5 { // for single phase
-			return BT_Result{T, y_, V_V, V_L}
+			return Eq_Result{in.P, T, in.X_, y_, V_V, V_L}, nil
 		}
 	}
-	return BT_Result{T, y_, V_V, V_L}
+	if sumy > 1.0001 {
+		return Eq_Result{}, errors.New("calc failed : y > 1")
+	}
+	return Eq_Result{in.P, T, in.X_, y_, V_V, V_L}, nil
 }

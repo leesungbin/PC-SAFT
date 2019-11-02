@@ -72,32 +72,42 @@ type NewtonInput struct {
 	Z_ []float64 `json:"z"`
 }
 
-func (components *Comps) Peos_P(in NewtonInput) (f float64) {
+func Peos_P(components Comps, in NewtonInput) (f float64, err error) {
 	// fmt.Printf("	Peos_P input : %v\n", in)
-	res, err := components.PCsaft(PCsaftInput{in.V, in.T, in.Z_})
+	res, err := PCsaft(components, PCsaftInput{in.V, in.T, in.Z_})
 	// fmt.Printf("		PCsaft res : %v\n", res)
 	if err != nil {
-		fmt.Printf("Peos_P got error while PCsaft : %v\n", err)
+		err = errors.New(fmt.Sprintf("Peos_P got error while PCsaft : %v\n", err))
+		return f, err
 	}
 	Peos := R * in.T / in.V * res.Z
 	f = Peos - in.P
 	// Log(fmt.Sprintf("Peos_P : %v %v", Peos, in.P))
-	return f
+	return f, nil
 }
 
-func (components *Comps) FindV_newton(in NewtonInput) (Vres float64, err error) {
-	var f float64
+func FindV_newton(components Comps, in NewtonInput) (Vres float64, err error) {
+	var f, f_next float64
 	max_iter := 100
 	V := in.V
 	dV := V * 1e-5
 	for i := 0; i < max_iter; i++ {
-		f = components.Peos_P(NewtonInput{V, in.P, in.T, in.Z_})
+		f, err = Peos_P(components, NewtonInput{V, in.P, in.T, in.Z_})
+		if err != nil {
+			return V, err
+		}
+
 		if math.Abs(f/in.P) < 1e-2 { // 정확도 1e-5까지 가는 경우가 잘 없다.
 			// fmt.Printf("iterated for %d times\nfindV_newton end : V, : %v\nconverged rate : %v\n", i, V, f/in.P)
 			return V, nil
 		}
+
 		V = V + dV
-		f_next := components.Peos_P(NewtonInput{V, in.P, in.T, in.Z_})
+		f_next, err = Peos_P(components, NewtonInput{V, in.P, in.T, in.Z_})
+		if err != nil {
+			return V, err
+		}
+
 		dfdV := (f_next - f) / dV
 		if math.Abs(dfdV*V/in.P) < 1e-5 {
 			return V, errors.New("Convergence error")
@@ -109,8 +119,8 @@ func (components *Comps) FindV_newton(in NewtonInput) (Vres float64, err error) 
 	return V, nil
 }
 
-func (components *Comps) GetVolume(in GetVolumeInput) (V float64, err error) {
-	Vvap, Vliq := components.PR_vol(in.P, in.T, in.Z_)
+func GetVolume(components Comps, in GetVolumeInput) (V float64, err error) {
+	Vvap, Vliq := PR_vol(components, in.P, in.T, in.Z_)
 
 	var V0 float64
 	if in.State == "V" {
@@ -119,7 +129,7 @@ func (components *Comps) GetVolume(in GetVolumeInput) (V float64, err error) {
 		V0 = Vliq * 0.99 // set scalVl0 = 0.99
 	}
 	// Log(fmt.Sprintf("GetVolume : %v", V0))
-	V, err = components.FindV_newton(NewtonInput{V0, in.P, in.T, in.Z_})
+	V, err = FindV_newton(components, NewtonInput{V0, in.P, in.T, in.Z_})
 	// Log(fmt.Sprintf("After Find V_newton : %v", V))
 	if err != nil {
 		return V, errors.New(err.Error())
@@ -127,8 +137,8 @@ func (components *Comps) GetVolume(in GetVolumeInput) (V float64, err error) {
 	return V, nil
 }
 
-func (components *Comps) Fugacity(in NewtonInput) (phi, fug []float64, err error) {
-	res, err := components.PCsaft(PCsaftInput{in.V, in.T, in.Z_})
+func Fugacity(components Comps, in NewtonInput) (phi, fug []float64, err error) {
+	res, err := PCsaft(components, PCsaftInput{in.V, in.T, in.Z_})
 	if err != nil {
 		return phi, fug, err
 	}

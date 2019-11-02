@@ -2,25 +2,13 @@ package api
 
 import "math"
 
-type DT_Input struct {
-	P  float64   `json:"P"`
-	Y_ []float64 `json:"y"`
-}
-
-type DT_Result struct {
-	T   float64   `json:"T"`
-	X_  []float64 `json:"x"`
-	V_V float64   `json:"Vvap"`
-	V_L float64   `json:"Vliq"`
-}
-
 type TX_init struct {
 	T  float64   `json:"T"`
 	X_ []float64 `json:"x"`
 	Bp []float64 `json:"B_p"`
 }
 
-func (components *Comps) DewT_init(P float64, y_ []float64) (res TX_init) {
+func DewT_init(components Comps, P float64, y_ []float64) (res TX_init) {
 	nc := len(components.Data)
 	Ap := make([]float64, nc)
 	res.Bp = make([]float64, nc)
@@ -44,10 +32,10 @@ func (components *Comps) DewT_init(P float64, y_ []float64) (res TX_init) {
 	return
 }
 
-func (components *Comps) DewT(in DT_Input) (res DT_Result) {
+func DewT(components Comps, in Eq_Input) (res Eq_Result) {
 	nc := len(components.Data)
 
-	initRes := components.DewT_init(in.P, in.Y_)
+	initRes := DewT_init(components, in.P, in.Y_)
 	T := initRes.T
 	x_ := initRes.X_
 
@@ -60,12 +48,12 @@ func (components *Comps) DewT(in DT_Input) (res DT_Result) {
 	maxit := 3000
 	for i := 0; i < maxit; i++ {
 		gvi_L := GetVolumeInput{in.P, T, x_, "L"}
-		V_L, _ := components.GetVolume(gvi_L)
-		phi_L, fug_L, _ := components.Fugacity(NewtonInput{V_L, in.P, T, x_})
+		V_L, _ := GetVolume(components, gvi_L)
+		phi_L, fug_L, _ := Fugacity(components, NewtonInput{V_L, in.P, T, x_})
 
 		gvi_V := GetVolumeInput{in.P, T, in.Y_, "V"}
-		V_V, _ := components.GetVolume(gvi_V)
-		phi_V, fug_V, _ := components.Fugacity(NewtonInput{V_V, in.P, T, in.Y_})
+		V_V, _ := GetVolume(components, gvi_V)
+		phi_V, fug_V, _ := Fugacity(components, NewtonInput{V_V, in.P, T, in.Y_})
 
 		xnew := make([]float64, nc)
 		sumx := 0.
@@ -89,8 +77,8 @@ func (components *Comps) DewT(in DT_Input) (res DT_Result) {
 		x_ = xnew
 
 		if math.Abs(V_V-V_L)/V_V < 1e-5 {
-			return DT_Result{T, x_, V_V, V_L}
+			return Eq_Result{in.P, T, x_, in.Y_, V_V, V_L}
 		}
 	}
-	return DT_Result{T, x_, V_V, V_L}
+	return Eq_Result{in.P, T, x_, in.Y_, V_V, V_L}
 }

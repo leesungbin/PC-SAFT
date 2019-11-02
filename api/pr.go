@@ -4,7 +4,7 @@ import (
 	"math"
 )
 
-func (components *Comps) PR_ab(T float64, z []float64) (amix, bmix float64) {
+func PR_ab(components Comps, T float64, z []float64) (amix, bmix float64) {
 	nc := len(components.Data)
 	a := make([]float64, nc)
 	b := make([]float64, nc)
@@ -33,8 +33,8 @@ func (components *Comps) PR_ab(T float64, z []float64) (amix, bmix float64) {
 	return
 }
 
-func (components *Comps) PR_vol(P, T float64, z []float64) (Vvap, Vliq float64) {
-	a, b := components.PR_ab(T, z)
+func PR_vol(components Comps, P, T float64, z []float64) (Vvap, Vliq float64) {
+	a, b := PR_ab(components, T, z)
 	// # using math formula for cubic equation  x^3 + a2 * x^2 + a1 * x + a0 = 0
 	a2 := b - R*T/P
 	a1 := -3*b*b + (a-2*b*R*T)/P

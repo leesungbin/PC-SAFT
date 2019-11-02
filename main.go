@@ -20,6 +20,10 @@ import (
 	_ "github.com/lib/pq"
 )
 
+type chanErr struct {
+	data Eq_Result
+	err  bool
+}
 type Service struct {
 	db *sql.DB
 }
@@ -101,7 +105,7 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				comps.Data[i] = component
 			}
 
-			res, err := comps.BublP(BP_Input{T: res_parse.T, X_: res_parse.X_})
+			res, err := BublP(comps, Eq_Input{T: res_parse.T, X_: res_parse.X_})
 			if err != nil {
 				res_json := map[string]interface{}{"status": 0, "error": err}
 				print, _ := json.Marshal(res_json)
@@ -109,7 +113,7 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			res_json := map[string]BP_Result{"data": res}
+			res_json := map[string]Eq_Result{"data": res}
 			print, _ := json.Marshal(res_json)
 			fmt.Fprintf(w, "%s", print)
 		} else {
@@ -154,65 +158,72 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 				comps.Data[i] = component
 			}
+			now := time.Now()
 
+			plots := ternary.Cover()
+			nc := len(plots)
+			inChan := make(chan Eq_Input, nc)
+			equilDatas := make(chan chanErr, nc)
+			var jsonDatas []Eq_Result
+
+			// for BublP
 			if res_parse.T != 0. {
-				plots := ternary.Cover()
-				nc := len(plots)
-				resChan := make([]chan BP_Result, nc)
-				equilData := make([]BP_Result, nc)
-				for i := 0; i < len(plots); i++ {
-					resChan[i] = make(chan BP_Result)
-				}
-
-				// parrallel processing
-				for i, plot := range plots {
+				for i := 0; i < nc; i++ {
 					go func(idx int) {
-						a, b, c, _ := ternary.Xy2abc(plot.X, plot.Y)
-
-						var timeout_channel chan bool
-						go func(res chan BP_Result) {
-							r, e := comps.BublP(BP_Input{T: res_parse.T, X_: []float64{a, b, c}})
-							// when calculation error occurs,
-							if e != nil {
-								// return empty result
-								resChan[idx] <- BP_Result{}
-							} else {
-								resChan[idx] <- r
-								timeout_channel <- false
-							}
-						}(resChan[idx])
-
-						// check timeout
-						select {
-						case _ = <-timeout_channel:
-							return
-
-							// when calculation timeout
-						case <-time.After(4 * time.Second):
-							// return empty result
-							resChan[idx] <- BP_Result{}
-							return
+						in := <-inChan
+						res, err := BublP(comps, Eq_Input{T: res_parse.T, X_: in.X_})
+						if err != nil {
+							equilDatas <- chanErr{data: Eq_Result{}, err: true}
+						} else {
+							equilDatas <- chanErr{data: res, err: false}
 						}
 					}(i)
 				}
-
 				for i := 0; i < nc; i++ {
-					equilData[i] = <-resChan[i]
+					a, b, c, _ := ternary.Xy2abc(plots[i].X, plots[i].Y)
+					fractions := []float64{a, b, c}
+					inChan <- Eq_Input{T: res_parse.T, X_: fractions}
 				}
-				res_json := map[string][]BP_Result{"data": equilData}
-				print, _ := json.Marshal(res_json)
-				fmt.Fprintf(w, "%s", print)
-			} else if res_parse.P != 0. {
-				plots := ternary.Cover()
-				resChan := make([]chan BT_Result, len(plots))
-				for i := 0; i < len(plots); i++ {
-					resChan[i] = make(chan BT_Result)
+				close(inChan)
+			} else if res_parse.P != 0. { // for BublT
+				for i := 0; i < nc; i++ {
+					go func(idx int) {
+						in := <-inChan
+						res, err := BublT(comps, Eq_Input{P: res_parse.P, X_: in.X_})
+						if err != nil {
+							equilDatas <- chanErr{data: Eq_Result{}, err: true}
+						} else {
+							equilDatas <- chanErr{data: res, err: false}
+						}
+					}(i)
 				}
+				for i := 0; i < nc; i++ {
+					a, b, c, _ := ternary.Xy2abc(plots[i].X, plots[i].Y)
+					fractions := []float64{a, b, c}
+					inChan <- Eq_Input{P: res_parse.P, X_: fractions}
+				}
+				close(inChan)
 			} else {
 				// error input
+				fmt.Fprintf(w, "hi equil!!")
 			}
 
+			for i := 0; i < nc; i++ {
+				select {
+				case normal := <-equilDatas:
+					if !normal.err && normal.data.P != 0 && normal.data.T != 0 {
+						jsonDatas = append(jsonDatas, normal.data)
+					}
+				case <-time.After(50 * time.Millisecond):
+					// jsonDatas = append(jsonDatas, Eq_Result{})
+				}
+			}
+			res_json := map[string][]Eq_Result{"data": jsonDatas}
+			print, _ := json.Marshal(res_json)
+			fmt.Fprintf(w, "%s", print)
+
+			fmt.Printf("time required : %v\n", time.Since(now))
+			return
 		}
-		return
 	}
 }

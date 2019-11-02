@@ -25,7 +25,7 @@ const Pi float64 = math.Pi
 const R float64 = 8.314e-5 // (m3.bar/mol/K)
 
 // PCsaft equation of state
-func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult, err error) {
+func PCsaft(components Comps, C PCsaftInput) (res PCsaftResult, err error) {
 	// start := time.Now()
 	// fmt.Printf("PCsaft input : %v\n", C)
 	nc := len(components.Data) // # of components
@@ -36,7 +36,7 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult, err error) {
 	zet := make([]float64, 4)
 	g := make([]float64, nc)
 	rho_dg := make([]float64, nc)
-	ek_AB := PrepareCrossParameter(*components)
+	ek_AB := PrepareCrossParameter(components)
 
 	for i := 0; i < nc; i++ {
 		// _ = ConvertAtoM_sig(&components.data[i].sig)
@@ -553,7 +553,6 @@ func (components *Comps) PCsaft(C PCsaftInput) (res PCsaftResult, err error) {
 		phi[k] = math.Exp(lnphi[k])
 	}
 	res.Phi = phi
-
 	// components.phi = phi
 	// components.Z = res.Z
 
