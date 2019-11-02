@@ -25,7 +25,7 @@ var want_polar = &PCsaftResult{
 // var pp_want = &PCsaftResult{}
 
 func Test_pcsaft(t *testing.T) {
-	got, err := NNN_ethane_nHexane_cyclohexane.PCsaft(input_PCsaft)
+	got, err := PCsaft(NNN_ethane_nHexane_cyclohexane, input_PCsaft)
 	if err != nil {
 		t.Errorf("%v\n", err)
 	} else if !PassWithAccuracy4(got.Z, want.Z) {
@@ -36,7 +36,7 @@ func Test_pcsaft(t *testing.T) {
 			t.Errorf("Phi : got %v expected %v", got.Phi[i], want.Phi[i])
 		}
 	}
-	got, err = NNP_ethane_nHexane_ethanol.PCsaft(input_PCsaft_polar)
+	got, err = PCsaft(NNP_ethane_nHexane_ethanol, input_PCsaft_polar)
 	if err != nil {
 		t.Errorf("%v\n", err)
 	} else if !PassWithAccuracy4(got.Z, want_polar.Z) {

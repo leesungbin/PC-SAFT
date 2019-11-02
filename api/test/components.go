@@ -11,5 +11,5 @@ var Ethanol_polar = Component{Name: "ethanol (polar)", Mw: 46.069, Tc: 513.9, Pc
 var Water_polar = Component{Name: "water (polar)", Mw: 18.015, Tc: 647.3, Pc: 221.2, Omega: 0.344, Tb: 373.15, M: 1.0405, Sig: 2.9657, Eps: 175.15, K: 0.08924, E: 2706.7, D: 1.85, X: 0.66245}
 var Benzene = Component{Name: "benzene", Mw: 78.114, Tc: 562.2, Pc: 48.9, Omega: 0.212, Tb: 353.2, M: 2.4653, Sig: 3.6478, Eps: 287.35, K: 0.0, E: 0.0, D: 0.0, X: 0.0}
 
-var NNN_ethane_nHexane_cyclohexane = &Comps{Data: []Component{Ethane, Nhexane, Cyclohexane}}
-var NNP_ethane_nHexane_ethanol = &Comps{Data: []Component{Ethane, Nhexane, Ethanol_polar}}
+var NNN_ethane_nHexane_cyclohexane = Comps{Data: []Component{Ethane, Nhexane, Cyclohexane}}
+var NNP_ethane_nHexane_ethanol = Comps{Data: []Component{Ethane, Nhexane, Ethanol_polar}}

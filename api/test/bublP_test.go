@@ -12,8 +12,8 @@ var want_BublP_init = PY_init{
 }
 
 // Volume is not added to result
-var want_BublP = BP_Result{P: 11.911044412248602, Y_: []float64{0.931106962189395, 0.031805774449269755, 0.037087479901090147}}
-var want_BublP_NNP = BP_Result{P: 38.35158864951551, Y_: []float64{0.9531677842868514, 0.02934545182397382, 0.01748647899926908}}
+var want_BublP = Eq_Result{P: 11.911044412248602, Y_: []float64{0.931106962189395, 0.031805774449269755, 0.037087479901090147}}
+var want_BublP_NNP = Eq_Result{P: 38.35158864951551, Y_: []float64{0.9531677842868514, 0.02934545182397382, 0.01748647899926908}}
 var Composition_NNN = []float64{0.2, 0.3, 0.5}
 var Composition_NNP = []float64{0.5, 0.3, 0.2}
 
@@ -21,7 +21,7 @@ var Temperature = 338.7
 var Pressure = 18.065865443773628
 
 func Test_BublP_init(t *testing.T) {
-	got := NNN_ethane_nHexane_cyclohexane.BublP_init(Temperature, Composition_NNN)
+	got := BublP_init(NNN_ethane_nHexane_cyclohexane, Temperature, Composition_NNN)
 	if !PassWithAccuracy4(got.P, want_BublP_init.P) {
 		t.Errorf("Expected %v got %v", want_BublP_init.P, got.P)
 	}
@@ -34,7 +34,7 @@ func Test_BublP_init(t *testing.T) {
 
 func Test_BublP(t *testing.T) {
 	// start := time.Now()
-	got, _ := BublP(NNN_ethane_nHexane_cyclohexane, BP_Input{T: Temperature, X_: Composition_NNN})
+	got, _ := BublP(NNN_ethane_nHexane_cyclohexane, Eq_Input{T: Temperature, X_: Composition_NNN})
 	// elapsed := time.Since(start)
 	// t.Errorf("time required : %v\n", elapsed) // average 1.6~2 ms, python보다 10배 빠름
 	// 오차 1% 미만
@@ -47,7 +47,7 @@ func Test_BublP(t *testing.T) {
 		}
 	}
 
-	got, _ = NNP_ethane_nHexane_ethanol.BublP(BP_Input{T: Temperature, X_: Composition_NNP})
+	got, _ = BublP(NNP_ethane_nHexane_ethanol, Eq_Input{T: Temperature, X_: Composition_NNP})
 	if !PassWithAccuracyN(1, got.P, want_BublP_NNP.P) {
 		t.Errorf("Expected %v got %v", want_BublP_NNP, got)
 	}

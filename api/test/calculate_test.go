@@ -69,7 +69,7 @@ var NNN_FindV_newton_Input = NewtonInput{V: 0.00010914379164188678, P: Pressure,
 var NNN_FindV_newton_Output = 0.00011453205172139417
 
 func Test_FindV_newton(t *testing.T) {
-	Vres, err := NNN_ethane_nHexane_cyclohexane.FindV_newton(NNN_FindV_newton_Input)
+	Vres, err := FindV_newton(NNN_ethane_nHexane_cyclohexane, NNN_FindV_newton_Input)
 	if err != nil {
 		t.Errorf("FindV_newton err : %v", err)
 	} else {
@@ -80,7 +80,7 @@ func Test_FindV_newton(t *testing.T) {
 }
 
 func Test_Peos_P(t *testing.T) {
-	got, _ := NNN_ethane_nHexane_cyclohexane.Peos_P(NNN_FindV_newton_Input)
+	got, _ := Peos_P(NNN_ethane_nHexane_cyclohexane, NNN_FindV_newton_Input)
 	want := 216.21032034626552
 	if !PassWithAccuracy4(got, want) {
 		t.Errorf("got %v, expected %v\n", got, want)
@@ -92,7 +92,7 @@ var NNN_Fugacity_Output_phi = []float64{2.9332610259971834, 0.05301216759321054,
 var NNN_Fugacity_Output_fug = []float64{10.5983798014261, 0.28731320598651555, 0.3365976537047761}
 
 func Test_Fugacity(t *testing.T) {
-	got_phi, got_fug, _ := NNN_ethane_nHexane_cyclohexane.Fugacity(NNN_Fugacity_newton_Input)
+	got_phi, got_fug, _ := Fugacity(NNN_ethane_nHexane_cyclohexane, NNN_Fugacity_newton_Input)
 	want_phi := NNN_Fugacity_Output_phi
 	want_fug := NNN_Fugacity_Output_fug
 
@@ -109,7 +109,7 @@ func Test_Fugacity(t *testing.T) {
 var NNN_GetVolume_Input = GetVolumeInput{P: Pressure, T: Temperature, Z_: Composition_NNN, State: "L"}
 
 func Test_GetVolume(t *testing.T) {
-	got, err := NNN_ethane_nHexane_cyclohexane.GetVolume(NNN_GetVolume_Input)
+	got, err := GetVolume(NNN_ethane_nHexane_cyclohexane, NNN_GetVolume_Input)
 	want := 0.00011453205172139417
 	if err != nil || !PassWithAccuracy4(got, want) {
 		t.Errorf("err: %v\ngot %v, expected %v\n", err, got, want)
