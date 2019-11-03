@@ -1,5 +1,4 @@
 import React, { useRef } from 'react';
-import './App.css';
 import { Canvas, useFrame } from 'react-three-fiber';
 
 const App: React.FC = () => {
@@ -13,7 +12,7 @@ const App: React.FC = () => {
 }
 
 
-function Thing() {
+export function Thing() {
   const ref = useRef<any>()
   useFrame(() => [(ref.current.rotation.x +=0.08), (ref.current.rotation.y += 0.05)])
   return (
