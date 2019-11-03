@@ -12,6 +12,11 @@ import (
 	"github.com/leesungbin/PC-SAFT/server/ternary"
 )
 
+type chanErr struct {
+	data Eq_Result
+	err  bool
+}
+
 func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	form := r.Form
