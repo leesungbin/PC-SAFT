@@ -5,17 +5,20 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
 	"database/sql"
 
-	. "github.com/leesungbin/PC-SAFT/api"
-	"github.com/leesungbin/PC-SAFT/env"
-	"github.com/leesungbin/PC-SAFT/parser"
-	"github.com/leesungbin/PC-SAFT/ternary"
-
 	"strings"
+
+	. "github.com/leesungbin/PC-SAFT/server/api"
+	"github.com/leesungbin/PC-SAFT/server/env"
+	"github.com/leesungbin/PC-SAFT/server/parser"
+	"github.com/leesungbin/PC-SAFT/server/ternary"
+	"github.com/leesungbin/PC-SAFT/server/ttp"
 
 	_ "github.com/lib/pq"
 )
@@ -27,6 +30,11 @@ type chanErr struct {
 type Service struct {
 	db *sql.DB
 }
+
+const (
+	envPublicDir = "web/dist"
+	envIndexFile = "index.html"
+)
 
 func main() {
 	var s *Service
@@ -50,7 +58,44 @@ func main() {
 
 	port := fmt.Sprintf(":%s", env.PORT)
 	fmt.Printf("PORT%s\n", port)
-	log.Fatal(http.ListenAndServe(port, s))
+
+	mux := http.NewServeMux()
+
+	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		p := filepath.Join(envPublicDir, filepath.Clean(r.URL.Path))
+		if info, err := os.Stat(p); err != nil {
+			http.ServeFile(w, r, filepath.Join(envPublicDir, envIndexFile))
+			return
+		} else if info.IsDir() {
+			http.ServeFile(w, r, filepath.Join(envPublicDir, envIndexFile))
+			return
+		}
+		http.ServeFile(w, r, p)
+	}))
+
+	mux.Handle("/api/version", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		res_json := map[string]string{"version": "1.0"}
+		print, _ := json.Marshal(res_json)
+		fmt.Fprintf(w, "%s", print)
+		return
+	}))
+	mux.Handle("/api/bublp", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "POST" {
+			ttp.BublP(db, w, r)
+			return
+		}
+		fmt.Fprintf(w, "Get req is not supported.")
+		return
+	}))
+	mux.Handle("/api/equil", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "POST" {
+			ttp.Equil()
+			return
+		}
+		fmt.Fprintf(w, "Get req is not supported.")
+		return
+	}))
+	log.Fatal(http.ListenAndServe(port, mux))
 
 }
 

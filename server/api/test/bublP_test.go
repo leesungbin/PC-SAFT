@@ -3,7 +3,7 @@ package test
 import (
 	"testing"
 
-	. "github.com/leesungbin/PC-SAFT/api"
+	. "github.com/leesungbin/PC-SAFT/server/api"
 )
 
 var want_BublP_init = PY_init{

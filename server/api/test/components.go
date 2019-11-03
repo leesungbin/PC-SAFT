@@ -1,7 +1,7 @@
 package test
 
 import (
-	. "github.com/leesungbin/PC-SAFT/api"
+	. "github.com/leesungbin/PC-SAFT/server/api"
 )
 
 var Ethane = Component{Name: "ethane", Mw: 30.070, Tc: 305.40, Pc: 48.800, Omega: 0.099, Tb: 184.60, M: 1.6069, Sig: 3.5206, Eps: 191.42, K: 0.000000, E: 0.00, D: 0.000, X: 0.00000}

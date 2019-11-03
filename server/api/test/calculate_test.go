@@ -4,7 +4,7 @@ import (
 	"math"
 	"testing"
 
-	. "github.com/leesungbin/PC-SAFT/api"
+	. "github.com/leesungbin/PC-SAFT/server/api"
 )
 
 var want_NP_benzene_water = CrossAssociatedValues{
