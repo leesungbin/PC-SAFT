@@ -2,15 +2,17 @@ package ttp
 
 import (
 	"database/sql"
-	"net/http"
-	. "github.com/leesungbin/PC-SAFT/server/api"
-	"github.com/leesungbin/PC-SAFT/server/ternary"
-	"github.com/leesungbin/PC-SAFT/server/parser"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"time"
+
+	. "github.com/leesungbin/PC-SAFT/server/api"
+	"github.com/leesungbin/PC-SAFT/server/parser"
+	"github.com/leesungbin/PC-SAFT/server/ternary"
 )
 
-func Equil(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	form := r.Form
 	res_parse, err_parse := parser.Post(form)

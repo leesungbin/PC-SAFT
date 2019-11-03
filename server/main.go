@@ -22,9 +22,10 @@ type chanErr struct {
 	data Eq_Result
 	err  bool
 }
-type Service struct {
-	db *sql.DB
-}
+
+// type Service struct {
+// 	db *sql.DB
+// }
 
 const (
 	envPublicDir = "web/dist"
@@ -32,7 +33,7 @@ const (
 )
 
 func main() {
-	var s *Service
+	// var s *Service
 	var dsn string
 	env := env.GetAppEnv()
 
@@ -48,7 +49,7 @@ func main() {
 		panic(err)
 	} else {
 		fmt.Println("db connected.")
-		s = &Service{db: db}
+		// s = &Service{db: db}
 	}
 
 	port := fmt.Sprintf(":%s", env.PORT)
@@ -76,7 +77,7 @@ func main() {
 	}))
 	mux.Handle("/api/bublp", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "POST" {
-			ttp.BublP(db, w, r)
+			ttp.BublP_ttp(db, w, r)
 			return
 		}
 		fmt.Fprintf(w, "Get req is not supported.")
@@ -84,7 +85,7 @@ func main() {
 	}))
 	mux.Handle("/api/equil", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "POST" {
-			ttp.Equil()
+			ttp.Equil_ttp(db, w, r)
 			return
 		}
 		fmt.Fprintf(w, "Get req is not supported.")

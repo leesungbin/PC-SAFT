@@ -12,7 +12,7 @@ import (
 )
 
 // not api.BublP. It's for request resolving.
-func BublP(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func BublP_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	form := r.Form
 	res_parse, err_parse := parser.Post(form)
