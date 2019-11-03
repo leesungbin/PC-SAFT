@@ -1,0 +1,49 @@
+import React from 'react';
+import { NavLink, Link } from 'react-router-dom';
+
+function Header() {
+  return (
+    <div style={style.root}>
+      <div style={style.logo}><Link to="/" style={style.logolink}>SAFT-GO</Link></div><ul style={style.linkGroup}>
+        <li><NavLink exact to="/" style={style.link} activeStyle={{fontWeight: 'bold'}}>Demo</NavLink></li>
+        <li><NavLink to="/docs" style={style.link}  activeStyle={{fontWeight: 'bold'}}>Document</NavLink></li>
+        <li><NavLink to="/db" style={style.link}  activeStyle={{fontWeight: 'bold'}}>Database</NavLink></li>
+      </ul>
+    </div>
+  );
+}
+export default Header;
+
+const style: { [key: string]: React.CSSProperties } = {
+  root: {
+    backgroundColor: 'rgba(174,196,255,0.22)',
+    height: 76,
+    display: 'flex',
+    justifyContent: 'space-between',
+    paddingLeft: 97,
+    paddingRight: 67,
+  },
+  logo: {
+    display: 'flex',
+    fontSize: 30,
+    alignItems: 'center'
+  },
+  logolink: {
+    color: 'black',
+    textDecoration: 'none',
+  },
+  linkGroup: {
+    display: 'flex',
+    width: 400,
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    listStyleType: 'none',
+  },
+  link: {
+    display: 'flex',
+    fontSize: 26,
+    color: 'black',
+    textDecoration: 'none',
+    // marginRight: 30
+  }
+};

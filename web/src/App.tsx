@@ -1,30 +1,23 @@
-import React, { useRef } from 'react';
-import './App.css';
-import { Canvas, useFrame } from 'react-three-fiber';
+import React from 'react';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import Header from './components/Header';
+import Home from './routes/Home';
+import Document from './routes/Document';
+import Database from './routes/Database';
 
-const App: React.FC = () => {
-  return (
-    <div className="App">
-      <Canvas>
-        <Thing />
-      </Canvas>
-    </div>
-  );
+class App extends React.Component {
+  render() {
+    return (
+      <Router>
+        <Header />
+        <Switch>
+          <Route path="/docs"><Document /></Route>
+          <Route path="/db"><Database /></Route>
+          <Route path="/"><Home /></Route>
+        </Switch>
+      </Router>
+    );
+  }
 }
 
-
-function Thing() {
-  const ref = useRef<any>()
-  useFrame(() => (ref.current.rotation.x = ref.current.rotation.y += 0.01))
-  return (
-    <mesh
-      ref={ref}
-      onClick={e => console.log('click')}
-      onPointerOver={e => console.log('hover')}
-      onPointerOut={e => console.log('unhover')}>
-      <boxBufferGeometry attach="geometry" args={[1, 1, 1]} />
-      <meshNormalMaterial attach="material" />
-    </mesh>
-  )
-}
 export default App;
