@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strconv"
 
 	"database/sql"
@@ -23,7 +21,8 @@ import (
 // }
 
 const (
-	envPublicDir = "web/build"
+	envPublicDir = "web"
+	envStaticDir = "web/static"
 	envIndexFile = "index.html"
 )
 
@@ -52,17 +51,11 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		p := filepath.Join(envPublicDir, filepath.Clean(r.URL.Path))
-		if info, err := os.Stat(p); err != nil {
-			http.ServeFile(w, r, filepath.Join(envPublicDir, envIndexFile))
-			return
-		} else if info.IsDir() {
-			http.ServeFile(w, r, filepath.Join(envPublicDir, envIndexFile))
-			return
-		}
-		http.ServeFile(w, r, p)
-	}))
+	craHandler := http.FileServer(http.Dir(envPublicDir))
+	staticHandler := http.FileServer(http.Dir(envStaticDir))
+	mux.Handle("/", craHandler)
+	mux.Handle("/static", staticHandler)
+
 	mux.Handle("/api", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "PC-SAFT API Server\n")
 		return

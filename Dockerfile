@@ -20,6 +20,6 @@ FROM debian:bullseye-20190708
 RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 WORKDIR /root/
 COPY --from=builder /app/main .
-COPY --from=web /web/build .
+COPY --from=web /web/build ./web
 RUN ls -lah
 ENTRYPOINT [ "/root/main" ]
