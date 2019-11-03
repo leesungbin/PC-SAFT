@@ -11,9 +11,9 @@ class App extends React.Component {
       <Router>
         <Header />
         <Switch>
-          <Route path="/docs"><Document /></Route>
+          <Route path="/docs" ><Document /></Route>
           <Route path="/db"><Database /></Route>
-          <Route path="/"><Home /></Route>
+          <Route exact path="/"><Home /></Route>
         </Switch>
       </Router>
     );
