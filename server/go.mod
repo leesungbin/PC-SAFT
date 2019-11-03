@@ -1,4 +1,4 @@
-module github.com/leesungbin/PC-SAFT
+module github.com/leesungbin/PC-SAFT/server
 
 go 1.13
 
