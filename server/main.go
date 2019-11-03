@@ -23,7 +23,7 @@ import (
 // }
 
 const (
-	envPublicDir = "web/dist"
+	envPublicDir = "web/build"
 	envIndexFile = "index.html"
 )
 
