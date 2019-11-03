@@ -11,17 +11,12 @@ import (
 
 	"database/sql"
 
-	. "github.com/leesungbin/PC-SAFT/server/api"
+	// . "github.com/leesungbin/PC-SAFT/server/api"
 	"github.com/leesungbin/PC-SAFT/server/env"
 	"github.com/leesungbin/PC-SAFT/server/ttp"
 
 	_ "github.com/lib/pq"
 )
-
-type chanErr struct {
-	data Eq_Result
-	err  bool
-}
 
 // type Service struct {
 // 	db *sql.DB
@@ -68,7 +63,10 @@ func main() {
 		}
 		http.ServeFile(w, r, p)
 	}))
-
+	mux.Handle("/api", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "PC-SAFT API Server\n")
+		return
+	}))
 	mux.Handle("/api/version", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		res_json := map[string]string{"version": "1.0"}
 		print, _ := json.Marshal(res_json)
