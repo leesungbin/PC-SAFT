@@ -1,4 +1,3 @@
-import { useFrame, Canvas, ReactThreeFiber } from 'react-three-fiber';
 import React from 'react';
 import { coordChange } from '../_lib/coordChange';
 
