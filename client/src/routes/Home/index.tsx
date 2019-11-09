@@ -5,11 +5,18 @@ import { Triangle } from '../../threeFragments/Triangle';
 import { Vector3 } from 'three';
 import { EQUIL_ENDPOINT } from '../../_lib/endpoint';
 
-class Home extends React.Component {
+type State = {
+  data?: {
+    P: number,
+    T: number,
+    x: number[],
+    y: number[],
+  }[]
+}
+class Home extends React.Component<{},State> {
   callEquil = async () => {
     const res = await fetch(EQUIL_ENDPOINT, {
       method: 'POST',
-      mode: 'no-cors',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -17,9 +24,9 @@ class Home extends React.Component {
       body: JSON.stringify({ T: 300, id: [20,40,50] }),
     });
     const json = await res.json()
-    console.log(json);
+    this.setState({data: json.data});
   }
-  
+
   render() {
     const trianglePoints = [new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(1 / 2, Math.sqrt(3) / 2, 0)];
     return (

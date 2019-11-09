@@ -33,15 +33,15 @@ func DewP(components Comps, in Eq_Input) (res Eq_Result) {
 	P := initRes.P
 	x_ := initRes.X_
 
-	var V_V, V_L float64
+	var Vv_res, Vl_res float64
 	maxit := 3000
 	for i := 0; i < maxit; i++ {
 		gvi_L := GetVolumeInput{P, in.T, x_, "L"}
-		V_L, _ = GetVolume(components, gvi_L)
+		V_L, _ := GetVolume(components, gvi_L)
 		phi_L, fug_L, _ := Fugacity(components, NewtonInput{V_L, P, in.T, x_})
 
 		gvi_V := GetVolumeInput{P, in.T, in.Y_, "V"}
-		V_V, _ = GetVolume(components, gvi_V)
+		V_V, _ := GetVolume(components, gvi_V)
 		phi_V, fug_V, _ := Fugacity(components, NewtonInput{V_V, P, in.T, in.Y_})
 
 		xnew := make([]float64, nc)
@@ -60,6 +60,8 @@ func DewP(components Comps, in Eq_Input) (res Eq_Result) {
 			}
 		}
 		if math.Abs(Pnew-P) < 1e-5 && converged {
+			Vv_res = V_V
+			Vl_res = V_L
 			break
 		}
 		P = Pnew
@@ -68,5 +70,5 @@ func DewP(components Comps, in Eq_Input) (res Eq_Result) {
 			return Eq_Result{P, in.T, x_, in.Y_, V_V, V_L}
 		}
 	}
-	return Eq_Result{P, in.T, x_, in.Y_, V_V, V_L}
+	return Eq_Result{P, in.T, x_, in.Y_, Vv_res, Vl_res}
 }

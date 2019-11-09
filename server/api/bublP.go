@@ -46,7 +46,7 @@ func BublP(components Comps, in Eq_Input) (res Eq_Result, err error) {
 	initRes := BublP_init(components, in.T, in.X_)
 	P := initRes.P
 	y_ := initRes.Y
-	var V_V, V_L float64
+	var Vv_res, Vl_res float64
 	for i = 0; i < maxit; i++ {
 		fvi_L := GetVolumeInput{P, in.T, in.X_, "L"}
 		V_L, err_l1 := GetVolume(components, fvi_L)
@@ -85,6 +85,8 @@ func BublP(components Comps, in Eq_Input) (res Eq_Result, err error) {
 			}
 		}
 		if math.Abs(Pnew-P) < 1e-5 && converged {
+			Vv_res = V_V
+			Vl_res = V_L
 			break
 		}
 		P = Pnew
@@ -97,5 +99,5 @@ func BublP(components Comps, in Eq_Input) (res Eq_Result, err error) {
 		return Eq_Result{}, errors.New("calc failed : y > 1")
 	}
 	// fmt.Printf("bubbleP calculation iterated # : %d\n", i)
-	return Eq_Result{P, in.T, in.X_, y_, V_V, V_L}, nil
+	return Eq_Result{P, in.T, in.X_, y_, Vv_res, Vl_res}, nil
 }

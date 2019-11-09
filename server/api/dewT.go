@@ -44,7 +44,7 @@ func DewT(components Comps, in Eq_Input) (res Eq_Result) {
 		B += in.Y_[i] * initRes.Bp[i]
 	}
 
-	var V_V, V_L float64
+	var Vv_res, Vl_res float64
 	maxit := 3000
 	for i := 0; i < maxit; i++ {
 		gvi_L := GetVolumeInput{in.P, T, x_, "L"}
@@ -71,6 +71,8 @@ func DewT(components Comps, in Eq_Input) (res Eq_Result) {
 			}
 		}
 		if math.Abs(delT) < 1e-3 && converged {
+			Vv_res = V_V
+			Vl_res = V_L
 			break
 		}
 		T += delT
@@ -80,5 +82,5 @@ func DewT(components Comps, in Eq_Input) (res Eq_Result) {
 			return Eq_Result{in.P, T, x_, in.Y_, V_V, V_L}
 		}
 	}
-	return Eq_Result{in.P, T, x_, in.Y_, V_V, V_L}
+	return Eq_Result{in.P, T, x_, in.Y_, Vv_res, Vl_res}
 }
