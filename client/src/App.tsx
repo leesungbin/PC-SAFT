@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Home from './routes/Home';
-import Document from './routes/Document';
+import Document from './routes/Documents';
 import Database from './routes/Database';
 
 class App extends React.Component {

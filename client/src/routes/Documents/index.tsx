@@ -1,5 +1,5 @@
 import React from 'react';
-import { Content } from '../components/Content';
+import { Content } from '../../components/Content';
 
 class Document extends React.Component {
   render() {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Content } from '../components/Content';
+import { Content } from '../../components/Content';
 
 class Database extends React.Component {
   render() {
