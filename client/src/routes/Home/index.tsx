@@ -12,14 +12,17 @@ type State = {
     T: number,
     x: number[],
     y: number[],
-  }[]
+  }[],
+  waiting: boolean,
 }
 class Home extends React.Component<{}, State> {
   state: State = {
-    data: []
+    data: [],
+    waiting: false,
   }
 
   callEquil = async () => {
+    this.setState({waiting: true});
     const res = await fetch(EQUIL_ENDPOINT, {
       method: 'POST',
       headers: {
@@ -29,12 +32,12 @@ class Home extends React.Component<{}, State> {
       body: JSON.stringify({ T: 300, id: [20, 40, 50] }),
     });
     const json = await res.json()
-    this.setState({ data: json.data });
+    this.setState({ data: json.data, waiting: false});
   }
 
   render() {
     const trianglePoints = [new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(1 / 2, Math.sqrt(3) / 2, 0)];
-    const { data } = this.state;
+    const { data, waiting } = this.state;
 
     return (
       <Content>
@@ -54,6 +57,7 @@ class Home extends React.Component<{}, State> {
             ))}
           </mesh>
         </Canvas>
+        {waiting && <p>계산 중이에요.</p>}
       </Content>
     );
   }
