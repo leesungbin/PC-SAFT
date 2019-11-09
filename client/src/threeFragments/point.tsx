@@ -1,14 +1,14 @@
 import { useFrame, Canvas, ReactThreeFiber } from 'react-three-fiber';
-import { Mesh } from 'three';
-import { useRef } from 'react';
 import React from 'react';
+import { coordChange } from '../_lib/coordChange';
 
-export default function point() {
-  const ref = useRef<Mesh>(null);
-  useFrame(() => ([ref.current!.rotation.x += 0.1, ref.current!.rotation.y += 0.1]));
+// t : type, 0: liq, 1 : vap
+export default function Point({ abc, val, t }: { abc: number[], val: number, t: number }) {
+  const coord = coordChange(abc[0], abc[1], abc[2]);
   return (
-    <mesh visible ref={ref} position={[0, 0, 0]} rotation={[0, 0, 0]}>
-      <sphereGeometry />
+    <mesh visible position={[coord.x, coord.y, val]}>
+      <sphereGeometry attach="geometry" args={[0.02, 5, 5]} />
+      { t === 0 ? <meshNormalMaterial attach="material" /> : <meshBasicMaterial attach="material" color="black"/>}
     </mesh>
   )
 }
