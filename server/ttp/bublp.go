@@ -56,6 +56,7 @@ func BublP_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 
 	res_json := map[string]Eq_Result{"data": res}
 	print, _ := json.Marshal(res_json)
+	w.Header().Add("Content-Type", "application/json")
 	fmt.Fprintf(w, "%s", print)
 
 	return

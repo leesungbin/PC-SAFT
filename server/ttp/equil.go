@@ -112,6 +112,7 @@ func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	}
 	res_json := map[string][]Eq_Result{"data": jsonDatas}
 	print, _ := json.Marshal(res_json)
+	w.Header().Add("Content-Type", "application/json")
 	fmt.Fprintf(w, "%s", print)
 	fmt.Printf("success for %.2f%% inputs\n", float64(len(jsonDatas))/float64(nc)*100)
 	fmt.Printf("time required : %v\n", time.Since(now))
