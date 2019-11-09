@@ -8,7 +8,6 @@ import (
 	"time"
 
 	. "github.com/leesungbin/PC-SAFT/server/api"
-	"github.com/leesungbin/PC-SAFT/server/parser"
 	"github.com/leesungbin/PC-SAFT/server/ternary"
 )
 
@@ -16,20 +15,33 @@ type chanErr struct {
 	data Eq_Result
 	err  bool
 }
+type jsonInput struct {
+	T  float64   `json:"T"`
+	P  float64   `json:"P"`
+	X_ []float64 `json:"x"`
+	Y_ []float64 `json:"y"`
+	Id []float64 `json:"id"`
+}
 
 func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	form := r.Form
-	res_parse, err_parse := parser.Post(form)
+	var j jsonInput
+	err := json.NewDecoder(r.Body).Decode(&j)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	// fmt.Printf("%v %v %v\n", j.T, j.P, j.Id)
+	res_parse, err_parse := getInfoFromBody(j)
 
 	if err_parse != nil {
 		res_json := map[string]interface{}{"status": 400, "error": err_parse}
 		print, _ := json.Marshal(res_json)
+		w.Header().Add("Content-Type", "application/json")
 		fmt.Fprintf(w, "%s", print)
 		return
 	}
 
-	rows, err := db.Query(res_parse.SelectQuery)
+	rows, err := db.Query(res_parse.query)
 	if err != nil {
 		fmt.Printf("%v\n", err)
 	}
@@ -59,11 +71,11 @@ func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	var jsonDatas []Eq_Result
 
 	// for BublP
-	if res_parse.T != 0. {
+	if j.T != 0. {
 		for i := 0; i < nc; i++ {
 			go func(idx int) {
 				in := <-inChan
-				res, err := BublP(comps, Eq_Input{T: res_parse.T, X_: in.X_})
+				res, err := BublP(comps, Eq_Input{T: j.T, X_: in.X_})
 				if err != nil {
 					equilDatas <- chanErr{data: Eq_Result{}, err: true}
 				} else {
@@ -74,14 +86,14 @@ func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		for i := 0; i < nc; i++ {
 			a, b, c, _ := ternary.Xy2abc(plots[i].X, plots[i].Y)
 			fractions := []float64{a, b, c}
-			inChan <- Eq_Input{T: res_parse.T, X_: fractions}
+			inChan <- Eq_Input{T: j.T, X_: fractions}
 		}
 		close(inChan)
-	} else if res_parse.P != 0. { // for BublT
+	} else if j.P != 0. { // for BublT
 		for i := 0; i < nc; i++ {
 			go func(idx int) {
 				in := <-inChan
-				res, err := BublT(comps, Eq_Input{P: res_parse.P, X_: in.X_})
+				res, err := BublT(comps, Eq_Input{P: j.P, X_: in.X_})
 				if err != nil {
 					equilDatas <- chanErr{data: Eq_Result{}, err: true}
 				} else {
@@ -92,7 +104,7 @@ func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		for i := 0; i < nc; i++ {
 			a, b, c, _ := ternary.Xy2abc(plots[i].X, plots[i].Y)
 			fractions := []float64{a, b, c}
-			inChan <- Eq_Input{P: res_parse.P, X_: fractions}
+			inChan <- Eq_Input{P: j.P, X_: fractions}
 		}
 		close(inChan)
 	} else {
