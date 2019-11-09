@@ -106,7 +106,7 @@ func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 			if !normal.err && normal.data.P != 0 && normal.data.T != 0 {
 				jsonDatas = append(jsonDatas, normal.data)
 			}
-		case <-time.After(50 * time.Millisecond):
+		case <-time.After(5 * time.Millisecond):
 			// jsonDatas = append(jsonDatas, Eq_Result{})
 		}
 	}

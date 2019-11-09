@@ -1,27 +1,26 @@
 import React from 'react';
 import { Content } from '../../components/Content';
 import { Canvas } from 'react-three-fiber';
+import { Triangle } from '../../threeFragments/Triangle';
+import { Vector3 } from 'three';
 
 class Home extends React.Component {
 
   render() {
+    const trianglePoints=[new Vector3(0,0,0), new Vector3(1,0,0), new Vector3(1/2, Math.sqrt(3)/2, 0)];
+
     return (
       <Content>
         <h1>Home</h1>
-        <Canvas>
-          <mesh visible userData={{ test: 'hello' }} position={[0, 0, 0]} rotation={[0, 0, 0]}>
-            <sphereGeometry attach="geometry" args={[1, 16, 16]} />
-            {/* <meshStandardMaterial attach="material" color="#aaaaaa" transparent /> */}
-            <meshNormalMaterial attach="material" />
-          </mesh>
-          <mesh visible userData={{ test: 'hello' }} position={[0, 2, 1]} rotation={[0, 0, 0]}>
-            <sphereGeometry attach="geometry" args={[1, 16, 16]} />
-            {/* <meshStandardMaterial attach="material" color="#abcdef" transparent /> */}
-            <meshNormalMaterial attach="material" />
-          </mesh>
+        <Canvas
+          style={{ height: 500 }}
+          camera={{ position: [1/2, Math.sqrt(3)/4, 5], fov: 20 }}
+          >
+            <Triangle points={trianglePoints}/>
         </Canvas>
       </Content>
     );
   }
 }
+
 export default Home;
