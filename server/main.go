@@ -10,7 +10,6 @@ import (
 	"database/sql"
 
 	"github.com/leesungbin/PC-SAFT/server/api"
-	. "github.com/leesungbin/PC-SAFT/server/api"
 	"github.com/leesungbin/PC-SAFT/server/env"
 	"github.com/leesungbin/PC-SAFT/server/ttp"
 
