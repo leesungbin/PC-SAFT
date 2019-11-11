@@ -9,7 +9,8 @@ import (
 
 	"database/sql"
 
-	// . "github.com/leesungbin/PC-SAFT/server/api"
+	"github.com/leesungbin/PC-SAFT/server/api"
+	. "github.com/leesungbin/PC-SAFT/server/api"
 	"github.com/leesungbin/PC-SAFT/server/env"
 	"github.com/leesungbin/PC-SAFT/server/ttp"
 
@@ -66,7 +67,7 @@ func main() {
 		return
 	}))
 	mux.Handle("/api/bublp", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "POST" {
+		if r.Method == http.MethodPost {
 			ttp.BublP_ttp(db, w, r)
 			return
 		}
@@ -74,11 +75,39 @@ func main() {
 		return
 	}))
 	mux.Handle("/api/equil", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "POST" {
+		if r.Method == http.MethodPost {
 			ttp.Equil_ttp(db, w, r)
 			return
 		}
 		fmt.Fprintf(w, "Get req is not supported.")
+		return
+	}))
+	mux.Handle("/api/datas", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			comps, err := api.SearchAll(db)
+			if err != nil {
+				fmt.Fprintf(w, "%v", err)
+				return
+			}
+			// print all datas
+			return
+		}
+		fmt.Fprintf(w, "not allowed.")
+		return
+	}))
+	mux.Handle("/api/search", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var name string
+		if r.Method == http.MethodPost {
+			json.NewDecoder(r.Body).Decode(&name)
+			comps, err := api.SearchWithName(db, name)
+			if err != nil {
+				fmt.Fprintf(w, "%v", err)
+				return
+			}
+			// print ids & components
+			return
+		}
+		fmt.Fprintf(w, "not allowed.")
 		return
 	}))
 	log.Fatal(http.ListenAndServe(port, mux))
