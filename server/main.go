@@ -88,22 +88,38 @@ func main() {
 				fmt.Fprintf(w, "%v", err)
 				return
 			}
-			// print all datas
+
+			res_json := map[string][](api.RowForm){"data": comps}
+			print, _ := json.Marshal(res_json)
+			w.Header().Add("Content-Type", "application/json")
+			fmt.Fprintf(w, "%s", print)
 			return
 		}
 		fmt.Fprintf(w, "not allowed.")
 		return
 	}))
 	mux.Handle("/api/search", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var name string
+		type searchInput struct {
+			Name string `json:"name"`
+		}
+		var si searchInput
 		if r.Method == http.MethodPost {
-			json.NewDecoder(r.Body).Decode(&name)
-			comps, err := api.SearchWithName(db, name)
+			err_json := json.NewDecoder(r.Body).Decode(&si)
+			if err_json != nil {
+				http.Error(w, err_json.Error(), http.StatusBadRequest)
+				return
+			}
+			comps, err := api.SearchWithName(db, si.Name)
+
 			if err != nil {
 				fmt.Fprintf(w, "%v", err)
 				return
 			}
-			// print ids & components
+
+			res_json := map[string][](api.RowForm){"data": comps}
+			print, _ := json.Marshal(res_json)
+			w.Header().Add("Content-Type", "application/json")
+			fmt.Fprintf(w, "%s", print)
 			return
 		}
 		fmt.Fprintf(w, "not allowed.")
