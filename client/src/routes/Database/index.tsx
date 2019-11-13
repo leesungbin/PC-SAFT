@@ -37,15 +37,15 @@ class Database extends React.Component<{}, State> {
 
   render() {
     return (
-      <Content>
-        <div style={{marginTop: 20, maxWidth: '100%'}}>
+      // <Content>
+        <div style={{margin: 20, maxWidth: '100%'}}>
           <DataTable
             columns={this.state.columns}
             data={this.state.data}
             title="DB Table"
           />
         </div>
-      </Content>
+      // </Content>
     );
   }
 }
