@@ -21,7 +21,7 @@ export default class MenuButton extends Component<MenuButtonProps, State> {
     }
   }
 
-  componentWillReceiveProps(nextProps: MenuButtonProps) {
+  componentDidUpdate(nextProps: MenuButtonProps) {
     if (nextProps.open !== this.state.open) {
       this.setState({ open: nextProps.open });
     }

@@ -35,34 +35,39 @@ class Home extends React.Component<HomeProps, State> {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ T: 300, id: [50, 60, 108] }),
+      body: JSON.stringify({ T: 300, id: [18, 35, 62] }),
     });
     const json = await res.json()
     this.setState({ data: json.data, waiting: false });
   }
-
+  
   render() {
     const trianglePoints = [new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(1 / 2, Math.sqrt(3) / 2, 0)];
+    
     const { data, waiting } = this.state;
-
+    const len = data.length;
     return (
       <Content>
         <button onClick={() => this.callEquil()}>fetch test</button>
         <h1>Home</h1>
         <Canvas
-          style={{ height: this.props.height*0.8, width: this.props.width*0.8 }}
-          camera={{ position: [1 / 2, Math.sqrt(3) / 4, 50], fov: 2, near: 1, far:  -1}}
+          style={{ height: this.props.height * 0.8, width: this.props.width * 0.8 }}
+          camera={{ position: [1 / 2, Math.sqrt(3) / 4, 50], fov: 2, near: 1, far: -1 }}
         >
-          <mesh rotation={[0,0,0]}>
+          <mesh rotation={[0, 0, 0]}>
             <Triangle points={trianglePoints} />
-            {data && data.map(e => (
-              <>
-                <Point abc={e.x} val={e.P} t={0} />
-                <Point abc={e.y} val={e.P} t={1} />
-                {Math.floor(Math.random()*5)===2 && <TieLine x={e.x} y={e.y} val={e.P} color="green"/>}
-              </>
+            {len && data.map((e, i) => (
+              <mesh key={i}>
+                {Math.floor(Math.random() * 5) === 2 && (
+                  <>
+                    <Point abc={e.x} val={0} t={0} />
+                    <Point abc={e.y} val={0} t={1} />
+                    <TieLine x={e.x} y={e.y} val={0} color="green" />
+                  </>
+                )}
+              </mesh>
             ))}
-          </mesh>
+            </mesh>
         </Canvas>
         {waiting && <p>계산 중이에요.</p>}
       </Content>
