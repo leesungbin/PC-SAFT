@@ -31,9 +31,11 @@ const styles: { [key: string]: React.CSSProperties } = {
     opacity: 0.9,
     color: '#fafafa',
     transition: 'height 0.3s ease',
-    zIndex: -1,
+    zIndex: 0,
   },
   menuList: {
     paddingTop: '3rem',
+    display: 'flex',
+    flexDirection: 'column',
   }
 }

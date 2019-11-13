@@ -14,11 +14,9 @@ export default function MenuItem(props: MenuItemProps) {
   }
   const styles: {[key: string]: React.CSSProperties} = {
     container: {
-      opacity: 0,
       animation: '1s appear forwards',
       animationDelay: props.delay,
       height: 70,
-      zIndex: 100,
     },
     menuItem: {
       fontFamily: `'Open Sans', sans-serif`,
@@ -30,6 +28,7 @@ export default function MenuItem(props: MenuItemProps) {
       transition: 'color 0.2s ease-in-out',
       animation: '0.5s slideIn forwards',
       animationDelay: props.delay,
+      textDecoration: 'none',
     },
     line: {
       width: '90%',
@@ -38,6 +37,7 @@ export default function MenuItem(props: MenuItemProps) {
       margin: '0 auto',
       animation: '0.5s shrink forwards',
       animationDelay: props.delay,
+      marginTop: 20,
     }
   }
   return (
