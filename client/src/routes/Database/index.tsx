@@ -36,14 +36,13 @@ class Database extends React.Component<{}, State> {
   }
 
   render() {
-    // console.log(this.state.rowData);
     return (
       <Content>
         <div style={{marginTop: 20, maxWidth: '100%'}}>
           <DataTable
             columns={this.state.columns}
             data={this.state.data}
-            title="PC-SAFT DATABASE"
+            title="DB Table"
           />
         </div>
       </Content>

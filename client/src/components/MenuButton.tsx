@@ -1,4 +1,4 @@
-import React, { Component, CSSProperties } from 'react';
+import React, { CSSProperties } from 'react';
 
 type MenuButtonProps = {
   open: boolean,
@@ -6,52 +6,27 @@ type MenuButtonProps = {
   onClick?: () => void,
 };
 
-type State = {
-  open: boolean,
-  color: string,
-}
-
-
-export default class MenuButton extends Component<MenuButtonProps, State> {
-  constructor(props: MenuButtonProps) {
-    super(props);
-    this.state = {
-      open: this.props.open ? this.props.open : false,
-      color: this.props.color ? this.props.color : 'black',
-    }
-  }
-
-  componentDidUpdate(nextProps: MenuButtonProps) {
-    if (nextProps.open !== this.state.open) {
-      this.setState({ open: nextProps.open });
-    }
-  }
-
-  handleClick() {
-    this.setState({ open: !this.state.open });
-  }
-
-  render() {
-    return (
-      <div style={style.container}
-        onClick={this.props.onClick ? this.props.onClick :
-          () => { this.handleClick(); }}>
-        <div style={{
-          ...style.line, background: this.state.color, ...style.lineTop,
-          transform: this.state.open ? 'rotate(45deg)' : 'none',
-        }} />
-        <div style={{
-          ...style.line, background: this.state.color, ...style.lineMiddle,
-          opacity: this.state.open ? 0 : 1,
-          transform: this.state.open ? 'translateX(-16px)' : 'none',
-        }} />
-        <div style={{
-          ...style.line, background: this.state.color, ...style.lineBottom,
-          transform: this.state.open ? 'translateX(-1px) rotate(-45deg)' : 'none',
-        }} />
-      </div>
-    )
-  }
+export default function MenuButton(props: MenuButtonProps) {
+  const color = props.color? props.color : 'black';
+  return (
+    <div style={style.container}
+      onClick={props.onClick ? props.onClick :
+        () => { console.log('hi') }}>
+      <div style={{
+        ...style.line, background: color, ...style.lineTop,
+        transform: props.open ? 'rotate(45deg)' : 'none',
+      }} />
+      <div style={{
+        ...style.line, background: color, ...style.lineMiddle,
+        opacity: props.open ? 0 : 1,
+        transform: props.open ? 'translateX(-16px)' : 'none',
+      }} />
+      <div style={{
+        ...style.line, background: color, ...style.lineBottom,
+        transform: props.open ? 'translateX(-1px) rotate(-45deg)' : 'none',
+      }} />
+    </div>
+  )
 }
 
 const style: { [key: string]: CSSProperties } = {
@@ -64,6 +39,7 @@ const style: { [key: string]: CSSProperties } = {
     alignItems: 'center',
     cursor: 'pointer',
     padding: '4px',
+    zIndex: 100,
   },
   line: {
     height: '2px',

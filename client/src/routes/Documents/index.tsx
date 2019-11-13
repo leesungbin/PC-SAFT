@@ -5,7 +5,7 @@ class Document extends React.Component {
   render() {
     return (
       <Content>
-        <h1>Document</h1>
+        
       </Content>
     );
   }

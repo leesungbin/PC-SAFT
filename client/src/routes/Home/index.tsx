@@ -40,18 +40,23 @@ class Home extends React.Component<HomeProps, State> {
     const json = await res.json()
     this.setState({ data: json.data, waiting: false });
   }
-  
+
   render() {
     const trianglePoints = [new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(1 / 2, Math.sqrt(3) / 2, 0)];
-    
+
     const { data, waiting } = this.state;
     const len = data.length;
     return (
-      <Content>
-        <button onClick={() => this.callEquil()}>fetch test</button>
-        <h1>Home</h1>
+      <div>
+        <Content>
+          <div style={{ height: 70 }}>
+            <button onClick={() => this.callEquil()}>fetch test</button>
+            <p>현재 물질 : 1-propylamine (N-PROPYL AMINE) / benzene / isobutane</p>
+            {waiting && <p>계산 중이에요.</p>}
+          </div>
+        </Content>
         <Canvas
-          style={{ height: this.props.height * 0.8, width: this.props.width * 0.8 }}
+          style={{ height: this.props.height * 0.8, width: '100%' }}
           camera={{ position: [1 / 2, Math.sqrt(3) / 4, 50], fov: 2, near: 1, far: -1 }}
         >
           <mesh rotation={[0, 0, 0]}>
@@ -67,10 +72,9 @@ class Home extends React.Component<HomeProps, State> {
                 )}
               </mesh>
             ))}
-            </mesh>
+          </mesh>
         </Canvas>
-        {waiting && <p>계산 중이에요.</p>}
-      </Content>
+      </div>
     );
   }
 }
