@@ -72,11 +72,11 @@ func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 
 	min := 1.
 	max := 0.
-	var method string
+	var mode string
 
 	// for BublP
 	if j.T != 0. {
-		method = "BUBLP"
+		mode = "BUBLP"
 		for i := 0; i < nc; i++ {
 			go func(idx int) {
 				in := <-inChan
@@ -101,7 +101,7 @@ func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		}
 		close(inChan)
 	} else if j.P != 0 { // for BublT
-		method = "BUBLT"
+		mode = "BUBLT"
 		for i := 0; i < nc; i++ {
 			go func(idx int) {
 				in := <-inChan
@@ -126,7 +126,7 @@ func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		}
 		close(inChan)
 	} else {
-		method = "error"
+		mode = "error"
 		// error input
 		fmt.Fprintf(w, "hi equil!!")
 	}
@@ -148,9 +148,9 @@ func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	type resJson struct {
 		Data   []Eq_Result `json:"data"`
 		Header Range       `json:"header"`
-		Method string      `json:"method"`
+		Mode   string      `json:"mode"`
 	}
-	res_json := map[string]resJson{"result": resJson{jsonDatas, Range{min, max}, method}}
+	res_json := map[string]resJson{"result": resJson{jsonDatas, Range{min, max}, mode}}
 
 	print, _ := json.Marshal(res_json)
 	w.Header().Add("Content-Type", "application/json")

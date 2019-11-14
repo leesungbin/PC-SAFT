@@ -7,6 +7,15 @@ import { EQUIL_ENDPOINT } from '../../_lib/endpoint';
 import Point from '../../threeFragments/Point';
 import { TieLine } from '../../threeFragments/TieLine';
 
+import ContinuosSlider from '../../components/ContinuosSlider';
+
+type FetchResult = {
+  result: {
+    data: { P: number, T: number, x: number[], y: number[] }[],
+    header: { min: number, max: number },
+    mode: string
+  }
+}
 type HomeProps = {
   width: number,
   height: number,
@@ -20,11 +29,18 @@ type State = {
     y: number[],
   }[],
   waiting: boolean,
+  T: number,
+  P: number,
+  mode?: string,
+  min?: number,
+  max?: number,
 }
 class Home extends React.Component<HomeProps, State> {
   state: State = {
     data: [],
     waiting: false,
+    T: 300,
+    P: 1,
   }
 
   callEquil = async () => {
@@ -37,41 +53,66 @@ class Home extends React.Component<HomeProps, State> {
       },
       body: JSON.stringify({ T: 300, id: [18, 35, 62] }),
     });
-    const json = await res.json()
-    this.setState({ data: json.data, waiting: false });
+    const json: FetchResult = await res.json()
+    const { data, header, mode } = json.result;
+    const { min, max } = header;
+    this.setState({ data, min, max, mode, waiting: false });
   }
 
   render() {
     const trianglePoints = [new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(1 / 2, Math.sqrt(3) / 2, 0)];
 
-    const { data, waiting } = this.state;
+    const { data, waiting, T, P, mode } = this.state;
     const len = data.length;
+
     return (
       <div>
         <Content>
-          <div style={{ height: 70 }}>
+          <div style={{ height: 100 }}>
             <button onClick={() => this.callEquil()}>fetch test</button>
             <p>현재 물질 : 1-propylamine (N-PROPYL AMINE) / benzene / isobutane</p>
             {waiting && <p>계산 중이에요.</p>}
           </div>
+          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
+            {mode && mode === "BUBLP" ?
+              <div style={{ flex: 1, padding: 10 }}>
+                <ContinuosSlider val={P} onChange={(P) => this.setState({ P })} min={this.state.min} max={this.state.max} />
+              </div>
+              :
+              <div style={{ flex: 1, padding: 10 }}>
+                <ContinuosSlider val={T} onChange={(T) => this.setState({ T })} min={this.state.min} max={this.state.max} />
+              </div>
+            }
+
+          </div>
         </Content>
+
         <Canvas
           style={{ height: this.props.height * 0.8, width: '100%' }}
           camera={{ position: [1 / 2, Math.sqrt(3) / 4, 50], fov: 2, near: 1, far: -1 }}
         >
           <mesh rotation={[0, 0, 0]}>
             <Triangle points={trianglePoints} />
-            {len && data.map((e, i) => (
-              <mesh key={i}>
-                {Math.floor(Math.random() * 5) === 2 && (
-                  <>
+            {len && data.map((e, i) => {
+              if (mode === "BUBLP" && e.P < P * 1.03 && e.P > P * 0.97) {
+                return (
+                  <mesh key={i}>
                     <Point abc={e.x} val={0} t={0} />
-                    <Point abc={e.y} val={0} t={1} />
                     <TieLine x={e.x} y={e.y} val={0} color="green" />
-                  </>
-                )}
-              </mesh>
-            ))}
+                    <Point abc={e.y} val={0} t={1} />
+                  </mesh>
+                )
+              }
+              else if (mode === "BUBLT" && e.T < T * 1.03 && e.T > T * 0.97) {
+                return (
+                  <mesh key={i}>
+                    <Point abc={e.x} val={0} t={0} />
+                    <TieLine x={e.x} y={e.y} val={0} color="green" />
+                    <Point abc={e.y} val={0} t={1} />
+                  </mesh>
+                )
+              }
+            })}
           </mesh>
         </Canvas>
       </div>
