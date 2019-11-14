@@ -70,8 +70,13 @@ func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	equilDatas := make(chan chanErr, nc)
 	var jsonDatas []Eq_Result
 
+	min := 1.
+	max := 0.
+	var method string
+
 	// for BublP
 	if j.T != 0. {
+		method = "BUBLP"
 		for i := 0; i < nc; i++ {
 			go func(idx int) {
 				in := <-inChan
@@ -80,6 +85,12 @@ func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 					equilDatas <- chanErr{data: Eq_Result{}, err: true}
 				} else {
 					equilDatas <- chanErr{data: res, err: false}
+					if min > res.P {
+						min = res.P
+					}
+					if max < res.P {
+						max = res.P
+					}
 				}
 			}(i)
 		}
@@ -89,7 +100,8 @@ func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 			inChan <- Eq_Input{T: j.T, X_: fractions}
 		}
 		close(inChan)
-	} else if j.P != 0. { // for BublT
+	} else if j.P != 0 { // for BublT
+		method = "BUBLT"
 		for i := 0; i < nc; i++ {
 			go func(idx int) {
 				in := <-inChan
@@ -98,6 +110,12 @@ func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 					equilDatas <- chanErr{data: Eq_Result{}, err: true}
 				} else {
 					equilDatas <- chanErr{data: res, err: false}
+					if min > res.T {
+						min = res.T
+					}
+					if max < res.T {
+						max = res.T
+					}
 				}
 			}(i)
 		}
@@ -108,6 +126,7 @@ func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		}
 		close(inChan)
 	} else {
+		method = "error"
 		// error input
 		fmt.Fprintf(w, "hi equil!!")
 	}
@@ -122,7 +141,17 @@ func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 			// jsonDatas = append(jsonDatas, Eq_Result{})
 		}
 	}
-	res_json := map[string][]Eq_Result{"data": jsonDatas}
+	type Range struct {
+		Min float64 `json:"min"`
+		Max float64 `json:"max"`
+	}
+	type resJson struct {
+		Data   []Eq_Result `json:"data"`
+		Header Range       `json:"header"`
+		Method string      `json:"method"`
+	}
+	res_json := map[string]resJson{"result": resJson{jsonDatas, Range{min, max}, method}}
+
 	print, _ := json.Marshal(res_json)
 	w.Header().Add("Content-Type", "application/json")
 	fmt.Fprintf(w, "%s", print)
