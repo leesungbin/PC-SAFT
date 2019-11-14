@@ -61,8 +61,8 @@ const style: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingLeft: 97,
-    paddingRight: 67,
+    paddingLeft: '8%',
+    paddingRight: '8%',
   },
   logo: {
     display: 'flex',

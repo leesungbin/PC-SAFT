@@ -9,8 +9,8 @@ export function LineSegs({vertices, color}: {vertices: Vector3[], color?: string
   const linecolor= color ? color : "black"
   return (
     <line>
-      <geometry attach="geometry" ref={ref} />
       <lineBasicMaterial attach="material" color={linecolor} />
+      <geometry attach="geometry" ref={ref} />
     </line>
   )
 }

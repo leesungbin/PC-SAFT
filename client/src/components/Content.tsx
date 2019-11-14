@@ -5,7 +5,7 @@ type ContentProps = {
 }
 export function Content(props: ContentProps) {
   return (
-    <div style={{marginLeft: 97, marginRight: 97}}>
+    <div style={{marginLeft: '8%', marginRight: '8%'}}>
       {props.children}
     </div>
   )
