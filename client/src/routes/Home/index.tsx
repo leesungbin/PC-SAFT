@@ -97,7 +97,7 @@ class Home extends React.Component<HomeProps, State> {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ name: searchingName })
+      body: JSON.stringify({ name: searchingName.toLowerCase() })
     });
     const json = await res.json();
     this.setState({ searchingLists: json.data });
