@@ -52,7 +52,10 @@ func main() {
 
 	craHandler := http.FileServer(http.Dir(envPublicDir))
 	staticHandler := http.FileServer(http.Dir(envStaticDir))
+	// bad..
 	mux.Handle("/", craHandler)
+	mux.Handle("/db", craHandler)
+	mux.Handle("/docs", craHandler)
 	mux.Handle("/static", staticHandler)
 
 	mux.Handle("/api", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

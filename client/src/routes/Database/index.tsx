@@ -31,21 +31,19 @@ class Database extends React.Component<{}, State> {
     const fetchData = await fetch(DATA_ENDPOINT, { method: 'POST' });
     const json = await fetchData.json();
     const data = json.data.map((e: any) => { return e.data });
-  
+
     this.setState({ data });
   }
 
   render() {
     return (
-      // <Content>
-        <div style={{margin: 20, maxWidth: '100%'}}>
-          <DataTable
-            columns={this.state.columns}
-            data={this.state.data}
-            title="DB Table"
-          />
-        </div>
-      // </Content>
+      <div style={{ margin: 20, maxWidth: '100%' }}>
+        <DataTable
+          columns={this.state.columns}
+          data={this.state.data}
+          title="DB Table"
+        />
+      </div>
     );
   }
 }

@@ -149,8 +149,15 @@ func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		Data   []Eq_Result `json:"data"`
 		Header Range       `json:"header"`
 		Mode   string      `json:"mode"`
+		Names  []string    `json:"names"`
 	}
-	res_json := map[string]resJson{"result": resJson{jsonDatas, Range{min, max}, mode}}
+
+	var names []string
+	for _, d := range comps.Data {
+		names = append(names, d.Name)
+	}
+
+	res_json := map[string]resJson{"result": resJson{jsonDatas, Range{min, max}, mode, names}}
 
 	print, _ := json.Marshal(res_json)
 	w.Header().Add("Content-Type", "application/json")

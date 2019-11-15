@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Content } from '../../components/Content';
 import { Canvas } from 'react-three-fiber';
 import { Triangle } from '../../threeFragments/Triangle';
@@ -9,12 +9,14 @@ import { TieLine } from '../../threeFragments/TieLine';
 
 import ContinuosSlider from '../../components/ContinuosSlider';
 import { Typography } from '@material-ui/core';
+import CalculatingIndicator from '../../components/CalculatingIndicator';
 
 type FetchResult = {
   result: {
     data: { P: number, T: number, x: number[], y: number[] }[],
     header: { min: number, max: number },
-    mode: string
+    mode: string,
+    names: string[],
   }
 }
 type HomeProps = {
@@ -32,9 +34,11 @@ type State = {
   waiting: boolean,
   T: number,
   P: number,
+  openSelector: boolean,
   mode?: string,
   min?: number,
   max?: number,
+  names?: string[],
 }
 class Home extends React.Component<HomeProps, State> {
   state: State = {
@@ -42,6 +46,7 @@ class Home extends React.Component<HomeProps, State> {
     waiting: false,
     T: 300,
     P: 1,
+    openSelector: false,
   }
 
   callEquil = async () => {
@@ -55,47 +60,43 @@ class Home extends React.Component<HomeProps, State> {
       body: JSON.stringify({ T: 300, id: [18, 35, 62] }),
     });
     const json: FetchResult = await res.json()
-    const { data, header, mode } = json.result;
+    const { data, header, mode, names } = json.result;
     const { min, max } = header;
-    this.setState({ data, min, max, mode, waiting: false });
+    this.setState({ data, min, max, mode, names, waiting: false });
   }
 
   render() {
     const trianglePoints = [new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(1 / 2, Math.sqrt(3) / 2, 0)];
 
-    const { data, waiting, T, P, mode } = this.state;
+    const { data, waiting, T, P, mode, openSelector } = this.state;
     const len = data.length;
-
-    const textPosition = new Vector3(1 / 2, Math.sqrt(3) / 4 + 0.2, 0);
-
     return (
       <div>
         <Content>
-          <div style={{ height: 100 }}>
-            <button onClick={() => this.callEquil()}>fetch test</button>
-            {/* <p>현재 물질 : 1-propylamine (N-PROPYL AMINE) / benzene / isobutane</p> */}
-            {waiting && <p>계산 중이에요.</p>}
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
-            {mode && mode === "BUBLP" ?
-              <div style={{ flex: 1, padding: 10 }}>
-                <Typography gutterBottom>P : {P.toFixed(3)} atm</Typography>
-                <ContinuosSlider val={P} onChange={(P) => this.setState({ P })} min={this.state.min} max={this.state.max} />
-              </div>
-              : mode === "BUBLT" ?
+          <div style={{ height: 150 }}>
+            <div style={{ height: 70 }}>
+              <button onClick={() => this.callEquil()}>fetch test</button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
+              {mode && mode === "BUBLP" ?
                 <div style={{ flex: 1, padding: 10 }}>
-                  <Typography gutterBottom>T : {T.toFixed(3)} K</Typography>
-                  <ContinuosSlider val={T} onChange={(T) => this.setState({ T })} min={this.state.min} max={this.state.max} />
+                  <Typography gutterBottom>P : {P.toFixed(3)} atm</Typography>
+                  <ContinuosSlider val={P} onChange={(P) => this.setState({ P })} min={this.state.min} max={this.state.max} />
                 </div>
-                : <></>
-            }
-
+                : mode === "BUBLT" ?
+                  <div style={{ flex: 1, padding: 10 }}>
+                    <Typography gutterBottom>T : {T.toFixed(3)} K</Typography>
+                    <ContinuosSlider val={T} onChange={(T) => this.setState({ T })} min={this.state.min} max={this.state.max} />
+                  </div>
+                  : <></>
+              }
+            </div>
           </div>
         </Content>
         <div style={{ display: 'flex', justifyContent: 'center', }}>
           <Canvas
-            style={{ height: 500, width: 500 }}
-            camera={{ position: [1 / 2, Math.sqrt(3) / 4, 50], fov: 2, near: 0.5, far: -0.2 }}
+            style={{ height: this.props.height * 0.7, width: this.props.width}}
+            camera={{ position: [1 / 2, Math.sqrt(3) / 4, 50], fov: 1.9, near: 1, far: -1 }}
           >
             <mesh rotation={[0, 0, 0]}>
               <Triangle points={trianglePoints} />
@@ -122,6 +123,7 @@ class Home extends React.Component<HomeProps, State> {
             </mesh>
           </Canvas>
         </div>
+        <CalculatingIndicator open={this.state.waiting}/>
       </div>
     );
   }
