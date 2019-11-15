@@ -1,5 +1,4 @@
 import React from 'react';
-import { Content } from '../../components/Content';
 import { DATA_ENDPOINT } from '../../_lib/endpoint';
 import DataTable from './Table';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dialog, DialogContent, DialogContentText, DialogTitle, CircularProgress } from '@material-ui/core';
+import { Dialog, DialogContent, CircularProgress, DialogContentText } from '@material-ui/core';
 
 type CompSelectorProps={
   open: boolean,

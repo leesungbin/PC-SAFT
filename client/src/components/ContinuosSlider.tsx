@@ -12,7 +12,6 @@ export default function ContinuosSlider({ val, min, max, onChange }: ContinuosSl
   const [value, setValue] = useState<number>(val);
   const handleChange = (event: any, newValue: number | number[]) => {
     setValue(newValue as number);
-    console.log(newValue);
     onChange && onChange(newValue as number);
   }
 
