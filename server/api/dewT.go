@@ -45,7 +45,7 @@ func DewT(components Comps, in Eq_Input) (res Eq_Result) {
 	}
 
 	var Vv_res, Vl_res float64
-	maxit := 3000
+	maxit := 300
 	for i := 0; i < maxit; i++ {
 		gvi_L := GetVolumeInput{in.P, T, x_, "L"}
 		V_L, _ := GetVolume(components, gvi_L)

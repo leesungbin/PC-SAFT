@@ -42,7 +42,7 @@ func BublP_init(components Comps, T float64, x_ []float64) (res PY_init) {
 func BublP(components Comps, in Eq_Input) (res Eq_Result, err error) {
 	var i int
 	var sumy float64
-	maxit := 3000
+	maxit := 300
 	initRes := BublP_init(components, in.T, in.X_)
 	P := initRes.P
 	y_ := initRes.Y
