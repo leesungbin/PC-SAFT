@@ -1,8 +1,6 @@
 package api
 
 import (
-	"errors"
-	"fmt"
 	"math"
 
 	"gonum.org/v1/gonum/mat"
@@ -47,11 +45,14 @@ func PCsaft(components Comps, C PCsaftInput) (res PCsaftResult, err error) {
 			zet[j] += Pi / 6 * rho_num * C.X_[i] * components.Data[i].M * Pow(d[i], float64(j))
 		}
 	}
-	// ## hard sphere term [Test Complete]
+	// fmt.Printf("M: %v\nd: %v\nzet: %v\n", M, d, zet) // ok
+
+	// ## hard sphere term
 	// Zhc initialize with m_*Zhs
 	Zhc := M * (zet[3]/(1-zet[3]) +
 		3*zet[1]*zet[2]/(zet[0]*Pow(1-zet[3], 2)) +
 		Pow(zet[2], 3)*(3-zet[3])/(zet[0]*Pow(1-zet[3], 3)))
+	// fmt.Printf("Zhc: %v\n", Zhc) // ok
 
 	for i := 0; i < nc; i++ {
 		g[i] = 1/(1-zet[3]) +
@@ -64,6 +65,8 @@ func PCsaft(components Comps, C PCsaftInput) (res PCsaftResult, err error) {
 
 		Zhc += -C.X_[i] * (components.Data[i].M - 1) / g[i] * rho_dg[i]
 	}
+
+	// fmt.Printf("g: %v\nrho_dg: %v\nZhc: %v\n", g, rho_dg, Zhc) // ok
 
 	// ## Dispersion term [Test Complete]
 	n := zet[3]
@@ -86,6 +89,8 @@ func PCsaft(components Comps, C PCsaftInput) (res PCsaftResult, err error) {
 		dI1 += a[i] * float64(i+1) * Pow(n, float64(i))
 		dI2 += b[i] * float64(i+1) * Pow(n, float64(i))
 	}
+	// fmt.Printf("a: %v\nb: %v\nI1: %v\nI2: %v\ndI1: %v\ndI2: %v\n", a, b, I1, I2, dI1, dI2) // ok
+
 	C1 := 1 / (1 +
 		M*(8*n-2*n*n)/Pow(1-n, 4) +
 		(1-M)*(20*n-27*n*n+12*Pow(n, 3)-2*Pow(n, 4))/Pow((1-n)*(2-n), 2))
@@ -113,13 +118,14 @@ func PCsaft(components Comps, C PCsaftInput) (res PCsaftResult, err error) {
 	}
 	Zdisp := -2*Pi*rho_num*dI1*m2esig3 - Pi*rho_num*M*(C1*dI2+C2*n*I2)*m2e2sig3
 
+	// fmt.Printf("Zhc: %v\nZdisp: %v\n", Zhc, Zdisp) // ok
+
 	// ## association term [not completed]
 	Zassoc := 0.
 	ncas := 0
 	for i := 0; i < nc; i++ {
 		if components.Data[i].K > 1e-10 {
 			ncas++
-			break
 		}
 	}
 
@@ -166,15 +172,21 @@ func PCsaft(components Comps, C PCsaftInput) (res PCsaftResult, err error) {
 				F[i][j] = math.Exp(ek_AB.E_AB[i][j]/C.T) - 1
 				K[i][j] = Pow((components.Data[i].Sig+components.Data[j].Sig)/2, 3) * ek_AB.K_AB[i][j]
 				g_ij := 1/(1-zet[3]) + d[i]*d[j]/(d[i]+d[j])*3*zet[2]/Pow(1-zet[3], 2) +
-					Pow(d[i]*d[j]/(d[i]+d[j]), 2) + 2*Pow(zet[2], 2)/Pow(1-zet[3], 3)
+					Pow(d[i]*d[j]/(d[i]+d[j]), 2)*2*Pow(zet[2], 2)/Pow(1-zet[3], 3)
 				DEL[i][j] = g_ij * F[i][j] * K[i][j]
+				// 	roDGij = t[3]/(1-t[3])**2     \
+				// +  d[i]*d[j]/(d[i]+d[j]) * ( 3*t[2]/(1-t[3])**2 + 6*t[2]*t[3]/(1-t[3])**3 )   \
+				// + ( d[i]*d[j]/(d[i]+d[j]) )**2 * ( 4*t[2]**2/(1-t[3])**3 + 6*t[2]**2 *t[3]/(1-t[3])**4 )
+				//   roDDEL[i][j] = roDGij * F[i][j] * K[i][j]
 				roDg_ij := zet[3]/Pow(1-zet[3], 2) +
 					d[i]*d[j]/(d[i]+d[j])*(3*zet[2]/Pow(1-zet[3], 2)+6*zet[2]*zet[3]/Pow(1-zet[3], 3)) +
-					Pow(zet[i]*zet[j]/(zet[i]+zet[j]), 2)*
+					Pow(d[i]*d[j]/(d[i]+d[j]), 2)*
 						(4*Pow(zet[2], 2)/Pow(1-zet[3], 3)+6*Pow(zet[2], 2)*zet[3]/Pow(1-zet[3], 4))
 				roDDEL[i][j] = roDg_ij * F[i][j] * K[i][j]
 			}
 		}
+		// fmt.Printf("F: %v\nK: %v\nDEL: %v\nroDDEL: %v\n", F, K, DEL, roDDEL) // ok
+
 		// # Find X's by iteration (successive substitution)
 		// # defaul value X = 1 for non-associating components
 		for i := range X {
@@ -187,21 +199,28 @@ func PCsaft(components Comps, C PCsaftInput) (res PCsaftResult, err error) {
 				X[i] = (-1 + math.Sqrt(1+4*rho_num*C.X_[i]*DEL[i][i])) / (2 * rho_num * C.X_[i] * DEL[i][i])
 			}
 		}
-		for {
-			Xold := X
-			err := 0.
+		// fmt.Printf("X: %v\n", X) // ok
+		// fmt.Printf("ncP :%v\n", nc+1)
+		for p := 0; ; p++ {
+			Xold := make([]float64, nc)
+			for o := 0; o < nc; o++ {
+				Xold[o] = X[o]
+			}
+
+			err_assoc := 0.
 			for i := 0; i < nc; i++ {
 				sum := 1.
 				for j := 0; j < nc; j++ {
-					sum += rho_num * C.X_[i] * X[j] * DEL[i][j]
+					sum += rho_num * C.X_[j] * X[j] * DEL[i][j]
 				}
-				X[i] = 1 / sum
-				err += math.Abs(X[i] - Xold[i])
+				X[i] = 1. / sum
+				err_assoc += math.Abs(X[i] - Xold[i])
 			}
-			if err/float64(nc+1) < 1e-5 {
+			if err_assoc/float64(nc+1) < 1e-5 {
 				break
 			}
 		}
+		// fmt.Printf("X after: %v\n", X) // ok
 
 		// iteration
 		// DX := make([]float64, nc)
@@ -245,20 +264,23 @@ func PCsaft(components Comps, C PCsaftInput) (res PCsaftResult, err error) {
 				a[i*nc+j] = A[i][j]
 			}
 		}
-
 		A_ := mat.NewDense(nc, nc, a)
 		B_ := mat.NewDense(nc, 1, B)
+		// fmt.Printf("A: %v\nB: %v\n", A_, B_) // ok
+
 		var DX mat.Dense
 		DX.Solve(A_, B_)
+		// fmt.Printf("solved: %v", DX) // ok
 
 		Zassoc = 0
 		for i := 0; i < nc; i++ {
 			Zassoc += C.X_[i] * 2 * (1/X[i] - 1./2.) * rho_num * DX.At(i, 0) // matrix
 			// Zassoc += C.x_[i] * 2 * (1/X[i] - 1./2.) * rho_num * DX[i]
 		}
+		// fmt.Printf("Zassoc: %v\n", Zassoc) // ok
 	}
 
-	// ## polar term - Jog and Chapman [Complete]
+	// ## polar term - Jog and Chapman
 
 	Zpolar := 0.
 	nc_pol := 0 // # number of polar components
@@ -274,6 +296,7 @@ func PCsaft(components Comps, C PCsaftInput) (res PCsaftResult, err error) {
 			mu2k[i] = Pow(components.Data[i].D, 2) / 1.380572e26 // # dipol^2 (D^2) / k    (m3 K)
 		}
 	}
+	// fmt.Printf("nc_pol: %v\nmu2k: %v\n", nc_pol, mu2k) // ok
 	if nc_pol > 0 {
 		for i := range dd {
 			dd[i] = make([]float64, nc)
@@ -310,17 +333,22 @@ func PCsaft(components Comps, C PCsaftInput) (res PCsaftResult, err error) {
 		} else {
 			Zpolar = 2/(1-A3p/A2p)*roDA2p - 1/Pow(1-A3p/A2p, 2)*(roDA2p-roDA3p)
 		}
+		// fmt.Printf("Zpolar: %v\n", Zpolar) // ok
 	}
 	Z := 1. + Zhc + Zdisp + Zassoc + Zpolar // calculated
-	if Z < 0 {
-		return res, errors.New(fmt.Sprintf("Z < 0\nZhc : %v, Zdisp : %v, Zassoc : %v, Zpolar : %v\n", Zhc, Zdisp, Zassoc, Zpolar))
-	}
+	// fmt.Printf("Z: %v\n", Z)
+	// if Z < 0 {
+	// 	return res, errors.New(fmt.Sprintf("Z < 0\nZhc : %v, Zdisp : %v, Zassoc : %v, Zpolar : %v\n", Zhc, Zdisp, Zassoc, Zpolar))
+	// }
 	res.Z = Z // calculated compressibility factor (Z)
 
 	// ## calculate fugacity ------------------------------------------------------------------------------------------
 	Ahs := 1 / zet[0] * (3*zet[1]*zet[2]/(1-zet[3]) + Pow(zet[2], 3)/zet[3]/Pow(1-zet[3], 2) +
 		(Pow(zet[2], 3)/Pow(zet[3], 2)-zet[0])*math.Log(1-zet[3]))
 	Ahc := M * Ahs
+
+	// fmt.Printf("Ahs : %v\nAhc: %v\n", Ahs, Ahc) // ok
+
 	for i := 0; i < nc; i++ {
 		Ahc += -C.X_[i] * (components.Data[i].M - 1) * math.Log(g[i])
 	}
@@ -331,6 +359,7 @@ func PCsaft(components Comps, C PCsaftInput) (res PCsaftResult, err error) {
 			tx[i][j] = Pi / 6 * rho_num * components.Data[j].M * Pow(d[j], float64(i))
 		}
 	}
+	// fmt.Printf("Ahc: %v\ntx: %v\n", Ahc, tx) // ok
 	Ahsx := make([]float64, nc)
 	for k := 0; k < nc; k++ {
 		Ahsx[k] = -tx[0][k]/zet[0]*Ahs + 1/zet[0]*(3*(tx[1][k]*zet[2]+zet[1]*tx[2][k])/(1-zet[3])+
@@ -339,7 +368,6 @@ func PCsaft(components Comps, C PCsaftInput) (res PCsaftResult, err error) {
 			((3*Pow(zet[2], 2)*tx[2][k]*zet[3]-2*Pow(zet[2], 3)*tx[3][k])/Pow(zet[3], 3)-tx[0][k])*
 				math.Log(1-zet[3])+(zet[0]-Pow(zet[2], 3)/Pow(zet[3], 2))*tx[3][k]/(1-zet[3]))
 	}
-	// fmt.Printf("%v %v %v\n", Ahc, tx, Ahsx) // complete
 	gx := make([][]float64, nc)
 	for i := 0; i < nc; i++ {
 		gx[i] = make([]float64, nc)
@@ -349,7 +377,7 @@ func PCsaft(components Comps, C PCsaftInput) (res PCsaftResult, err error) {
 				Pow(d[i]/2, 2)*(4*zet[2]*tx[2][k]/Pow(1-zet[3], 3)+6*zet[2]*zet[2]*tx[3][k]/Pow(1-zet[3], 4))
 		}
 	}
-	// fmt.Printf("%v %v\n", Ahsx, gx) // complete
+	// fmt.Printf("Ahsx: %v\n gx: %v\n", Ahsx, gx) // ok
 	Ahcx := make([]float64, nc)
 	for k := 0; k < nc; k++ {
 		Ahcx[k] = components.Data[k].M*Ahs + M*Ahsx[k] - (components.Data[k].M-1)*math.Log(g[k]) // # with correlation
@@ -357,18 +385,24 @@ func PCsaft(components Comps, C PCsaftInput) (res PCsaftResult, err error) {
 			Ahcx[k] += -C.X_[i] * (components.Data[i].M - 1) / g[i] * gx[i][k]
 		}
 	}
-
 	lnphi := make([]float64, nc)
 	for k := 0; k < nc; k++ {
-		lnphi[k] = res.Z - 1 - math.Log(res.Z) + Ahc + Ahcx[k]
+		if res.Z > 0 {
+			lnphi[k] = res.Z - 1 - math.Log(res.Z) + Ahc + Ahcx[k]
+		} else {
+			// is it okay?
+			lnphi[k] = res.Z - 1 + Ahc + Ahcx[k]
+		}
+
 		for j := 0; j < nc; j++ {
 			lnphi[k] += -C.X_[j] * Ahcx[j]
 		}
 	}
-	// fmt.Printf("%v %v %v\n", gx, Ahcx, lnphi) // complete
+	// fmt.Printf("Ahcx: %v\nlnphi: %v\n", Ahcx, lnphi) // ok
 
 	// # Dispersion term
 	Adisp := -2*Pi*rho_num*I1*m2esig3 - Pi*rho_num*M*C1*I2*m2e2sig3
+	// fmt.Printf("Adisp: %v\n", Adisp) // ok
 
 	m2ekTsig3x := make([]float64, nc)
 	m2ekT2sig3x := make([]float64, nc)
@@ -380,13 +414,14 @@ func PCsaft(components Comps, C PCsaftInput) (res PCsaftResult, err error) {
 			m2ekT2sig3x[k] += 2 * components.Data[k].M * C.X_[j] * components.Data[j].M * Pow(ekT, 2) * sig3
 		}
 	}
-	// fmt.Printf("%v %v %v\n", Adisp, m2ekTsig3x, m2ekT2sig3x) // complete
+	// fmt.Printf("m2ekTsig3x: %v\nm2ekT2sig3x: %v\n", m2ekTsig3x, m2ekT2sig3x) // ok
 
 	C1x := make([]float64, nc)
 	for k := 0; k < nc; k++ {
 		C1x[k] = C2*tx[3][k] - Pow(C1, 2)*(components.Data[k].M*(8*n-2*Pow(n, 2))/Pow(1-n, 4)-
 			components.Data[k].M*(20*n-27*Pow(n, 2)+12*Pow(n, 3)-2*Pow(n, 4))/Pow(1-n, 2)/Pow(2-n, 2))
 	}
+	// fmt.Printf("C1x: %v\n", C1x) // ok
 
 	ax := make([][]float64, 7)
 	bx := make([][]float64, 7)
@@ -398,7 +433,7 @@ func PCsaft(components Comps, C PCsaftInput) (res PCsaftResult, err error) {
 			bx[i][k] = components.Data[k].M/(M*M)*b1[i] + components.Data[k].M/(M*M)*(3-4/M)*b2[i]
 		}
 	}
-	// fmt.Printf("%v %v %v\n", C1x, ax, bx) // complete
+	// fmt.Printf("ax: %v\nbx: %v\n", ax, bx) // ok
 	I1x := make([]float64, nc)
 	I2x := make([]float64, nc)
 	for k := 0; k < nc; k++ {
@@ -413,14 +448,14 @@ func PCsaft(components Comps, C PCsaftInput) (res PCsaftResult, err error) {
 			Pi*rho_num*((components.Data[k].M*C1*I2+M*C1x[k]*I2+M*C1*I2x[k])*m2e2sig3+
 				M*C1*I2*m2ekT2sig3x[k])
 	}
-	// fmt.Printf("%v %v %v\n", I1x, I2x, Adispx) // complete
+	// fmt.Printf("I1x: %v\nI2x: %v\nAdispx: %v\n", I1x, I2x, Adispx) // ok
 	for k := 0; k < nc; k++ {
 		lnphi[k] += Adisp + Adispx[k]
 		for j := 0; j < nc; j++ {
 			lnphi[k] += -C.X_[j] * Adispx[j]
 		}
 	}
-	// fmt.Printf("%v\n", lnphi) // complete
+	// fmt.Printf("lnphi: %v\n", lnphi) // ok
 
 	// # Association term
 	// # single associaing components of I
@@ -464,43 +499,63 @@ func PCsaft(components Comps, C PCsaftInput) (res PCsaftResult, err error) {
 				}
 			}
 		}
+		// fmt.Printf("DELx: %v\n", DELx) // ok
 		Xx := make([][]float64, nc)
 		for i := 0; i < nc; i++ {
 			Xx[i] = make([]float64, nc)
 		}
-		for {
-			Xxold := Xx
-			err := 0.
-			for i := 0; i < nc; i++ {
-				for k := 0; k < nc; k++ {
-					sum := rho_num * X[k] * DEL[i][k]
-					for j := 0; j < nc; j++ {
-						sum += rho_num * C.X_[j] * X[j] * DELx[i][j][k]
-						if j == i {
-							continue
-						}
-						sum += rho_num * C.X_[j] * Xx[j][k] * DEL[i][j]
-					}
-
-					Xx[i][k] = -Pow(X[i], 2) / (1 + rho_num*C.X_[i]*Pow(X[i], 2)*DEL[i][i]) * sum
-					err += math.Abs(Xx[i][k] - Xxold[i][k])
+		A := make([][]float64, nc*nc)
+		B := make([]float64, nc*nc)
+		for i := 0; i < nc*nc; i++ {
+			A[i] = make([]float64, nc*nc)
+		}
+		for i := 0; i < nc; i++ {
+			for k := 0; k < nc; k++ {
+				ik_ := i*nc + k
+				A[ik_][ik_] = 1
+				B[ik_] = -Pow(X[i], 2) * rho_num * X[k] * DEL[i][k]
+				for j := 0; j < nc; j++ {
+					jk_ := j*nc + k
+					A[ik_][jk_] += Pow(X[i], 2) * rho_num * C.X_[j] * DEL[i][j]
+					B[ik_] += -Pow(X[i], 2) * rho_num * C.X_[j] * X[j] * DELx[i][j][k]
 				}
 			}
-			if err/float64(nc+1)/float64(nc+1) < 1e-6 {
-				break
+		}
+		a := make([]float64, nc*nc*nc*nc)
+		for i := 0; i < nc*nc; i++ {
+			for j := 0; j < nc*nc; j++ {
+				a[i*nc*nc+j] = A[i][j]
 			}
 		}
+		A_ := mat.NewDense(nc*nc, nc*nc, a)
+		B_ := mat.NewDense(nc*nc, 1, B)
+		// fmt.Printf("A_: %v\nB_: %v\n", A, B) // ok
+
+		var DX mat.Dense
+		DX.Solve(A_, B_)
+		// u = linalg.solve(A, B)
+		for i := 0; i < nc; i++ {
+			for k := 0; k < nc; k++ {
+				ik_ := i*nc + k
+				Xx[i][k] = DX.At(ik_, 0)
+			}
+		}
+		// fmt.Printf("DX: %v\n", DX) // ok
+		// fmt.Printf("Xx: %v\n", Xx) // ok
+
 		Aassoc := 0.
 		for i := 0; i < nc; i++ {
-			Aassoc += C.X_[i] * 2 * (math.Log(X[i]) - X[i]/2 + 1/2)
+			Aassoc += C.X_[i] * 2 * (math.Log(X[i]) - X[i]/2 + 1./2.)
 		}
+		// fmt.Printf("Assoc: %v\n", Aassoc) // ok
 		Aassocx := make([]float64, nc)
 		for k := 0; k < nc; k++ {
 			for i := 0; i < nc; i++ {
-				Aassocx[k] += C.X_[i] * 2 * (1/X[i] - 1/2) * Xx[i][k]
+				Aassocx[k] += C.X_[i] * 2 * (1/X[i] - 1./2.) * Xx[i][k]
 			}
-			Aassocx[k] += 2 * (math.Log(X[k]) - X[k]/2 + 1/2)
+			Aassocx[k] += 2 * (math.Log(X[k]) - X[k]/2 + 1./2.)
 		}
+		// fmt.Printf("Assocx: %v\n", Aassocx) // ok
 		// # add to fugacity coefficient
 		for k := 0; k < nc; k++ {
 			lnphi[k] += Aassoc + Aassocx[k]
@@ -508,8 +563,8 @@ func PCsaft(components Comps, C PCsaftInput) (res PCsaftResult, err error) {
 				lnphi[k] += -C.X_[j] * Aassocx[j]
 			}
 		}
-
 	}
+
 	if nc_pol > 0 && math.Abs(A2p) > 1e-10 {
 		Apolar := A2p / (1 - A3p/A2p)
 		dI2px := make([]float64, nc)

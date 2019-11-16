@@ -48,3 +48,8 @@ func Test_pcsaft(t *testing.T) {
 		}
 	}
 }
+
+func Test_PPP_pcsaft(t *testing.T) {
+	got, err := PCsaft(PPP_methanol_water_aceticacid, PCsaftInput{V: 0.00004242566595868248, T: PPP_Temperarute, X_: PPP_composition})
+	t.Errorf("%v\n%v\n", err, got)
+}

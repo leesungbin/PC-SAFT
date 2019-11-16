@@ -86,6 +86,13 @@ func Test_Peos_P(t *testing.T) {
 		t.Errorf("got %v, expected %v\n", got, want)
 	}
 }
+func Test_PPP_Peos_P(t *testing.T) {
+	got, _ := Peos_P(PPP_methanol_water_aceticacid, NewtonInput{V: 4.242566595868248e-05, P: 1.013, T: 345.07893999999993, Z_: PPP_composition})
+	want := -526.164269
+	if !PassWithAccuracy4(got, want) {
+		t.Errorf("got %v, expected %v\n", got, want)
+	}
+}
 
 var NNN_Fugacity_newton_Input = NewtonInput{V: 0.00011453205172139417, P: Pressure, T: Temperature, Z_: Composition_NNN}
 var NNN_Fugacity_Output_phi = []float64{2.9332610259971834, 0.05301216759321054, 0.037263385443932213}

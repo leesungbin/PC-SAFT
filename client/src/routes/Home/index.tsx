@@ -73,7 +73,7 @@ class Home extends React.Component<HomeProps, State> {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ T: 300, id }),
+        body: JSON.stringify({ P: 1.013, id }),
       });
       const json: FetchResult = await res.json()
       const { data, header, mode, names } = json.result;

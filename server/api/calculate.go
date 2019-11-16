@@ -97,7 +97,7 @@ func FindV_newton(components Comps, in NewtonInput) (Vres float64, err error) {
 			return V, err
 		}
 
-		if math.Abs(f/in.P) < 1e-2 { // 정확도 1e-5까지 가는 경우가 잘 없다.
+		if math.Abs(f/in.P) < 1e-5 { // 정확도 1e-5까지 가는 경우가 잘 없다.
 			// fmt.Printf("iterated for %d times\nfindV_newton end : V, : %v\nconverged rate : %v\n", i, V, f/in.P)
 			return V, nil
 		}
@@ -126,7 +126,7 @@ func GetVolume(components Comps, in GetVolumeInput) (V float64, err error) {
 	if in.State == "V" {
 		V0 = Vvap
 	} else {
-		V0 = Vliq * 0.99 // set scalVl0 = 0.99
+		V0 = Vliq * 0.95 // set scalVl0 = 0.95
 	}
 	// Log(fmt.Sprintf("GetVolume : %v", V0))
 	V, err = FindV_newton(components, NewtonInput{V0, in.P, in.T, in.Z_})
