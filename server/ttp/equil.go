@@ -85,7 +85,7 @@ func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 					equilDatas <- chanErr{data: Eq_Result{}, err: true}
 				} else {
 					equilDatas <- chanErr{data: res, err: false}
-					if min > res.P {
+					if min > res.P || min == 1. {
 						min = res.P
 					}
 					if max < res.P {

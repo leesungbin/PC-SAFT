@@ -175,7 +175,7 @@ class Home extends React.Component<HomeProps, State> {
             <mesh rotation={[0, 0, 0]}>
               <Triangle points={trianglePoints} />
               {len && data.map((e, i) => {
-                if (mode === "BUBLP" && e.P < P * 1.03 && e.P > P * 0.97) {
+                if (mode === "BUBLP" && e.P < P * 1.01 && e.P > P * 0.99) {
                   return (
                     <mesh key={i}>
                       <Point abc={e.x} val={0} t={0} />
@@ -184,11 +184,11 @@ class Home extends React.Component<HomeProps, State> {
                     </mesh>
                   )
                 }
-                else if (mode === "BUBLT" && e.T < T * 1.03 && e.T > T * 0.97) {
+                else if (mode === "BUBLT" && e.T < T * 1.005 && e.T > T * 0.995) {
                   return (
                     <mesh key={i}>
                       <Point abc={e.x} val={0} t={0} />
-                      <TieLine x={e.x} y={e.y} val={0} color="green" />
+                      <TieLine x={e.x} y={e.y} val={0.1} color="green" />
                       <Point abc={e.y} val={0} t={1} />
                     </mesh>
                   )
