@@ -97,7 +97,7 @@ func FindV_newton(components Comps, in NewtonInput) (Vres float64, err error) {
 			return V, err
 		}
 
-		if math.Abs(f/in.P) < 1e-4 { // 정확도 1e-5까지 가는 경우가 잘 없다.
+		if math.Abs(f/in.P) < 1e-3 { // 정확도 1e-5까지 가는 경우가 잘 없다.
 			// fmt.Printf("iterated for %d times\nfindV_newton end : V, : %v\nconverged rate : %v\n", i, V, f/in.P)
 			return V, nil
 		}
