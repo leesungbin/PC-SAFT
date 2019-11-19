@@ -1,0 +1,19 @@
+.box {
+    margin: 30px ;
+    border: 1px solid black;
+    
+}
+
+.container {
+    margin: 30px;
+    max-width: 100%;
+    background-color: #fff;
+    border: 1px solid #d1d5da;
+    border-radius: 3px;
+    padding-top: 20px;
+    padding-left: 30px;
+}
+
+.title1 {
+    
+}

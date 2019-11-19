@@ -3,8 +3,8 @@ import { Content } from '../../components/Content';
 import { Canvas } from 'react-three-fiber';
 import { Triangle } from '../../threeFragments/Triangle';
 import { Vector3 } from 'three';
-import { EQUIL_ENDPOINT, SEARCH_ENDPOINT } from '../../_lib/endpoint';
-import Point from '../../threeFragments/Point';
+import { EQUIL_ENDPOINT, SEARCH_ENDPOINT, DATA_ENDPOINT } from '../../_lib/endpoint';
+import Point from '../../threeFragments/point';
 import { TieLine } from '../../threeFragments/TieLine';
 
 import ContinuosSlider from '../../components/ContinuosSlider';
@@ -12,6 +12,8 @@ import { Typography, ListItem, ListItemText, List, Chip } from '@material-ui/cor
 import CalculatingIndicator from '../../components/CalculatingIndicator';
 import SearchHeader from '../../components/SearchHeader';
 import { ErrorSnack } from '../../components/Snack';
+
+import './index.css';
 
 type FetchResult = {
   result: {
@@ -47,7 +49,8 @@ type State = {
   searchingName?: string,
   searchingLists?: any[],
   selectedComponents: Component[],
-  error: string
+  error: string,
+  components: Component[],
 }
 
 class Home extends React.Component<HomeProps, State> {
@@ -59,6 +62,15 @@ class Home extends React.Component<HomeProps, State> {
     openSelector: false,
     selectedComponents: [],
     error: '',
+    components: [],
+  }
+
+  componentDidMount = async () => {
+    const fetchData = await fetch(DATA_ENDPOINT, { method: 'POST' });
+    const json = await fetchData.json();
+    const components = json.data.map((e: any) => { return e.data });
+
+    this.setState({ components });
   }
 
   callEquil = async () => {
@@ -117,9 +129,42 @@ class Home extends React.Component<HomeProps, State> {
     const next = selectedComponents.filter((_, i) => { return i !== index });
     this.setState({ selectedComponents: next, error: '' });
   }
+  
+  selectComponentFromComponentList(component: Component) {
+    const { selectedComponents } = this.state;
+    this.setState({ selectedComponents: [...selectedComponents, component], searchingName: '', searchingLists: [] });
+  }
+
+  removeComponentFromComponentList(component: Component) {
+    const { selectedComponents } = this.state;
+    const index = selectedComponents.findIndex(c => c.name === component.name)
+    selectedComponents.splice(index, 1)
+    this.setState({ selectedComponents, error: '' });
+  }
+
+  onClickComponentListItemHandler(component: Component) {
+    const { selectedComponents } = this.state;
+    const foundComponent = selectedComponents.find(c => c.name === component.name)
+    if (foundComponent) {
+      this.removeComponentFromComponentList(component)
+    } else {
+      this.selectComponentFromComponentList(component)
+    }
+  }
+
   render() {
     const trianglePoints = [new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(1 / 2, Math.sqrt(3) / 2, 0)];
-
+    const parameters = {
+      font: 'sans-serif',
+      size: 20,
+      height: 20,
+      curveSegments: 0,
+      bevelEnabled: false,
+      bevelThickness: 0,
+      bevelSize: 0,
+      bevelOffset: 0,
+      bevelSegments: 0
+    }
     const { data, waiting, T, P, mode, searchingLists } = this.state;
     const len = data.length;
     return (
@@ -168,35 +213,48 @@ class Home extends React.Component<HomeProps, State> {
           </div>
         </Content>
         <div style={{ display: 'flex', justifyContent: 'center', zIndex: 0 }}>
-          <Canvas
-            style={{ height: this.props.height * 0.7, width: this.props.width }}
-            camera={{ position: [1 / 2, Math.sqrt(3) / 4, 50], fov: 1.9, near: 1, far: -1 }}
-          >
-            <mesh rotation={[0, 0, 0]}>
-              <Triangle points={trianglePoints} />
-              {len && data.map((e, i) => {
-                if (mode === "BUBLP" && e.P < P * 1.01 && e.P > P * 0.99) {
-                  return (
-                    <mesh key={i}>
-                      <Point abc={e.x} val={0} t={0} />
-                      <TieLine x={e.x} y={e.y} val={0} color="green" />
-                      <Point abc={e.y} val={0} t={1} />
-                    </mesh>
-                  )
-                }
-                else if (mode === "BUBLT" && e.T < T * 1.005 && e.T > T * 0.995) {
-                  return (
-                    <mesh key={i}>
-                      <Point abc={e.x} val={0} t={0} />
-                      <TieLine x={e.x} y={e.y} val={0.1} color="green" />
-                      <Point abc={e.y} val={0} t={1} />
-                    </mesh>
-                  )
-                }
-                return <></>
-              })}
-            </mesh>
-          </Canvas>
+          <div>
+            <Canvas
+              style={{ height: this.props.height * 0.7, width: this.props.width * 0.7 }}
+              camera={{ position: [1 / 2, Math.sqrt(3) / 4, 50], fov: 1.9, near: 1, far: -1 }}
+            >
+              <mesh rotation={[0, 0, 0]}>
+                <Triangle points={trianglePoints} />
+                {len && data.map((e, i) => {
+                  if (mode === "BUBLP" && e.P < P * 1.01 && e.P > P * 0.99) {
+                    return (
+                      <mesh key={i}>
+                        <Point abc={e.x} val={0} t={0} />
+                        <TieLine x={e.x} y={e.y} val={0} color="green" />
+                        <Point abc={e.y} val={0} t={1} />
+                      </mesh>
+                    )
+                  }
+                  else if (mode === "BUBLT" && e.T < T * 1.005 && e.T > T * 0.995) {
+                    return (
+                      <mesh key={i}>
+                        <Point abc={e.x} val={0} t={0} />
+                        <TieLine x={e.x} y={e.y} val={0.1} color="green" />
+                        <Point abc={e.y} val={0} t={1} />
+                      </mesh>
+                    )
+                  }
+                  return <></>
+                })}
+              </mesh>
+            </Canvas>
+          </div>
+          <div style={{ flex: '1 1 auto', marginRight: '50px' }}>
+            <ul style={{ maxHeight: this.props.height * 0.7, overflow: 'auto' }} className={'component-list'}>
+              {this.state.components.map((component) => (
+                <li style={{ backgroundColor: this.state.selectedComponents.find(comp => comp.name === component.name) ? 'skyblue' : 'white' }} 
+                  className={'component-list__item'}
+                  onClick={() => this.onClickComponentListItemHandler(component)}>
+                  <span>{ component.name }</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
         <CalculatingIndicator open={waiting} />
         <ErrorSnack error={this.state.error} onClose={() => this.setState({ error: '' })} />
