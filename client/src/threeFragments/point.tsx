@@ -6,7 +6,7 @@ export default function Point({ abc, val, t }: { abc: number[], val: number, t: 
   const coord = coordChange(abc[0], abc[1], abc[2]);
   return (
     <mesh visible position={[coord.x, coord.y, val]}>
-      <sphereGeometry attach="geometry" args={[0.01, 5, 5]} />
+      <sphereGeometry attach="geometry" args={[0.007, 4, 4]} />
       { t === 0 ? <meshBasicMaterial attach="material" color="blue" /> : <meshBasicMaterial attach="material" color="hotpink"/>}
     </mesh>
   )

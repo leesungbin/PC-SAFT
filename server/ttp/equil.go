@@ -30,7 +30,7 @@ func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	// fmt.Printf("%v %v %v\n", j.T, j.P, j.Id)
+	fmt.Printf("%v %v %v\n", j.T, j.P, j.Id)
 	res_parse, err_parse := getInfoFromBody(j)
 
 	if err_parse != nil {

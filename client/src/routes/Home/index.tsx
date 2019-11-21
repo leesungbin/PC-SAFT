@@ -68,7 +68,7 @@ class Home extends React.Component<HomeProps, State> {
   componentDidMount = async () => {
     const fetchData = await fetch(DATA_ENDPOINT, { method: 'POST' });
     const json = await fetchData.json();
-    const components = json.data.map((e: any) => { return e.data });
+    const components = json.data.map((e: any) => { return {...e.data, id: e.id} });
 
     this.setState({ components });
   }
@@ -79,8 +79,8 @@ class Home extends React.Component<HomeProps, State> {
     }
   }
   callEquil = async () => {
-    const { error } = this.state;
-    const selectedComponents = this.state.components.filter(component => component.selected === true);
+    const { selectedComponents, error } = this.state;
+    console.log(selectedComponents);
     if (selectedComponents.length === 3 && error === '') {
       const id = selectedComponents.map(comp => { return comp.id });
 
@@ -199,7 +199,7 @@ class Home extends React.Component<HomeProps, State> {
 }
 const styles: { [key: string]: React.CSSProperties } = {
   calculateButton: {
-    width: 100, height: 40, backgroundColor: "#FECF58", borderRadius: 10, fontSize: 17
+    width: '100%', height: 40, backgroundColor: "#FECF58", borderRadius: 10, fontSize: 17
   }
 }
 
