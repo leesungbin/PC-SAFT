@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"math"
 )
 
@@ -50,25 +51,29 @@ func BublT(components Comps, in Eq_Input) (res Eq_Result, err error) {
 
 	// Volume of Vapor & Liquid
 	var Vv_res, Vl_res float64
-	maxit := 300
+	maxit := 3000
 	for i := 0; i < maxit; i++ {
 		fvi_L := GetVolumeInput{in.P, T, in.X_, "L"}
 		V_L, err_l1 := GetVolume(components, fvi_L)
+		fmt.Printf("V_L: %v\nfvi_L: %v\n", V_L, fvi_L)
 		if err_l1 != nil {
 			return Eq_Result{}, err_l1
 		}
 
 		phi_L, fug_L, err_l2 := Fugacity(components, NewtonInput{V_L, in.P, T, in.X_})
+		fmt.Printf("phi_L: %v\n fug_L : %v\n", phi_L, fug_L)
 		if err_l2 != nil {
 			return Eq_Result{}, err_l2
 		}
 
 		fvi_V := GetVolumeInput{in.P, T, y_, "V"}
 		V_V, err_v1 := GetVolume(components, fvi_V)
+		fmt.Printf("V_V: %v\nfvi_V: %v\n", V_V, fvi_V)
 		if err_v1 != nil {
 			return Eq_Result{}, err_v1
 		}
 		phi_V, fug_V, err_v2 := Fugacity(components, NewtonInput{V_V, in.P, T, y_})
+		fmt.Printf("phi_V: %v\n fug_V : %v\n", phi_V, fug_V)
 		if err_v2 != nil {
 			return Eq_Result{}, err_v2
 		}
@@ -81,6 +86,7 @@ func BublT(components Comps, in Eq_Input) (res Eq_Result, err error) {
 		}
 
 		delT := -math.Log(sumy) * T * T / B
+		fmt.Printf("delT: %v\n\n", delT)
 		converged := true
 		for j := 0; j < nc; j++ {
 			if math.Abs(fug_L[j]-fug_V[j]) > 1e-5 {
@@ -101,7 +107,8 @@ func BublT(components Comps, in Eq_Input) (res Eq_Result, err error) {
 		}
 	}
 	if sumy > 1.0001 {
-		return Eq_Result{}, errors.New("calc failed : y > 1")
+		return Eq_Result{}, errors.New(fmt.Sprintf("calc failed : y > 1, %v", sumy))
 	}
+	// fmt.Printf("max iter, in.X : %v\n", in.X_)
 	return Eq_Result{in.P, T, in.X_, y_, Vv_res, Vl_res}, nil
 }

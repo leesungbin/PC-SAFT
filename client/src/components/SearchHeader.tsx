@@ -10,7 +10,7 @@ type SearchHeaderProps = {
 }
 export default function SearchHeader({ text, onChangeContent, listComponents }: SearchHeaderProps) {
   return (
-    <div style={{ margin: '0, 9%, 0, 9%' }}>
+    <div style={{flex: 1, width: '100%'}}>
       <TextField
         value={text}
         onChange={event => onChangeContent && onChangeContent(event.target.value)}
@@ -22,7 +22,7 @@ export default function SearchHeader({ text, onChangeContent, listComponents }: 
             </InputAdornment>
           )
         }}
-        style={{ flex: 1, width: '80%', marginTop: 10, marginBottom: 10, paddingLeft: '10%', paddingRight: '10%' }}
+        style={{ flex: 1, width: '100%', marginTop: 10, marginBottom: 10}}
       />
       <div style={{ position: 'relative', flexDirection: 'row', justifyContent: 'center' }}>
         {listComponents}

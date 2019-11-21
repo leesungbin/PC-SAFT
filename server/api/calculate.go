@@ -126,7 +126,7 @@ func GetVolume(components Comps, in GetVolumeInput) (V float64, err error) {
 	if in.State == "V" {
 		V0 = Vvap
 	} else {
-		V0 = Vliq * 0.95 // set scalVl0 = 0.95
+		V0 = Vliq * 0.80 // set scalVl0 = 0.95
 	}
 	// Log(fmt.Sprintf("GetVolume : %v", V0))
 	V, err = FindV_newton(components, NewtonInput{V0, in.P, in.T, in.Z_})
@@ -139,11 +139,12 @@ func GetVolume(components Comps, in GetVolumeInput) (V float64, err error) {
 
 func Fugacity(components Comps, in NewtonInput) (phi, fug []float64, err error) {
 	res, err := PCsaft(components, PCsaftInput{in.V, in.T, in.Z_})
+	// fmt.Printf("fugacity - pcsaft res : %v\n", res)
 	if err != nil {
 		return phi, fug, err
 	}
 	if len(res.Phi) == 1 && (res.Phi)[0] == 0 {
-		fmt.Println("0 fugacity")
+		// fmt.Println("0 fugacity")
 		fug = []float64{0}
 	} else {
 		fug = make([]float64, len(res.Phi))

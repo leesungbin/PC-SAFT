@@ -19,6 +19,6 @@ var PPP_methanol_water_aceticacid = Comps{Data: []Component{Methanol_polar, Wate
 
 var PPP_Pressure = 1.013                 // kPa
 var PPP_Temperarute = 345.07893999999993 // K
-var PPP_composition = []float64{0.7919, 0.208, 0.0001}
+var PPP_composition = []float64{0.75, 0.2, 0.05}
 
 // var PPP_composition = []float64{0.6623, 0.1841, 0.1536}

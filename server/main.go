@@ -78,8 +78,8 @@ func main() {
 	}))
 	mux.Handle("/api/equil", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
-			// ttp.Equil_ttp(db, w, r)
-			ttp.Equil_ttp_sync(db, w, r)
+			ttp.Equil_ttp(db, w, r)
+			// ttp.Equil_ttp_sync(db, w, r)
 			return
 		}
 		fmt.Fprintf(w, "Get req is not supported.")

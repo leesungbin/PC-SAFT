@@ -387,6 +387,8 @@ func PCsaft(components Comps, C PCsaftInput) (res PCsaftResult, err error) {
 	}
 	lnphi := make([]float64, nc)
 	for k := 0; k < nc; k++ {
+		// test
+		// lnphi[k] = math.Abs(res.Z) - 1 - math.Log(math.Abs(res.Z)) + Ahc + Ahcx[k]
 		if res.Z > 0 {
 			lnphi[k] = res.Z - 1 - math.Log(res.Z) + Ahc + Ahcx[k]
 		} else {
