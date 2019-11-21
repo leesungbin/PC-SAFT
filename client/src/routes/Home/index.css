@@ -1,0 +1,14 @@
+.component-list {
+
+}
+
+.component-list .component-list__item {
+    list-style: none;
+    padding: 6px 12px; 
+    border-bottom: 1px dotted black;
+    cursor: pointer;
+}
+
+.component-list .component-list__item:hover {
+    background-color: #eee !important;
+}
