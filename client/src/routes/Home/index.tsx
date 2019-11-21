@@ -8,9 +8,8 @@ import Point from '../../threeFragments/Point';
 import { TieLine } from '../../threeFragments/TieLine';
 
 import ContinuosSlider from '../../components/ContinuosSlider';
-import { Typography, ListItem, ListItemText, List, Chip } from '@material-ui/core';
+import { Typography, Chip } from '@material-ui/core';
 import CalculatingIndicator from '../../components/CalculatingIndicator';
-import SearchHeader from '../../components/SearchHeader';
 import { ErrorSnack } from '../../components/Snack';
 
 import './index.css';
