@@ -120,6 +120,7 @@ class Home extends React.Component<HomeProps, State> {
 
     const { data, waiting, T, P, mode } = this.state;
     const len = data.length;
+    const isMobile = this.props.width < 400;
     return (
       <div>
         <div style={{ marginTop: 10, marginLeft: '10%', marginRight: '10%', height: 40, justifyContent: 'center' }}>
@@ -142,7 +143,7 @@ class Home extends React.Component<HomeProps, State> {
           </div>
           <div>
             <Canvas
-              style={{ height: this.props.height * 0.7, width: this.props.width * 0.7 }}
+              style={isMobile? {marginTop: 10, height: this.props.width*0.7, width: this.props.width} : {height: this.props.height*0.7, width: this.props.width*0.7 }}
               camera={{ position: [1 / 2, Math.sqrt(3) / 4, 3], fov: 18, near: 1, far: -1 }}
             >
               <mesh rotation={[0, 0, 0]}>

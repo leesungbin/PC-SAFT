@@ -27,7 +27,7 @@ func DewP_init(components Comps, T float64, y_ []float64) (res PX_init) {
 	return
 }
 
-func DewP(components Comps, in Eq_Input) (res Eq_Result) {
+func DewP(components Comps, in Eq_Input) (res Eq_Result, err error) {
 	nc := len(components.Data)
 	initRes := DewP_init(components, in.T, in.Y_)
 	P := initRes.P
@@ -37,12 +37,25 @@ func DewP(components Comps, in Eq_Input) (res Eq_Result) {
 	maxit := 300
 	for i := 0; i < maxit; i++ {
 		gvi_L := GetVolumeInput{P, in.T, x_, "L"}
-		V_L, _ := GetVolume(components, gvi_L)
-		phi_L, fug_L, _ := Fugacity(components, NewtonInput{V_L, P, in.T, x_})
+		V_L, err_l1 := GetVolume(components, gvi_L)
+		if err_l1 != nil {
+			return Eq_Result{}, err_l1
+		}
+
+		phi_L, fug_L, err_l2 := Fugacity(components, NewtonInput{V_L, P, in.T, x_})
+		if err_l2 != nil {
+			return Eq_Result{}, err_l2
+		}
 
 		gvi_V := GetVolumeInput{P, in.T, in.Y_, "V"}
-		V_V, _ := GetVolume(components, gvi_V)
-		phi_V, fug_V, _ := Fugacity(components, NewtonInput{V_V, P, in.T, in.Y_})
+		V_V, err_v1 := GetVolume(components, gvi_V)
+		if err_v1 != nil {
+			return Eq_Result{}, err_v1
+		}
+		phi_V, fug_V, err_v2 := Fugacity(components, NewtonInput{V_V, P, in.T, in.Y_})
+		if err_v1 != nil {
+			return Eq_Result{}, err_v2
+		}
 
 		xnew := make([]float64, nc)
 		sumx := 0.
@@ -67,8 +80,8 @@ func DewP(components Comps, in Eq_Input) (res Eq_Result) {
 		P = Pnew
 		x_ = xnew
 		if math.Abs(V_V-V_L)/V_V < 1e-5 {
-			return Eq_Result{P, in.T, x_, in.Y_, V_V, V_L}
+			return Eq_Result{P, in.T, x_, in.Y_, V_V, V_L}, nil
 		}
 	}
-	return Eq_Result{P, in.T, x_, in.Y_, Vv_res, Vl_res}
+	return Eq_Result{P, in.T, x_, in.Y_, Vv_res, Vl_res}, nil
 }
