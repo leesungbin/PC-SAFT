@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -92,7 +91,7 @@ func Flash(components Comps, P float64, T float64, z_ []float64) (res FlashResul
 			K[j] = phi_L[j] / phi_V[j]
 		}
 		vold := xyv.V
-		fmt.Printf("v: %v\n", vold)
+		// fmt.Printf("v: %v\n", vold)
 		for iv := 0; iv < 100; iv++ {
 			F := 0.
 			dFdv := 0.
@@ -125,7 +124,7 @@ func Flash(components Comps, P float64, T float64, z_ []float64) (res FlashResul
 			xyv.X_[j] = z_[j] / (1 + xyv.V*(K[j]-1))
 			xyv.Y_[j] = K[j] * xyv.X_[j]
 		}
-		fmt.Printf("x : %v\ny: %v\n", xyv.X_, xyv.Y_)
+		// fmt.Printf("x : %v\ny: %v\n", xyv.X_, xyv.Y_)
 	}
 	res.X_ = xyv.X_
 	res.Y_ = xyv.Y_
