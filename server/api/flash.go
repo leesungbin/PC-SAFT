@@ -65,7 +65,7 @@ func Flash(components Comps, P float64, T float64, z_ []float64) (res FlashResul
 	if ph != Two {
 		return FlashResult{}, nil
 	}
-	maxit := 3000
+	maxit := 300
 	nc := len(z_)
 	K := make([]float64, nc)
 
