@@ -39,7 +39,7 @@ func Flash_Init(components Comps, P float64, T float64, z_ []float64) (ph Phase,
 	if err != nil {
 		return 0, XYV{}, err
 	}
-	fmt.Printf("P: %v\nPd: %v\nPb: %v\n", P, dpRes.P, bpRes.P)
+	// fmt.Printf("P: %v\nPd: %v\nPb: %v\n", P, dpRes.P, bpRes.P)
 	if P < dpRes.P || P > bpRes.P {
 		ph = Single
 		return ph, XYV{}, nil
@@ -89,9 +89,10 @@ func Flash(components Comps, P float64, T float64, z_ []float64) (res FlashResul
 			return FlashResult{}, err
 		}
 		for j := 0; j < nc; j++ {
-			K[i] = phi_L[i] / phi_V[i]
+			K[j] = phi_L[j] / phi_V[j]
 		}
 		vold := xyv.V
+		fmt.Printf("v: %v\n", vold)
 		for iv := 0; iv < 100; iv++ {
 			F := 0.
 			dFdv := 0.
@@ -121,9 +122,10 @@ func Flash(components Comps, P float64, T float64, z_ []float64) (res FlashResul
 
 		// update x,y
 		for j := 0; j < nc; j++ {
-			xyv.X_[j] = z_[i] / (1 + xyv.V*K[j] - 1)
+			xyv.X_[j] = z_[j] / (1 + xyv.V*(K[j]-1))
 			xyv.Y_[j] = K[j] * xyv.X_[j]
 		}
+		fmt.Printf("x : %v\ny: %v\n", xyv.X_, xyv.Y_)
 	}
 	res.X_ = xyv.X_
 	res.Y_ = xyv.Y_

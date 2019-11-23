@@ -7,22 +7,25 @@ import (
 	"net/http"
 
 	. "github.com/leesungbin/PC-SAFT/server/api"
-	"github.com/leesungbin/PC-SAFT/server/parser"
 )
 
 func Flash_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	form := r.Form
-	res_parse, err_parse := parser.Post(form)
-
+	var j jsonInput
+	err := json.NewDecoder(r.Body).Decode(&j)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	res_parse, err_parse := getInfoFromBody(j)
 	if err_parse != nil {
 		res_json := map[string]interface{}{"status": 400, "error": err_parse}
 		print, _ := json.Marshal(res_json)
+		w.Header().Add("Content-Type", "application/json")
 		fmt.Fprintf(w, "%s", print)
 		return
 	}
 
-	rows, err := db.Query(res_parse.SelectQuery)
+	rows, err := db.Query(res_parse.query)
 	if err != nil {
 		fmt.Printf("%v\n", err)
 	}
@@ -43,8 +46,7 @@ func Flash_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		}
 		comps.Data[i] = component
 	}
-
-	res, err := Flash(comps, res_parse.P, res_parse.T, res_parse.X_)
+	res, err := Flash(comps, j.P, j.T, j.X_)
 	if err != nil {
 		res_json := map[string]interface{}{"status": 0, "error": err}
 		print, _ := json.Marshal(res_json)
