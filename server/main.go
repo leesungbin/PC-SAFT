@@ -85,6 +85,12 @@ func main() {
 		fmt.Fprintf(w, "Get req is not supported.")
 		return
 	}))
+	mux.Handle("/api/flash", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			ttp.Flash_ttp(db, w, r)
+			return
+		}
+	}))
 	mux.Handle("/api/datas", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			comps, err := api.SearchAll(db)
