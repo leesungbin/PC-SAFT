@@ -79,6 +79,16 @@ func Test_FindV_newton(t *testing.T) {
 	}
 }
 
+func Test_FindV_newton_PPP(t *testing.T) {
+	Vres, err := FindV_newton(PPP_methanol_water_aceticacid, NewtonInput{V: 4.3908300527119304e-05 * LiquidScale, P: 0.16185190274476668, T: 300, Z_: PPP_composition})
+	if err != nil {
+		t.Errorf("FindV_newton err : %v", err)
+	} else {
+		if !PassWithAccuracy4(Vres, 3.6944504380802516e-05) {
+			t.Errorf("got %v, expected %v\n", Vres, 3.6944504380802516e-05)
+		}
+	}
+}
 func Test_Peos_P(t *testing.T) {
 	got, _ := Peos_P(NNN_ethane_nHexane_cyclohexane, NNN_FindV_newton_Input)
 	want := 216.21032034626552
