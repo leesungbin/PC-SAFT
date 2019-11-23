@@ -1,7 +1,9 @@
 package test
 
 import (
+	"fmt"
 	"testing"
+	"time"
 	// "time"
 
 	. "github.com/leesungbin/PC-SAFT/server/api"
@@ -33,11 +35,28 @@ func Test_BublP_init(t *testing.T) {
 	}
 }
 
+func Test_BublP_init_PPP(t *testing.T) {
+	start := time.Now()
+	got := BublP_init(PPP_methanol_water_aceticacid, 300, PPP_composition)
+	elapsed := time.Since(start)
+	fmt.Printf("time required : %v\n", elapsed) // 1.359 us
+	P_want := 0.16185190274476668
+	Y_want := []float64{0.935211528952177, 0.05633965101420472, 0.008448820033618156}
+	if !PassWithAccuracy4(got.P, P_want) {
+		t.Errorf("Expected %v got %v\n", P_want, got.P)
+	}
+	for i := 0; i < 3; i++ {
+		if !PassWithAccuracy4(got.Y[i], Y_want[i]) {
+			t.Errorf("Expected %v got %v\n", Y_want[i], got.Y[i])
+		}
+	}
+}
+
 func Test_BublP(t *testing.T) {
-	// start := time.Now()
+	start := time.Now()
 	got, _ := BublP(NNN_ethane_nHexane_cyclohexane, Eq_Input{T: Temperature, X_: Composition_NNN})
-	// elapsed := time.Since(start)
-	// t.Errorf("time required : %v\n", elapsed) // average 1.6~2 ms, python보다 10배 빠름
+	elapsed := time.Since(start)
+	fmt.Printf("time required : %v\n", elapsed) // average 1.6~2 ms, python보다 10배 빠름
 	// 오차 1% 미만
 	if !PassWithAccuracyN(2, got.P, want_BublP.P) {
 		t.Errorf("Expected %v got %v", want_BublP, got)
