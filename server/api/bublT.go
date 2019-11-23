@@ -51,7 +51,7 @@ func BublT(components Comps, in Eq_Input) (res Eq_Result, err error) {
 
 	// Volume of Vapor & Liquid
 	var Vv_res, Vl_res float64
-	maxit := 3000
+	maxit := 300
 	for i := 0; i < maxit; i++ {
 		fvi_L := GetVolumeInput{in.P, T, in.X_, "L"}
 		V_L, err_l1 := GetVolume(components, fvi_L)
@@ -106,7 +106,7 @@ func BublT(components Comps, in Eq_Input) (res Eq_Result, err error) {
 			return Eq_Result{in.P, T, in.X_, y_, V_V, V_L}, nil
 		}
 	}
-	if sumy > 1.0001 {
+	if sumy > 1.0001 || sumy < 0.9999 {
 		return Eq_Result{}, errors.New(fmt.Sprintf("calc failed : y > 1, %v", sumy))
 	}
 	// fmt.Printf("max iter, in.X : %v\n", in.X_)

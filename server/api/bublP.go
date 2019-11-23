@@ -96,8 +96,8 @@ func BublP(components Comps, in Eq_Input) (res Eq_Result, err error) {
 			return Eq_Result{P, in.T, in.X_, y_, V_V, V_L}, nil
 		}
 	}
-	if sumy > 1.0001 {
-		return Eq_Result{}, errors.New("calc failed : y > 1")
+	if sumy > 1.0001 || sumy < 0.9999 {
+		return Eq_Result{}, errors.New("calc failed : y != 1")
 	}
 	// fmt.Printf("bubbleP calculation iterated # : %d\n", i)
 	return Eq_Result{P, in.T, in.X_, y_, Vv_res, Vl_res}, nil
