@@ -95,7 +95,7 @@ func Flash(components Comps, P float64, T float64, z_ []float64) (res FlashResul
 		for iv := 0; iv < 100; iv++ {
 			F := 0.
 			dFdv := 0.
-			for k := 0; i < nc; k++ {
+			for k := 0; k < nc; k++ {
 				F += z_[k] * (K[k] - 1) / (1 + xyv.V*(K[k]-1))
 				dFdv += -z_[k] * Pow(K[k]-1, 2) / Pow((1+xyv.V*(K[k]-1)), 2)
 			}
@@ -114,6 +114,8 @@ func Flash(components Comps, P float64, T float64, z_ []float64) (res FlashResul
 			}
 		}
 		if math.Abs(xyv.V-vold) < 1e-5 && converged {
+			res.Vliq = Vliq
+			res.Vvap = Vvap
 			break
 		}
 
@@ -123,5 +125,8 @@ func Flash(components Comps, P float64, T float64, z_ []float64) (res FlashResul
 			xyv.Y_[j] = K[j] * xyv.X_[j]
 		}
 	}
+	res.X_ = xyv.X_
+	res.Y_ = xyv.Y_
+	res.V = xyv.V
 	return
 }
