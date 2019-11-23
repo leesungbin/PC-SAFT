@@ -126,7 +126,7 @@ func GetVolume(components Comps, in GetVolumeInput) (V float64, err error) {
 	if in.State == "V" {
 		V0 = Vvap
 	} else {
-		V0 = Vliq * 0.90 // set scalVl0 = 0.95
+		V0 = Vliq * LiquidScale // set scalVl0 = 0.95
 	}
 	// Log(fmt.Sprintf("GetVolume : %v", V0))
 	V, err = FindV_newton(components, NewtonInput{V0, in.P, in.T, in.Z_})

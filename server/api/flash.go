@@ -1,6 +1,9 @@
 package api
 
-import "math"
+import (
+	"fmt"
+	"math"
+)
 
 type Phase int
 
@@ -36,7 +39,7 @@ func Flash_Init(components Comps, P float64, T float64, z_ []float64) (ph Phase,
 	if err != nil {
 		return 0, XYV{}, err
 	}
-
+	fmt.Printf("P: %v\nPd: %v\nPb: %v\n", P, dpRes.P, bpRes.P)
 	if P < dpRes.P || P > bpRes.P {
 		ph = Single
 		return ph, XYV{}, nil
@@ -51,7 +54,6 @@ func Flash_Init(components Comps, P float64, T float64, z_ []float64) (ph Phase,
 		fraction.X_[i] = (1-fraction.V)*z_[i] + fraction.V*dpRes.X_[i]
 		fraction.Y_[i] = (1-fraction.V)*bpRes.Y_[i] + fraction.V*z_[i]
 	}
-
 	return ph, fraction, nil
 }
 

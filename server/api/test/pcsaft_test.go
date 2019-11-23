@@ -50,6 +50,19 @@ func Test_pcsaft(t *testing.T) {
 }
 
 func Test_PPP_pcsaft(t *testing.T) {
-	got, err := PCsaft(PPP_methanol_water_aceticacid, PCsaftInput{V: 0.00004242566595868248, T: PPP_Temperarute, X_: PPP_composition})
-	t.Errorf("%v\n%v\n", err, got)
+	got, err := PCsaft(PPP_methanol_water_aceticacid, PCsaftInput{V: 0.00003512664042169545, T: 300, X_: PPP_composition})
+	// t.Errorf("%v\n%v\n", err, got)
+	Z_want := 0.8658783139415385
+	if err != nil {
+		t.Errorf("%v\n", err)
+	} else if !PassWithAccuracy4(got.Z, Z_want) {
+		t.Errorf("Z / got %v expected %v", got.Z, Z_want)
+	}
+	Phi_want := []float64{0.0007708155495898285, 0.0001682518420433508, 0.0003258109387130754}
+	for i := 0; i < 3; i++ {
+		if !PassWithAccuracy4(Phi_want[i], got.Phi[i]) {
+			t.Errorf("Phi / got %v expected %v", got.Phi, Phi_want)
+			break
+		}
+	}
 }

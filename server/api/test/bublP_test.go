@@ -39,21 +39,21 @@ func Test_BublP(t *testing.T) {
 	// elapsed := time.Since(start)
 	// t.Errorf("time required : %v\n", elapsed) // average 1.6~2 ms, python보다 10배 빠름
 	// 오차 1% 미만
-	if !PassWithAccuracyN(1, got.P, want_BublP.P) {
+	if !PassWithAccuracyN(2, got.P, want_BublP.P) {
 		t.Errorf("Expected %v got %v", want_BublP, got)
 	}
 	for i, v := range got.Y_ {
-		if !PassWithAccuracyN(1, v, want_BublP.Y_[i]) {
+		if !PassWithAccuracyN(2, v, want_BublP.Y_[i]) {
 			t.Errorf("Expected %v got %v", want_BublP, got)
 		}
 	}
 
 	got, _ = BublP(NNP_ethane_nHexane_ethanol, Eq_Input{T: Temperature, X_: Composition_NNP})
-	if !PassWithAccuracyN(1, got.P, want_BublP_NNP.P) {
+	if !PassWithAccuracyN(2, got.P, want_BublP_NNP.P) {
 		t.Errorf("Expected %v got %v", want_BublP_NNP, got)
 	}
 	for i, v := range got.Y_ {
-		if !PassWithAccuracyN(1, v, want_BublP_NNP.Y_[i]) {
+		if !PassWithAccuracyN(2, v, want_BublP_NNP.Y_[i]) {
 			t.Errorf("Expected %v got %v", want_BublP_NNP, got)
 		}
 	}
