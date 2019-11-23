@@ -79,7 +79,10 @@ func Test_BublP(t *testing.T) {
 }
 
 func Test_BublP_PPP(t *testing.T) {
+	start := time.Now()
 	res, err := BublP(PPP_methanol_water_aceticacid, Eq_Input{T: 300, X_: PPP_composition})
+	elapsed := time.Since(start)
+	t.Errorf("time required : %v\n", elapsed) // 10~15 ms
 	if err != nil {
 		t.Errorf("%v\n", err)
 	}

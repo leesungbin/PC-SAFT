@@ -2,7 +2,6 @@ package api
 
 import (
 	"errors"
-	"fmt"
 	"math"
 )
 
@@ -59,7 +58,7 @@ func BublP(components Comps, in Eq_Input) (res Eq_Result, err error) {
 		if err_l2 != nil {
 			return Eq_Result{}, err_l2
 		}
-		fmt.Printf("Liquid\nV_L : %v\nphi_L : %v\nfug_L : %v\n", V_L, phi_L, fug_L)
+		// fmt.Printf("Liquid\nV_L : %v\nphi_L : %v\nfug_L : %v\n", V_L, phi_L, fug_L)
 
 		fvi_V := GetVolumeInput{P, in.T, y_, "V"}
 		V_V, err_v1 := GetVolume(components, fvi_V)
@@ -70,7 +69,7 @@ func BublP(components Comps, in Eq_Input) (res Eq_Result, err error) {
 		if err_v2 != nil {
 			return Eq_Result{}, err_v2
 		}
-		fmt.Printf("Vapor\nV_V : %v\nphi_V : %v\nfug_V : %v\n\n", V_V, phi_V, fug_V)
+		// fmt.Printf("Vapor\nV_V : %v\nphi_V : %v\nfug_V : %v\n\n", V_V, phi_V, fug_V)
 		// adjust y composition
 		nc := len(components.Data)
 		ynew := make([]float64, nc)
