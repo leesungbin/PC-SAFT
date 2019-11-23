@@ -77,3 +77,22 @@ func Test_BublP(t *testing.T) {
 		}
 	}
 }
+
+func Test_BublP_PPP(t *testing.T) {
+	res, err := BublP(PPP_methanol_water_aceticacid, Eq_Input{T: 300, X_: PPP_composition})
+	if err != nil {
+		t.Errorf("%v\n", err)
+	}
+	P_want := 0.15725065375735317
+	Y_want := []float64{0.8884315687198456, 0.09211096673754716, 0.01943383543373948}
+	if !PassWithAccuracy4(res.P, P_want) {
+		t.Errorf("Expected %v got %v\n", P_want, res.P)
+	}
+	for i := 0; i < 3; i++ {
+		if !PassWithAccuracy4(res.Y_[i], Y_want[i]) {
+			t.Errorf("Expectd %v got %v\n", Y_want, res.Y_)
+			break
+		}
+	}
+
+}
