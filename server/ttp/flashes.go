@@ -25,7 +25,7 @@ func Flashes_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	fmt.Printf("%v %v %v\n", j.T, j.P, j.Id)
+	// fmt.Printf("%v %v %v\n", j.T, j.P, j.Id)
 	res_parse, err_parse := getInfoFromBody(j)
 
 	if err_parse != nil {
@@ -67,7 +67,7 @@ func Flashes_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	for i := 0; i < nc; i++ {
 		go func(idx int) {
 			in := <-inChan
-			res, err := Flash(comps, P: j.T, T: j.T, X_: in.Z_})
+			res, err := Flash(comps, {P: j.T, T: j.T, X_: in.Z_})
 			if err != nil {
 				equilDatas <- chanFlashErr{data: FlashResult{}, err: true}
 			} else {
@@ -85,10 +85,10 @@ func Flashes_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	for i := 0; i < nc; i++ {
 		select {
 		case normal := <-equilDatas:
-			if !normal.err && normal.data.P != 0 && normal.data.T != 0 {
+			if !normal.err && normal.data.Vliq != 0 && normal.data.Vvap != 0 {
 				jsonDatas = append(jsonDatas, normal.data)
 			}
-		case <-time.After(5 * time.Millisecond):
+		case <-time.After(20 * time.Millisecond):
 			// jsonDatas = append(jsonDatas, Eq_Result{})
 		}
 	}
