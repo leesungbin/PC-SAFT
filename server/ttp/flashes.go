@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	. "github.com/leesungbin/PC-SAFT/server/api"
 	"github.com/leesungbin/PC-SAFT/server/ternary"
@@ -15,7 +16,7 @@ type chanFlashErr struct {
 	err  bool
 }
 type chanFlashInput struct {
-	Z_ float64
+	Z_ []float64
 }
 
 func Flashes_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
@@ -67,7 +68,7 @@ func Flashes_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	for i := 0; i < nc; i++ {
 		go func(idx int) {
 			in := <-inChan
-			res, err := Flash(comps, {P: j.T, T: j.T, X_: in.Z_})
+			res, err := Flash(comps, j.P, j.T, in.Z_)
 			if err != nil {
 				equilDatas <- chanFlashErr{data: FlashResult{}, err: true}
 			} else {
@@ -81,7 +82,7 @@ func Flashes_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		inChan <- chanFlashInput{Z_: fractions}
 	}
 	close(inChan)
-	
+
 	for i := 0; i < nc; i++ {
 		select {
 		case normal := <-equilDatas:
