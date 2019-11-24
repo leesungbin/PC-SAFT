@@ -59,6 +59,8 @@ func Flashes_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		comps.Data[i] = component
 	}
 
+	now := time.Now()
+
 	plots := ternary.Cover()
 	nc := len(plots)
 	inChan := make(chan chanFlashInput, nc)
@@ -93,4 +95,19 @@ func Flashes_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 			// jsonDatas = append(jsonDatas, Eq_Result{})
 		}
 	}
+	var names []string
+	for _, d := range comps.Data {
+		names = append(names, d.Name)
+	}
+	type resJson struct {
+		Data  []FlashResult `json:"data"`
+		Names []string      `json:"names"`
+	}
+	res_json := map[string]resJson{"result": resJson{jsonDatas, names}}
+	print, _ := json.Marshal(res_json)
+	w.Header().Add("Content-Type", "application/json")
+	fmt.Fprintf(w, "%s", print)
+	fmt.Printf("success for %.2f%% inputs\n", float64(len(jsonDatas))/float64(nc)*100)
+	fmt.Printf("time required : %v\n", time.Since(now))
+	return
 }
