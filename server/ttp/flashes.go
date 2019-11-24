@@ -91,7 +91,7 @@ func Flashes_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 			if !normal.err && normal.data.Vliq != 0 && normal.data.Vvap != 0 {
 				jsonDatas = append(jsonDatas, normal.data)
 			}
-		case <-time.After(20 * time.Millisecond):
+		case <-time.After(100 * time.Millisecond):
 			// jsonDatas = append(jsonDatas, Eq_Result{})
 		}
 	}
