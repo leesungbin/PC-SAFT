@@ -91,6 +91,12 @@ func main() {
 			return
 		}
 	}))
+	mux.Handle("/api/flashes", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			ttp.Flashes_ttp(db, w, r)
+			return
+		}
+	}))
 	mux.Handle("/api/datas", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			comps, err := api.SearchAll(db)
