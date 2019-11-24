@@ -8,7 +8,7 @@ import Point from '../../threeFragments/Point';
 import { TieLine } from '../../threeFragments/TieLine';
 
 import ContinuosSlider from '../../components/ContinuosSlider';
-import { Typography, Chip } from '@material-ui/core';
+import { Typography, Chip, Checkbox, FormGroup, FormControlLabel, TextField } from '@material-ui/core';
 import CalculatingIndicator from '../../components/CalculatingIndicator';
 import { ErrorSnack } from '../../components/Snack';
 
@@ -40,8 +40,8 @@ type State = {
     y: number[],
   }[],
   waiting: boolean,
-  T: number,
-  P: number,
+  T?: number,
+  P?: number,
   openSelector: boolean,
   mode?: string,
   min?: number,
@@ -50,24 +50,28 @@ type State = {
   selectedComponents: Component[],
   error: string,
   components: Component[],
+  constT: boolean,
+  constP: boolean,
 }
 
 class Home extends React.Component<HomeProps, State> {
   state: State = {
     data: [],
     waiting: false,
-    T: 300,
-    P: 1,
+    // T: 300,
+    // P: 1,
     openSelector: false,
     selectedComponents: [],
     error: '',
     components: [],
+    constT: false,
+    constP: false,
   }
 
   componentDidMount = async () => {
     const fetchData = await fetch(DATA_ENDPOINT, { method: 'POST' });
     const json = await fetchData.json();
-    const components = json.data.map((e: any) => { return {...e.data, id: e.id} });
+    const components = json.data.map((e: any) => { return { ...e.data, id: e.id } });
 
     this.setState({ components });
   }
@@ -123,13 +127,44 @@ class Home extends React.Component<HomeProps, State> {
     const isMobile = this.props.width < 400;
     return (
       <div>
-        <div style={{ marginTop: 10, marginLeft: '10%', marginRight: '10%', height: 40, justifyContent: 'center' }}>
+        <div style={{ marginTop: 10, marginLeft: "4%", height: 40, justifyContent: 'center' }}>
           {this.state.selectedComponents && this.state.selectedComponents.map((comp, i) => (
             <Chip style={{ marginRight: 10, marginBottom: 10 }} key={i} label={comp.name} variant="outlined" onDelete={() => this.cancleComponent(i)} />
           ))}
         </div>
         <div style={{ display: 'flex', justifyContent: 'center', zIndex: 0, flexWrap: "wrap" }}>
           <div style={{ width: 300 }}>
+            <FormGroup>
+              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+                <FormControlLabel
+                  control={<Checkbox checked={this.state.constP} onChange={() => { this.setState({ constP: !this.state.constP }) }} value="P (atm)" />}
+                  label="P (atm)"
+                />
+                <div style={{ marginBottom: 4 }}>
+                  <TextField value={this.state.P} placeholder="Const Pressure"
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      
+                    }}
+                  />
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+                <FormControlLabel
+                  control={<Checkbox checked={this.state.constT} onChange={() => { this.setState({ constT: !this.state.constT }) }} value="T (K)" />}
+                  label="T (K)"
+                />
+                <div style={{ marginBottom: 4 }}>
+                  <TextField value={this.state.T} placeholder="Const Temperature"
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      
+                    }}
+                  />
+                </div>
+              </div>
+            </FormGroup>
+
             <ComponentSelector
               components={this.state.components}
               onClickContent={(i) => {
@@ -138,18 +173,18 @@ class Home extends React.Component<HomeProps, State> {
                 newComponents[i].selected = newComponents[i].selected ? false : true;
                 this.setState({ components: newComponents });
               }}
-              calcButton = {<button onClick={() => this.callEquil()} style={styles.calculateButton}>Calculate</button>}
+              calcButton={<button onClick={() => this.callEquil()} style={styles.calculateButton}>Calculate</button>}
             />
           </div>
           <div>
             <Canvas
-              style={isMobile? {marginTop: 10, height: this.props.width*0.7, width: this.props.width} : {height: this.props.height*0.7, width: this.props.width*0.7 }}
+              style={isMobile ? { marginTop: 10, height: this.props.width * 0.7, width: this.props.width } : { height: this.props.height * 0.7, width: this.props.width * 0.7 }}
               camera={{ position: [1 / 2, Math.sqrt(3) / 4, 3], fov: 18, near: 1, far: -1 }}
             >
               <mesh rotation={[0, 0, 0]}>
                 <Triangle points={trianglePoints} />
                 {len && data.map((e, i) => {
-                  if (mode === "BUBLP" && e.P < P * 1.01 && e.P > P * 0.99) {
+                  if (P && mode === "BUBLP" && e.P < P * 1.01 && e.P > P * 0.99) {
                     return (
                       <mesh key={i}>
                         <Point abc={e.x} val={0} t={0} />
@@ -158,7 +193,7 @@ class Home extends React.Component<HomeProps, State> {
                       </mesh>
                     )
                   }
-                  else if (mode === "BUBLT" && e.T < T * 1.005 && e.T > T * 0.995) {
+                  else if (T && mode === "BUBLT" && e.T < T * 1.005 && e.T > T * 0.995) {
                     return (
                       <mesh key={i}>
                         <Point abc={e.x} val={0} t={0} />
@@ -167,19 +202,19 @@ class Home extends React.Component<HomeProps, State> {
                       </mesh>
                     )
                   }
-                  return <></>
+                  return
                 })}
               </mesh>
             </Canvas>
             <Content>
               <div style={{ height: 100, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ display: 'flex', width: '100%', flexDirection: 'row', justifyContent: 'space-around' }}>
-                  {mode && mode === "BUBLP" ?
+                  {P && mode && mode === "BUBLP" ?
                     <div style={{ flex: 1, padding: '0,10%,10%,0' }}>
                       <Typography gutterBottom>P : {P.toFixed(3)} atm</Typography>
                       <ContinuosSlider val={P} onChange={(P) => this.setState({ P })} min={this.state.min} max={this.state.max} />
                     </div>
-                    : mode === "BUBLT" ?
+                    : T && mode === "BUBLT" ?
                       <div style={{ flex: 1, padding: '0,10%,10%,0' }}>
                         <Typography gutterBottom>T : {T.toFixed(3)} K</Typography>
                         <ContinuosSlider val={T} onChange={(T) => this.setState({ T })} min={this.state.min} max={this.state.max} />
