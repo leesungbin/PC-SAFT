@@ -31,8 +31,8 @@ export default class ComponentSelector extends React.Component<ComponentSelector
     // console.log(this.state.searchingLists);
   }
 
-  render() {
-    const components = this.props.components.filter((component) => component.name.toLowerCase().indexOf(this.state.searchingName.toLowerCase()));
+  render() {  
+    const components = this.props.components.filter((component) => component.name.toLowerCase().indexOf(this.state.searchingName.toLowerCase()) > -1);
     return (
       <div>
         <SearchHeader
