@@ -14,6 +14,7 @@ import { ErrorSnack } from '../../components/Snack';
 
 import './index.css';
 import ComponentSelector from '../../components/ComponentSelector';
+import FormControlCondition from '../../components/FormControlCondition';
 
 type FetchResult = {
   result: {
@@ -80,6 +81,7 @@ class Home extends React.Component<HomeProps, State> {
       const selectedComponents = this.state.components.filter(component => component.selected === true);
       this.setState({ selectedComponents });
     }
+    // console.log(this.state.T, this.state.P);
   }
   callEquil = async () => {
     const { selectedComponents, error } = this.state;
@@ -125,6 +127,7 @@ class Home extends React.Component<HomeProps, State> {
     const { data, waiting, T, P, mode } = this.state;
     const len = data.length;
     const isMobile = this.props.width < 400;
+
     return (
       <div>
         <div style={{ marginTop: 10, marginLeft: "4%", height: 40, justifyContent: 'center' }}>
@@ -135,34 +138,8 @@ class Home extends React.Component<HomeProps, State> {
         <div style={{ display: 'flex', justifyContent: 'center', zIndex: 0, flexWrap: "wrap" }}>
           <div style={{ width: 300 }}>
             <FormGroup>
-              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-                <FormControlLabel
-                  control={<Checkbox checked={this.state.constP} onChange={() => { this.setState({ constP: !this.state.constP }) }} value="P (atm)" />}
-                  label="P (atm)"
-                />
-                <div style={{ marginBottom: 4 }}>
-                  <TextField value={this.state.P} placeholder="Const Pressure"
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      
-                    }}
-                  />
-                </div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-                <FormControlLabel
-                  control={<Checkbox checked={this.state.constT} onChange={() => { this.setState({ constT: !this.state.constT }) }} value="T (K)" />}
-                  label="T (K)"
-                />
-                <div style={{ marginBottom: 4 }}>
-                  <TextField value={this.state.T} placeholder="Const Temperature"
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      
-                    }}
-                  />
-                </div>
-              </div>
+              <FormControlCondition valueDef="P" placeholder="Const Pressure (atm)" onChangeValue={(P) => this.setState({ P })} onError={(error) => this.setState({ error })} />
+              <FormControlCondition valueDef="T" placeholder="Const Temperature (K)" onChangeValue={(T) => this.setState({ T })} onError={(error) => this.setState({ error })} />
             </FormGroup>
 
             <ComponentSelector
