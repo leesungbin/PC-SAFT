@@ -8,7 +8,7 @@ export function LineSegs({vertices, color}: {vertices: Vector3[], color?: string
   }, []);
   const linecolor= color ? color : "black"
   return (
-    <line>
+    <line onPointerOver={() => console.log('line')} onPointerOut={() => console.log('line out')}>
       <lineBasicMaterial attach="material" color={linecolor} linewidth={1}/>
       <geometry attach="geometry" ref={ref} />
     </line>
