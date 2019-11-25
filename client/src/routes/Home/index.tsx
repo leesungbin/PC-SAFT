@@ -1,11 +1,7 @@
 import React from 'react';
 import { Content } from '../../components/Content';
-import { Canvas } from 'react-three-fiber';
-import { Triangle } from '../../threeFragments/Triangle';
-import { Vector3 } from 'three';
 import { EQUIL_ENDPOINT, DATA_ENDPOINT, FLASHES_ENDPOINT } from '../../_lib/endpoint';
-import Point from '../../threeFragments/Point';
-import { TieLine } from '../../threeFragments/TieLine';
+
 
 import ContinuosSlider from '../../components/ContinuosSlider';
 import { Typography, Chip, FormGroup } from '@material-ui/core';
@@ -15,6 +11,9 @@ import { ErrorSnack } from '../../components/Snack';
 import './index.css';
 import ComponentSelector from '../../components/ComponentSelector';
 import FormControlCondition from '../../components/FormControlCondition';
+import { Stage, Layer, Line, Text } from 'react-konva';
+import Tie from '../../canvas/Tie';
+import { xyTransform, coordChange } from '../../_lib/coordChange';
 
 type FetchResult = {
   result: {
@@ -174,21 +173,23 @@ class Home extends React.Component<HomeProps, State> {
   }
 
   render() {
-    const trianglePoints = [new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(1 / 2, Math.sqrt(3) / 2, 0)];
+    // const trianglePoints = [new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(1 / 2, Math.sqrt(3) / 2, 0)];
 
-    const { data, waiting, T, P, mode } = this.state;
-    const len = data.length;
-    const isMobile = this.props.width < 400;
-
+    const { data, waiting, T, P, mode, names } = this.state;
+    // const len = data.length;
+    const { width } = this.props;
+    const isMobile = (width) < 850 ? true : false;
+    const ternaryWidth = isMobile ? width - 20 : (width - 380) * 0.7 - 20;
+    const points = [ternaryWidth * 0.015026, ternaryWidth * 0.92, ternaryWidth * 0.5, ternaryWidth * 0.08, ternaryWidth * 0.984974, ternaryWidth * 0.92];
     return (
       <div>
-        <div style={{ marginTop: 10, marginLeft: "4%", height: 40, justifyContent: 'center' }}>
+        <div style={isMobile ? { marginLeft: '10%', marginTop: 10, height: 40, whiteSpace: 'nowrap' } : { marginTop: 10, marginLeft: "7%", height: 40, whiteSpace: 'nowrap' }}>
           {this.state.selectedComponents && this.state.selectedComponents.map((comp, i) => (
             <Chip style={{ marginRight: 10, marginBottom: 10 }} key={i} label={comp.name} variant="outlined" onDelete={() => this.cancleComponent(i)} />
           ))}
         </div>
-        <div style={{ display: 'flex', justifyContent: 'center', zIndex: 0, flexWrap: "wrap" }}>
-          <div style={{ width: 300 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-around', zIndex: 0, flexWrap: "wrap" }}>
+          <div style={isMobile ? { width: '80%', margin: '10%', marginTop: 10 } : { width: 300, padding: 30, paddingTop: 10 }}>
             <FormGroup>
               <FormControlCondition valueDef="P" placeholder="Const Pressure (atm)" onChangeValue={(fetchP) => this.setState({ fetchP })} onError={(error) => this.setState({ error })} onCheckConst={(constP) => this.setState({ constP })} />
               <FormControlCondition valueDef="T" placeholder="Const Temperature (K)" onChangeValue={(fetchT) => this.setState({ fetchT })} onError={(error) => this.setState({ error })} onCheckConst={(constT) => this.setState({ constT })} />
@@ -207,66 +208,76 @@ class Home extends React.Component<HomeProps, State> {
               </button>}
             />
           </div>
-          <div>
-            <Canvas
-              style={isMobile ? { marginTop: 10, height: this.props.width * 0.7, width: this.props.width } : { height: this.props.height * 0.7, width: this.props.width * 0.7 }}
-              camera={{ position: [1 / 2, Math.sqrt(3) / 4, 3], fov: 18, near: 1, far: -1 }}
-            >
-              <mesh rotation={[0, 0, 0]}>
-                <Triangle points={trianglePoints} />
-                {len && data.map((e, i) => {
-                  if (P && mode === "BUBLP" && e.P < P * 1.01 && e.P > P * 0.99) {
-                    return (
-                      <mesh key={i}>
-                        <Point abc={e.x} val={0} t={0} />
-                        <TieLine x={e.x} y={e.y} val={0} color="green" />
-                        <Point abc={e.y} val={0} t={1} />
-                      </mesh>
-                    )
-                  }
-                  else if (T && mode === "BUBLT" && e.T < T * 1.005 && e.T > T * 0.995) {
-                    return (
-                      <mesh key={i}>
-                        <Point abc={e.x} val={0} t={0} />
-                        <TieLine x={e.x} y={e.y} val={0.1} color="green" />
-                        <Point abc={e.y} val={0} t={1} />
-                      </mesh>
-                    )
-                  }
-                  return <></>
-                })}
-                {len && mode === "FLASH" && data.map((e,i) => (
-                  <mesh key={i}>
-                    <Point abc={e.x} val={0} t={0} />
-                    <TieLine x={e.x} y={e.y} val={0.1} color="green" />
-                    <Point abc={e.y} val={0} t={1} />
-                  </mesh>
-                ))}
-              </mesh>
-            </Canvas>
-            <Content>
-              <div style={{ height: 100, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ display: 'flex', width: '100%', flexDirection: 'row', justifyContent: 'space-around' }}>
-                  {P && mode && mode === "BUBLP" ?
-                    <div style={{ flex: 1, padding: '0,10%,10%,0' }}>
-                      <Typography gutterBottom>P : {P.toFixed(3)} atm</Typography>
-                      <ContinuosSlider val={P} onChange={(P) => this.setState({ P })} min={this.state.min} max={this.state.max} />
-                    </div>
-                    : T && mode === "BUBLT" ?
-                      <div style={{ flex: 1, padding: '0,10%,10%,0' }}>
-                        <Typography gutterBottom>T : {T.toFixed(3)} K</Typography>
-                        <ContinuosSlider val={T} onChange={(T) => this.setState({ T })} min={this.state.min} max={this.state.max} />
-                      </div>
-                      : <></>
-                  }
-                </div>
-              </div>
-            </Content>
-          </div>
+          <Stage width={ternaryWidth} height={ternaryWidth} style={{ marginRight: 10, marginLeft: 10 }}>
+            <Layer>
+              {/* label */}
+              <Text text={names && names[0]} x={0} y={ternaryWidth * 0.08 - 21} width={ternaryWidth} align="center" fontSize={20} />
+              <Text text={names && names[1]} x={0} y={ternaryWidth * 0.92 + 1} fontSize={20} />
+              <Text text={names && names[2]} x={0} y={ternaryWidth * 0.92 + 1} width={ternaryWidth} align="right" fontSize={20} />
+
+              {/* background triangle */}
+              <Line points={points} closed={true} width={1} stroke="black" />
+
+              {/* fill with calculated data */}
+              {/* bublP */}
+              {mode === "BUBLP" && data && P && data.map((e, i) => {
+                if (P < e.P * 1.001 && P > e.P * 0.999) {
+                  const xy_x = coordChange(e.x[0], e.x[1], e.x[2]);
+                  const xy_y = coordChange(e.y[0], e.y[1], e.y[2]);
+                  const t_x = xyTransform(xy_x.x, xy_x.y, points, e.x);
+                  const t_y = xyTransform(xy_y.x, xy_y.y, points, e.y);
+                  // console.log(i, t_x, t_y)
+                  return <Tie key={i} liq={t_x} vap={t_y} info={{L: e.x, V:e.y}}/>
+                }
+                return null;
+              })}
+
+              {/* bublT */}
+              {mode === "BUBLT" && data && T && data.map((e, i) => {
+                if (T < e.T * 1.001 && T > e.T * 0.999) {
+                  const xy_x = coordChange(e.x[0], e.x[1], e.x[2]);
+                  const xy_y = coordChange(e.y[0], e.y[1], e.y[2]);
+                  const t_x = xyTransform(xy_x.x, xy_x.y, points, e.x);
+                  const t_y = xyTransform(xy_y.x, xy_y.y, points, e.y);
+                  // console.log(i, t_x, t_y)
+                  return <Tie key={i} liq={t_x} vap={t_y} info={{L: e.x, V:e.y}}/>
+                }
+                return null;
+              })}
+
+              {/* for flash */}
+              {mode === "FLASH" && data && data.map((e, i) => {
+                const xy_x = coordChange(e.x[0], e.x[1], e.x[2]);
+                const xy_y = coordChange(e.y[0], e.y[1], e.y[2]);
+                const t_x = xyTransform(xy_x.x, xy_x.y, points, e.x);
+                const t_y = xyTransform(xy_y.x, xy_y.y, points, e.y);
+                // console.log(i, t_x, t_y)
+                return <Tie key={i} liq={t_x} vap={t_y} info={{L: e.x, V:e.y}}/>
+              })}
+            </Layer>
+          </Stage>
         </div>
+        <Content>
+          <div style={{ height: 100, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', width: '100%', flexDirection: 'row', justifyContent: 'space-around' }}>
+              {P && mode && mode === "BUBLP" ?
+                <div style={{ flex: 1, padding: '0,10%,10%,0' }}>
+                  <Typography gutterBottom>P : {P.toFixed(3)} atm</Typography>
+                  <ContinuosSlider val={P} onChange={(P) => this.setState({ P })} min={this.state.min} max={this.state.max} />
+                </div>
+                : T && mode === "BUBLT" ?
+                  <div style={{ flex: 1, padding: '0,10%,10%,0' }}>
+                    <Typography gutterBottom>T : {T.toFixed(3)} K</Typography>
+                    <ContinuosSlider val={T} onChange={(T) => this.setState({ T })} min={this.state.min} max={this.state.max} />
+                  </div>
+                  : <></>
+              }
+            </div>
+          </div>
+        </Content>
         <CalculatingIndicator open={waiting} />
         <ErrorSnack error={this.state.error} onClose={() => this.setState({ error: '' })} />
-      </div>
+      </div >
     );
   }
 }
@@ -275,5 +286,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     width: '100%', height: 40, backgroundColor: "#FECF58", borderRadius: 10, fontSize: 17
   }
 }
+// const mobileStyles: { [key: string]: React.CSSProperties } = {
+
+// }
 
 export default Home;

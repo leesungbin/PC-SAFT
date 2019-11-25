@@ -40,8 +40,9 @@ class FormControlCondition extends React.Component<FormControlConditionProps, St
           }
           label={this.props.valueDef}
         />
-        <div style={{ marginBottom: 4 }}>
+        <div style={{ marginBottom: 4, flex: 1, flexGrow: 1 }}>
           <TextField
+            style={{width: '96%', marginLeft: '2%', marginRight: '2%'}}
             error={this.state.hasErr}
             value={this.state.val ? this.state.val : undefined}
             placeholder={this.props.placeholder}
