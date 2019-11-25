@@ -88,16 +88,16 @@ class Home extends React.Component<HomeProps, State> {
   startCalculate = () => {
     if (this.state.error) return;
     if (this.state.selectedComponents.length !== 3) {
-      this.setState({error: '3개의 물질을 선택하세요.'});
+      this.setState({ error: '3개의 물질을 선택하세요.' });
       return;
     }
     if (!this.state.constT && !this.state.constP) {
-      this.setState({error: '온도나 압력을 고정해주세요.'});
+      this.setState({ error: '온도나 압력을 고정해주세요.' });
       return;
     }
     if (this.state.constT && this.state.constP) {
       if (this.state.fetchT || this.state.fetchP) {
-        this.setState({ error: 'Constant 설정한 property에 값을 입력해야합니다.'});
+        this.setState({ error: 'Constant 설정한 property에 값을 입력해야합니다.' });
         return
       }
       this.callFlashes();
@@ -109,42 +109,39 @@ class Home extends React.Component<HomeProps, State> {
     }
   }
   callEquil = async () => {
-    const { selectedComponents, error } = this.state;
+    const { selectedComponents } = this.state;
     console.log(selectedComponents);
-    if (selectedComponents.length === 3 && error === '') {
-      const id = selectedComponents.map(comp => { return comp.id });
+    const id = selectedComponents.map(comp => { return comp.id });
 
-      this.setState({ waiting: true });
-      const res = await fetch(EQUIL_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: this.state.constP ? JSON.stringify({ P: this.state.fetchP, id }) : JSON.stringify({ T: this.state.fetchT, id }),
-      });
-      const json: FetchResult = await res.json()
-      const { data, header, mode, names } = json.result;
-      if (data.length === 0) {
-        this.setState({ error: '계산이 잘 되지 않는 조합입니다...' });
-        return;
-      }
-      const { min, max } = header;
-      this.setState({ data, min, max, mode, names, waiting: false });
-      if (mode === 'BUBLP') {
-        this.setState({ P: min });
-      } else {
-        this.setState({ T: min });
-      }
-      return;
-    } else {
-      this.setState({ error: '아직 계산을 시작 할 수 없습니다.' })
+    this.setState({ waiting: true });
+    const res = await fetch(EQUIL_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: this.state.constP ? JSON.stringify({ P: this.state.fetchP, id }) : JSON.stringify({ T: this.state.fetchT, id }),
+    });
+    const json: FetchResult = await res.json()
+    const { data, header, mode, names } = json.result;
+    if (data.length === 0) {
+      this.setState({ error: '계산이 잘 되지 않는 조합입니다...' });
       return;
     }
+    const { min, max } = header;
+    this.setState({ data, min, max, mode, names, waiting: false });
+    if (mode === 'BUBLP') {
+      this.setState({ P: min });
+    } else {
+      this.setState({ T: min });
+    }
   }
+
+  // fetch method 작성할 것.
   callFlashes = async () => {
     console.log('callFlashes');
   }
+
   cancleComponent = (index: number) => {
     let components = [...this.state.components]
     const cancleComponentIdx = this.state.components.findIndex(component => component.name === this.state.selectedComponents[index].name);
@@ -226,7 +223,7 @@ class Home extends React.Component<HomeProps, State> {
                       <Typography gutterBottom>P : {P.toFixed(3)} atm</Typography>
                       <ContinuosSlider val={P} onChange={(P) => this.setState({ P })} min={this.state.min} max={this.state.max} />
                     </div>
-                    :T && mode === "BUBLT" ?
+                    : T && mode === "BUBLT" ?
                       <div style={{ flex: 1, padding: '0,10%,10%,0' }}>
                         <Typography gutterBottom>T : {T.toFixed(3)} K</Typography>
                         <ContinuosSlider val={T} onChange={(T) => this.setState({ T })} min={this.state.min} max={this.state.max} />
