@@ -8,7 +8,7 @@ import Point from '../../threeFragments/Point';
 import { TieLine } from '../../threeFragments/TieLine';
 
 import ContinuosSlider from '../../components/ContinuosSlider';
-import { Typography, Chip, Checkbox, FormGroup, FormControlLabel, TextField } from '@material-ui/core';
+import { Typography, Chip, FormGroup } from '@material-ui/core';
 import CalculatingIndicator from '../../components/CalculatingIndicator';
 import { ErrorSnack } from '../../components/Snack';
 
@@ -43,6 +43,8 @@ type State = {
   waiting: boolean,
   T?: number,
   P?: number,
+  fetchT?: number,
+  fetchP?: number,
   openSelector: boolean,
   mode?: string,
   min?: number,
@@ -83,6 +85,29 @@ class Home extends React.Component<HomeProps, State> {
     }
     // console.log(this.state.T, this.state.P);
   }
+  startCalculate = () => {
+    if (this.state.error) return;
+    if (this.state.selectedComponents.length !== 3) {
+      this.setState({error: '3개의 물질을 선택하세요.'});
+      return;
+    }
+    if (!this.state.constT && !this.state.constP) {
+      this.setState({error: '온도나 압력을 고정해주세요.'});
+      return;
+    }
+    if (this.state.constT && this.state.constP) {
+      if (this.state.fetchT || this.state.fetchP) {
+        this.setState({ error: 'Constant 설정한 property에 값을 입력해야합니다.'});
+        return
+      }
+      this.callFlashes();
+      return;
+    }
+    if (this.state.constT && this.state.fetchT || this.state.constP && this.state.fetchP) {
+      console.log('call equil');
+      this.callEquil();
+    }
+  }
   callEquil = async () => {
     const { selectedComponents, error } = this.state;
     console.log(selectedComponents);
@@ -96,7 +121,7 @@ class Home extends React.Component<HomeProps, State> {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ P: 1.013, id }),
+        body: this.state.constP ? JSON.stringify({ P: this.state.fetchP, id }) : JSON.stringify({ T: this.state.fetchT, id }),
       });
       const json: FetchResult = await res.json()
       const { data, header, mode, names } = json.result;
@@ -106,11 +131,19 @@ class Home extends React.Component<HomeProps, State> {
       }
       const { min, max } = header;
       this.setState({ data, min, max, mode, names, waiting: false });
+      if (mode === 'BUBLP') {
+        this.setState({ P: min });
+      } else {
+        this.setState({ T: min });
+      }
       return;
     } else {
       this.setState({ error: '아직 계산을 시작 할 수 없습니다.' })
       return;
     }
+  }
+  callFlashes = async () => {
+    console.log('callFlashes');
   }
   cancleComponent = (index: number) => {
     let components = [...this.state.components]
@@ -138,8 +171,8 @@ class Home extends React.Component<HomeProps, State> {
         <div style={{ display: 'flex', justifyContent: 'center', zIndex: 0, flexWrap: "wrap" }}>
           <div style={{ width: 300 }}>
             <FormGroup>
-              <FormControlCondition valueDef="P" placeholder="Const Pressure (atm)" onChangeValue={(P) => this.setState({ P })} onError={(error) => this.setState({ error })} />
-              <FormControlCondition valueDef="T" placeholder="Const Temperature (K)" onChangeValue={(T) => this.setState({ T })} onError={(error) => this.setState({ error })} />
+              <FormControlCondition valueDef="P" placeholder="Const Pressure (atm)" onChangeValue={(fetchP) => this.setState({ fetchP })} onError={(error) => this.setState({ error })} onCheckConst={(constP) => this.setState({ constP })} />
+              <FormControlCondition valueDef="T" placeholder="Const Temperature (K)" onChangeValue={(fetchT) => this.setState({ fetchT })} onError={(error) => this.setState({ error })} onCheckConst={(constT) => this.setState({ constT })} />
             </FormGroup>
 
             <ComponentSelector
@@ -150,7 +183,9 @@ class Home extends React.Component<HomeProps, State> {
                 newComponents[i].selected = newComponents[i].selected ? false : true;
                 this.setState({ components: newComponents });
               }}
-              calcButton={<button onClick={() => this.callEquil()} style={styles.calculateButton}>Calculate</button>}
+              calcButton={
+                <button onClick={() => { this.startCalculate(); }} style={styles.calculateButton}>Calculate
+              </button>}
             />
           </div>
           <div>
@@ -179,7 +214,7 @@ class Home extends React.Component<HomeProps, State> {
                       </mesh>
                     )
                   }
-                  return
+                  return <></>
                 })}
               </mesh>
             </Canvas>
@@ -191,7 +226,7 @@ class Home extends React.Component<HomeProps, State> {
                       <Typography gutterBottom>P : {P.toFixed(3)} atm</Typography>
                       <ContinuosSlider val={P} onChange={(P) => this.setState({ P })} min={this.state.min} max={this.state.max} />
                     </div>
-                    : T && mode === "BUBLT" ?
+                    :T && mode === "BUBLT" ?
                       <div style={{ flex: 1, padding: '0,10%,10%,0' }}>
                         <Typography gutterBottom>T : {T.toFixed(3)} K</Typography>
                         <ContinuosSlider val={T} onChange={(T) => this.setState({ T })} min={this.state.min} max={this.state.max} />
