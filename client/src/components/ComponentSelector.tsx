@@ -32,6 +32,7 @@ export default class ComponentSelector extends React.Component<ComponentSelector
   }
 
   render() {
+    const components = this.props.components.filter((component) => component.name.toLowerCase().indexOf(this.state.searchingName.toLowerCase()));
     return (
       <div>
         <SearchHeader
@@ -42,7 +43,7 @@ export default class ComponentSelector extends React.Component<ComponentSelector
           }}
         />
         <ul style={{ height: 300, overflow: 'auto', padding: 0 }} className={'component-list'}>
-          {this.props.components.map((component,i ) => (
+          {components.map((component,i ) => (
             (component.name.indexOf(this.state.searchingName) > -1) ? <li key={i} style={{ backgroundColor: component.selected ? 'skyblue' : 'white' }}
               className={'component-list__item'}
               onClick={() => this.props.onClickContent(i)}>

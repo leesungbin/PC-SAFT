@@ -103,7 +103,7 @@ class Home extends React.Component<HomeProps, State> {
       this.callFlashes();
       return;
     }
-    if (this.state.constT && this.state.fetchT || this.state.constP && this.state.fetchP) {
+    if ((this.state.constT && this.state.fetchT) || (this.state.constP && this.state.fetchP)) {
       console.log('call equil');
       this.callEquil();
     }
@@ -125,7 +125,7 @@ class Home extends React.Component<HomeProps, State> {
     const json: FetchResult = await res.json()
     const { data, header, mode, names } = json.result;
     if (!data || data.length === 0) {
-      this.setState({ error: '계산이 잘 되지 않는 조합입니다...' });
+      this.setState({ error: '계산이 잘 되지 않는 조합입니다...', waiting: false });
       return;
     }
     const { min, max } = header;
@@ -155,11 +155,12 @@ class Home extends React.Component<HomeProps, State> {
     const json: FetchResult = await res.json();
     console.log(json);
     const { data, names } = json.result;
+    const mode = 'FLASH';
+
     if (!data || data.length === 0) {
-      this.setState({ error: '계산이 잘 되지 않는 조합입니다...' });
+      this.setState({ error: '계산이 잘 되지 않는 조합입니다...', waiting: false, mode });
       return;
     }
-    const mode = 'FLASH';
     this.setState({ data, mode, names, waiting: false });
   }
 
