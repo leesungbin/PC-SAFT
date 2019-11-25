@@ -3,7 +3,7 @@ import { Content } from '../../components/Content';
 import { Canvas } from 'react-three-fiber';
 import { Triangle } from '../../threeFragments/Triangle';
 import { Vector3 } from 'three';
-import { EQUIL_ENDPOINT, DATA_ENDPOINT } from '../../_lib/endpoint';
+import { EQUIL_ENDPOINT, DATA_ENDPOINT, FLASHES_ENDPOINT } from '../../_lib/endpoint';
 import Point from '../../threeFragments/Point';
 import { TieLine } from '../../threeFragments/TieLine';
 
@@ -96,7 +96,7 @@ class Home extends React.Component<HomeProps, State> {
       return;
     }
     if (this.state.constT && this.state.constP) {
-      if (this.state.fetchT || this.state.fetchP) {
+      if (!this.state.fetchT && !this.state.fetchP) {
         this.setState({ error: 'Constant 설정한 property에 값을 입력해야합니다.' });
         return
       }
@@ -124,7 +124,7 @@ class Home extends React.Component<HomeProps, State> {
     });
     const json: FetchResult = await res.json()
     const { data, header, mode, names } = json.result;
-    if (data.length === 0) {
+    if (!data || data.length === 0) {
       this.setState({ error: '계산이 잘 되지 않는 조합입니다...' });
       return;
     }
@@ -139,7 +139,28 @@ class Home extends React.Component<HomeProps, State> {
 
   // fetch method 작성할 것.
   callFlashes = async () => {
-    console.log('callFlashes');
+    const { selectedComponents } = this.state;
+    console.log(selectedComponents);
+    const id = selectedComponents.map(comp => { return comp.id });
+
+    this.setState({ waiting: true });
+    const res = await fetch(FLASHES_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ P: this.state.fetchP, T: this.state.fetchT, id }),
+    });
+    const json: FetchResult = await res.json();
+    console.log(json);
+    const { data, names } = json.result;
+    if (!data || data.length === 0) {
+      this.setState({ error: '계산이 잘 되지 않는 조합입니다...' });
+      return;
+    }
+    const mode = 'FLASH';
+    this.setState({ data, mode, names, waiting: false });
   }
 
   cancleComponent = (index: number) => {
@@ -213,6 +234,13 @@ class Home extends React.Component<HomeProps, State> {
                   }
                   return <></>
                 })}
+                {len && mode === "FLASH" && data.map((e,i) => (
+                  <mesh key={i}>
+                    <Point abc={e.x} val={0} t={0} />
+                    <TieLine x={e.x} y={e.y} val={0.1} color="green" />
+                    <Point abc={e.y} val={0} t={1} />
+                  </mesh>
+                ))}
               </mesh>
             </Canvas>
             <Content>
