@@ -12,7 +12,7 @@ type PointProps = {
 export default function Point({ setHover, fill, x, y, info, hover }: PointProps) {
   return (
     <Group>
-      <Circle onMouseOver={() => setHover(true)} onMouseOut={() => setHover(false)} radius={3} fill={fill} x={x} y={y} />
+      <Circle onMouseEnter={() => setHover(true)} onMouseOut={() => setHover(false)} radius={3} fill={fill} x={x} y={y} />
       {hover &&
         <Text text={
           JSON.stringify(info, (key, val) => { return val.toFixed ? Number(val.toFixed(3)) : val })}

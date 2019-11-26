@@ -208,73 +208,76 @@ class Home extends React.Component<HomeProps, State> {
               </button>}
             />
           </div>
-          <Stage width={ternaryWidth} height={ternaryWidth} style={{ marginRight: 10, marginLeft: 10 }}>
-            <Layer>
-              {/* label */}
-              <Text text={names && names[0]} x={0} y={ternaryWidth * 0.08 - 21} width={ternaryWidth} align="center" fontSize={20} />
-              <Text text={names && names[1]} x={0} y={ternaryWidth * 0.92 + 1} fontSize={20} />
-              <Text text={names && names[2]} x={0} y={ternaryWidth * 0.92 + 1} width={ternaryWidth} align="right" fontSize={20} />
+          <div>
+            <Stage width={ternaryWidth} height={ternaryWidth} style={{ marginRight: 10, marginLeft: 10, marginTop: -40 - 0.05 * ternaryWidth }}>
+              <Layer>
+                {/* label */}
+                <Text text={names && names[0]} x={0} y={ternaryWidth * 0.08 - 21} width={ternaryWidth} align="center" fontSize={20} />
+                <Text text={names && names[1]} x={0} y={ternaryWidth * 0.92 + 1} fontSize={20} />
+                <Text text={names && names[2]} x={0} y={ternaryWidth * 0.92 + 1} width={ternaryWidth} align="right" fontSize={20} />
 
-              {/* background triangle */}
-              <Line points={points} closed={true} width={1} stroke="black" />
+                {/* background triangle */}
+                <Line points={points} closed={true} width={1} stroke="black" />
 
-              {/* fill with calculated data */}
-              {/* bublP */}
-              {mode === "BUBLP" && data && P && data.map((e, i) => {
-                if (P < e.P * 1.001 && P > e.P * 0.999) {
+                {/* fill with calculated data */}
+                {/* bublP */}
+                {mode === "BUBLP" && data && P && data.map((e, i) => {
+                  if (P < e.P * 1.001 && P > e.P * 0.999) {
+                    const xy_x = coordChange(e.x[0], e.x[1], e.x[2]);
+                    const xy_y = coordChange(e.y[0], e.y[1], e.y[2]);
+                    const t_x = xyTransform(xy_x.x, xy_x.y, points, e.x);
+                    const t_y = xyTransform(xy_y.x, xy_y.y, points, e.y);
+                    // console.log(i, t_x, t_y)
+                    return <Tie key={i} liq={t_x} vap={t_y} info={{ L: e.x, V: e.y }} />
+                  }
+                  return null;
+                })}
+
+                {/* bublT */}
+                {mode === "BUBLT" && data && T && data.map((e, i) => {
+                  if (T < e.T * 1.001 && T > e.T * 0.999) {
+                    const xy_x = coordChange(e.x[0], e.x[1], e.x[2]);
+                    const xy_y = coordChange(e.y[0], e.y[1], e.y[2]);
+                    const t_x = xyTransform(xy_x.x, xy_x.y, points, e.x);
+                    const t_y = xyTransform(xy_y.x, xy_y.y, points, e.y);
+                    // console.log(i, t_x, t_y)
+                    return <Tie key={i} liq={t_x} vap={t_y} info={{ L: e.x, V: e.y }} />
+                  }
+                  return null;
+                })}
+
+                {/* for flash */}
+                {mode === "FLASH" && data && data.map((e, i) => {
                   const xy_x = coordChange(e.x[0], e.x[1], e.x[2]);
                   const xy_y = coordChange(e.y[0], e.y[1], e.y[2]);
                   const t_x = xyTransform(xy_x.x, xy_x.y, points, e.x);
                   const t_y = xyTransform(xy_y.x, xy_y.y, points, e.y);
                   // console.log(i, t_x, t_y)
-                  return <Tie key={i} liq={t_x} vap={t_y} info={{L: e.x, V:e.y}}/>
-                }
-                return null;
-              })}
-
-              {/* bublT */}
-              {mode === "BUBLT" && data && T && data.map((e, i) => {
-                if (T < e.T * 1.001 && T > e.T * 0.999) {
-                  const xy_x = coordChange(e.x[0], e.x[1], e.x[2]);
-                  const xy_y = coordChange(e.y[0], e.y[1], e.y[2]);
-                  const t_x = xyTransform(xy_x.x, xy_x.y, points, e.x);
-                  const t_y = xyTransform(xy_y.x, xy_y.y, points, e.y);
-                  // console.log(i, t_x, t_y)
-                  return <Tie key={i} liq={t_x} vap={t_y} info={{L: e.x, V:e.y}}/>
-                }
-                return null;
-              })}
-
-              {/* for flash */}
-              {mode === "FLASH" && data && data.map((e, i) => {
-                const xy_x = coordChange(e.x[0], e.x[1], e.x[2]);
-                const xy_y = coordChange(e.y[0], e.y[1], e.y[2]);
-                const t_x = xyTransform(xy_x.x, xy_x.y, points, e.x);
-                const t_y = xyTransform(xy_y.x, xy_y.y, points, e.y);
-                // console.log(i, t_x, t_y)
-                return <Tie key={i} liq={t_x} vap={t_y} info={{L: e.x, V:e.y}}/>
-              })}
-            </Layer>
-          </Stage>
-        </div>
-        <Content>
-          <div style={{ height: 100, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ display: 'flex', width: '100%', flexDirection: 'row', justifyContent: 'space-around' }}>
-              {P && mode && mode === "BUBLP" ?
-                <div style={{ flex: 1, padding: '0,10%,10%,0' }}>
-                  <Typography gutterBottom>P : {P.toFixed(3)} atm</Typography>
-                  <ContinuosSlider val={P} onChange={(P) => this.setState({ P })} min={this.state.min} max={this.state.max} />
+                  return <Tie key={i} liq={t_x} vap={t_y} info={{ L: e.x, V: e.y }} />
+                })}
+              </Layer>
+            </Stage>
+            <Content>
+              <div style={{ height: 100, justifyContent: 'center' }}>
+                <div style={{ display: 'flex', width: '100%', flexDirection: 'row', justifyContent: 'space-around' }}>
+                  {P && mode && mode === "BUBLP" ?
+                    <div style={{ flex: 1, padding: '0,10%,10%,0' }}>
+                      <Typography gutterBottom>P : {P.toFixed(3)} atm</Typography>
+                      <ContinuosSlider val={P} onChange={(P) => this.setState({ P })} min={this.state.min} max={this.state.max} />
+                    </div>
+                    : T && mode === "BUBLT" ?
+                      <div style={{ flex: 1, padding: '0,10%,10%,0' }}>
+                        <Typography gutterBottom>T : {T.toFixed(3)} K</Typography>
+                        <ContinuosSlider val={T} onChange={(T) => this.setState({ T })} min={this.state.min} max={this.state.max} />
+                      </div>
+                      : <></>
+                  }
                 </div>
-                : T && mode === "BUBLT" ?
-                  <div style={{ flex: 1, padding: '0,10%,10%,0' }}>
-                    <Typography gutterBottom>T : {T.toFixed(3)} K</Typography>
-                    <ContinuosSlider val={T} onChange={(T) => this.setState({ T })} min={this.state.min} max={this.state.max} />
-                  </div>
-                  : <></>
-              }
-            </div>
+              </div>
+            </Content>
           </div>
-        </Content>
+        </div>
+
         <CalculatingIndicator open={waiting} />
         <ErrorSnack error={this.state.error} onClose={() => this.setState({ error: '' })} />
       </div >
