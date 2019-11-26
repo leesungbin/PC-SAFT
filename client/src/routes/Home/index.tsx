@@ -180,7 +180,7 @@ class Home extends React.Component<HomeProps, State> {
     // const len = data.length;
     const { width } = this.props;
     const isMobile = (width) < 850 ? true : false;
-    const ternaryWidth = isMobile ? width - 20 : (width - 380) * 0.7 - 20;
+    const ternaryWidth = isMobile ? width - 20 : Math.min((width - 380) * 0.7 - 20, 650);
     const points = [ternaryWidth * 0.015026, ternaryWidth * 0.92, ternaryWidth * 0.5, ternaryWidth * 0.08, ternaryWidth * 0.984974, ternaryWidth * 0.92];
 
     const translated = data.map(e => {
@@ -219,7 +219,7 @@ class Home extends React.Component<HomeProps, State> {
             />
           </div>
           <div>
-            <Stage width={ternaryWidth} height={ternaryWidth} style={{ marginRight: 10, marginLeft: 10, marginTop: -40 - 0.05 * ternaryWidth }}>
+            <Stage width={ternaryWidth} height={ternaryWidth} style={{ marginRight: 10, marginLeft: 10, marginTop: -40}}>
               <Layer>
                 {/* label */}
                 <Text text={names && names[0]} x={0} y={ternaryWidth * 0.08 - 21} width={ternaryWidth} align="center" fontSize={20} />
