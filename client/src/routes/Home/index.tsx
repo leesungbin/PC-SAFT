@@ -227,7 +227,7 @@ class Home extends React.Component<HomeProps, State> {
                 <Text text={names && names[2]} x={0} y={ternaryWidth * 0.92 + 1} width={ternaryWidth} align="right" fontSize={20} />
 
                 {/* background triangle */}
-                <Line points={points} closed={true} width={1} stroke="black" />
+                <Line points={points} closed={true} stroke="black" strokeWidth={3} />
 
                 {/* fill with calculated data */}
                 {/* bublP */}

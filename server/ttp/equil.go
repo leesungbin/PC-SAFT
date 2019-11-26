@@ -110,7 +110,7 @@ func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 					equilDatas <- chanErr{data: Eq_Result{}, err: true}
 				} else {
 					equilDatas <- chanErr{data: res, err: false}
-					if min > res.T || min == 1 {
+					if (min > res.T || min == 1) && res.T > 0 {
 						min = res.T
 					}
 					if max < res.T {
@@ -158,9 +158,14 @@ func Equil_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	}
 
 	res_json := map[string]resJson{"result": resJson{jsonDatas, Range{min, max}, mode, names}}
+	print, err := json.Marshal(res_json)
 
-	print, _ := json.Marshal(res_json)
 	w.Header().Add("Content-Type", "application/json")
+
+	if err != nil {
+		fmt.Fprintf(w, "{\"err\": \"marshal error : %s\"", err)
+		return
+	}
 	fmt.Fprintf(w, "%s", print)
 	fmt.Printf("success for %.2f%% inputs\n", float64(len(jsonDatas))/float64(nc)*100)
 	fmt.Printf("time required : %v\n", time.Since(now))

@@ -12,7 +12,7 @@ export function CL({ x, y }: CLProps) {
     points.push(y[i]);
   }
   return (
-    <Line points={points} stroke="black" width={0.5} />
+    <Line points={points} stroke="black" strokeWidth={1} />
   )
 }
 

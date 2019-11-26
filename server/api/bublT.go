@@ -102,9 +102,14 @@ func BublT(components Comps, in Eq_Input) (res Eq_Result, err error) {
 		T += delT
 		y_ = ynew
 
+		if T < 0 {
+			return Eq_Result{}, errors.New("T < 0")
+		}
+
 		if math.Abs(V_V-V_L)/V_V < 1e-5 { // for single phase
 			return Eq_Result{in.P, T, in.X_, y_, V_V, V_L}, nil
 		}
+
 	}
 	if sumy > 1.0001 || sumy < 0.9999 {
 		return Eq_Result{}, errors.New(fmt.Sprintf("calc failed : y > 1, %v", sumy))
