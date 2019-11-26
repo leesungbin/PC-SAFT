@@ -14,6 +14,7 @@ import FormControlCondition from '../../components/FormControlCondition';
 import { Stage, Layer, Line, Text } from 'react-konva';
 import Tie from '../../canvas/Tie';
 import { xyTransform, coordChange } from '../../_lib/coordChange';
+import { CLs } from '../../canvas/CL';
 
 type FetchResult = {
   result: {
@@ -181,6 +182,15 @@ class Home extends React.Component<HomeProps, State> {
     const isMobile = (width) < 850 ? true : false;
     const ternaryWidth = isMobile ? width - 20 : (width - 380) * 0.7 - 20;
     const points = [ternaryWidth * 0.015026, ternaryWidth * 0.92, ternaryWidth * 0.5, ternaryWidth * 0.08, ternaryWidth * 0.984974, ternaryWidth * 0.92];
+
+    const translated = data.map(e => {
+      const xy_x = coordChange(e.x[0], e.x[1], e.x[2]);
+      const xy_y = coordChange(e.y[0], e.y[1], e.y[2]);
+      const liq = xyTransform(xy_x.x, xy_x.y, points, e.x);
+      const vap = xyTransform(xy_y.x, xy_y.y, points, e.y);
+      return { liq, vap, T: e.T, P: e.P, x: e.x, y: e.y };
+    });
+
     return (
       <div>
         <div style={isMobile ? { marginLeft: '10%', marginTop: 10, height: 40, whiteSpace: 'nowrap' } : { marginTop: 10, marginLeft: "7%", height: 40, whiteSpace: 'nowrap' }}>
@@ -221,40 +231,26 @@ class Home extends React.Component<HomeProps, State> {
 
                 {/* fill with calculated data */}
                 {/* bublP */}
-                {mode === "BUBLP" && data && P && data.map((e, i) => {
+                {mode === "BUBLP" && data && P && translated.map((e, i) => {
                   if (P < e.P * 1.001 && P > e.P * 0.999) {
-                    const xy_x = coordChange(e.x[0], e.x[1], e.x[2]);
-                    const xy_y = coordChange(e.y[0], e.y[1], e.y[2]);
-                    const t_x = xyTransform(xy_x.x, xy_x.y, points, e.x);
-                    const t_y = xyTransform(xy_y.x, xy_y.y, points, e.y);
-                    // console.log(i, t_x, t_y)
-                    return <Tie key={i} liq={t_x} vap={t_y} info={{ L: e.x, V: e.y }} />
+                    return <Tie key={i} liq={e.liq} vap={e.vap} info={{ L: e.x, V: e.y }} />
                   }
                   return null;
                 })}
 
                 {/* bublT */}
-                {mode === "BUBLT" && data && T && data.map((e, i) => {
+                {mode === "BUBLT" && data && T && translated.map((e, i) => {
                   if (T < e.T * 1.001 && T > e.T * 0.999) {
-                    const xy_x = coordChange(e.x[0], e.x[1], e.x[2]);
-                    const xy_y = coordChange(e.y[0], e.y[1], e.y[2]);
-                    const t_x = xyTransform(xy_x.x, xy_x.y, points, e.x);
-                    const t_y = xyTransform(xy_y.x, xy_y.y, points, e.y);
-                    // console.log(i, t_x, t_y)
-                    return <Tie key={i} liq={t_x} vap={t_y} info={{ L: e.x, V: e.y }} />
+                    return <Tie key={i} liq={e.liq} vap={e.vap} info={{ L: e.x, V: e.y }} />
                   }
                   return null;
                 })}
 
                 {/* for flash */}
-                {mode === "FLASH" && data && data.map((e, i) => {
-                  const xy_x = coordChange(e.x[0], e.x[1], e.x[2]);
-                  const xy_y = coordChange(e.y[0], e.y[1], e.y[2]);
-                  const t_x = xyTransform(xy_x.x, xy_x.y, points, e.x);
-                  const t_y = xyTransform(xy_y.x, xy_y.y, points, e.y);
-                  // console.log(i, t_x, t_y)
-                  return <Tie key={i} liq={t_x} vap={t_y} info={{ L: e.x, V: e.y }} />
+                {mode === "FLASH" && data && translated.map((e, i) => {
+                  return <Tie key={i} liq={e.liq} vap={e.vap} info={{ L: e.x, V: e.y }} />
                 })}
+                {mode === "FLASH" && data && <CLs datas={translated} />}
               </Layer>
             </Stage>
             <Content>
