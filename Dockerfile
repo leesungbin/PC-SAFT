@@ -16,7 +16,7 @@ COPY client/tsconfig.json ./
 RUN ls /web
 RUN npm run build
 
-FROM debian:bullseye-20190708
+FROM debian:bullseye-20191118
 RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 WORKDIR /root/
 COPY --from=builder /app/main .
