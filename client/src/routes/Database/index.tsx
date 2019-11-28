@@ -76,27 +76,27 @@ class Database extends React.Component<{}, State> {
     return (
       <div style={{ margin: 20, maxWidth: '100%' }}>
         <FormControl>
-          <InputLabel id="d-status-select-label">d 필터</InputLabel>
+          <InputLabel id="d-status-select-label">극성 필터</InputLabel>
           <Select 
             labelId="d-status-select-label"
             id="d-status-select"
             color="primary"
             value={this.state.dStatus} onChange={(e) => this.onDStatusChange(e)}>
             <MenuItem value={"None"}>필터 없음</MenuItem>
-            <MenuItem value={"Zero"}>d가 0인 것만 보기</MenuItem>
-            <MenuItem value={"NonZero"}>d가 0이 아닌 것만 보기</MenuItem>
+            <MenuItem value={"NonZero"}>Polar component</MenuItem>
+            <MenuItem value={"Zero"}>Nonpolar component</MenuItem>
           </Select>
         </FormControl>
         <FormControl>
-          <InputLabel id="t-status-select-label">e 필터</InputLabel>
+          <InputLabel id="t-status-select-label">회합성 필터</InputLabel>
           <Select 
             labelId="t-status-select-label"
             id="t-status-select"
             color="primary"
             value={this.state.eStatus} onChange={(e) => this.onTStatusChange(e)}>
             <MenuItem value={"None"}>필터 없음</MenuItem>
-            <MenuItem value={"Zero"}>e가 0인 것만 보기</MenuItem>
-            <MenuItem value={"NonZero"}>e가 0이 아닌 것만 보기</MenuItem>
+            <MenuItem value={"NonZero"}>Associating component</MenuItem>
+            <MenuItem value={"Zero"}>Nonassociating component 보기</MenuItem>
           </Select>
         </FormControl>
         <DataTable
