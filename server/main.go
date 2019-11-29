@@ -50,12 +50,13 @@ func main() {
 
 	mux := http.NewServeMux()
 
+	rh := http.RedirectHandler("/", 307)
 	craHandler := http.FileServer(http.Dir(envPublicDir))
 	staticHandler := http.FileServer(http.Dir(envStaticDir))
-	// bad..
+
 	mux.Handle("/", craHandler)
-	mux.Handle("/db", craHandler)
-	mux.Handle("/docs", craHandler)
+	mux.Handle("/db", rh)
+	mux.Handle("/docs", rh)
 	mux.Handle("/static", staticHandler)
 
 	mux.Handle("/api", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
