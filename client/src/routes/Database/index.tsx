@@ -2,7 +2,10 @@ import React from 'react';
 import { DATA_ENDPOINT } from '../../_lib/endpoint';
 import DataTable from './Table';
 import './index.css';
+import { Select, MenuItem, InputLabel, FormControl } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 
+type FilterValue = 'Zero' | 'NonZero' | 'None';
 type Component = {
   id: string,
   name: string,
@@ -12,11 +15,10 @@ type Component = {
 type State = {
   columns: { title: string, field: string }[],
   data: Component[],
-  isDZeroFilterOn: boolean,
-  isDNonZeroFilterOn: boolean,
-  isEZeroFilterOn: boolean,
-  isENonZeroFilterOn: boolean,
+  dStatus: FilterValue,
+  eStatus: FilterValue,
 }
+
 class Database extends React.Component<{}, State> {
   state: State = {
     columns: [
@@ -35,10 +37,8 @@ class Database extends React.Component<{}, State> {
       { title: 'x', field: 'x' },
     ],
     data: [],
-    isDZeroFilterOn: false,
-    isDNonZeroFilterOn: false,
-    isEZeroFilterOn: false,
-    isENonZeroFilterOn: false,
+    dStatus: 'None',
+    eStatus: 'None',
   }
 
   componentDidMount = async () => {
@@ -50,33 +50,55 @@ class Database extends React.Component<{}, State> {
   }
 
   filterData(data: Component[]) {
-    if (this.state.isDZeroFilterOn) {
-      return data.filter((datum: Component) => datum.d === 0)
-    } else if (this.state.isDNonZeroFilterOn) {
-      return data.filter((datum: Component) => datum.d !== 0)
-    } else if (this.state.isEZeroFilterOn) {
-      return data.filter((datum: Component) => datum.e === 0)
-    } else if (this.state.isENonZeroFilterOn) {
-      return data.filter((datum: Component) => datum.e !== 0)
+    let results = data.slice();
+    if (this.state.dStatus === 'NonZero') {
+      results = results.filter((datum: Component) => datum.d !== 0)
+    } else if (this.state.dStatus === 'Zero') {
+      results = results.filter((datum: Component) => datum.d === 0)
     }
-    return data
+    if (this.state.eStatus === 'NonZero') {
+      results = results.filter((datum: Component) => datum.e !== 0)
+    } else if (this.state.eStatus === 'Zero') {
+      results = results.filter((datum: Component) => datum.e === 0)
+    }
+    return results
+  }
+
+  onDStatusChange(e: any) {
+    this.setState({ dStatus: e.target.value })
+  }
+
+  onTStatusChange(e: any) {
+    this.setState({ eStatus: e.target.value })
   }
 
   render() {
     return (
       <div style={{ margin: 20, maxWidth: '100%' }}>
-        <button className={'btn btn-1'} style={{ background: this.state.isDZeroFilterOn ? 'skyblue' : 'white' }} onClick={() => this.setState({ isDZeroFilterOn: !this.state.isDZeroFilterOn })}>
-          <span><strong>D가 0인 것만 보기 필터 켜기</strong></span>
-        </button>
-        <button className={'btn btn-1'} style={{ background: this.state.isDNonZeroFilterOn ? 'skyblue' : 'white' }} onClick={() => this.setState({ isDNonZeroFilterOn: !this.state.isDNonZeroFilterOn })}>
-          <span><strong>D가 0이 아닌 것만 보기 필터 켜기</strong></span>
-        </button>
-        <button className={'btn btn-1'} style={{ background: this.state.isEZeroFilterOn ? 'skyblue' : 'white' }} onClick={() => this.setState({ isEZeroFilterOn: !this.state.isEZeroFilterOn })}>
-          <span><strong>E가 0인 것만 보기 필터 켜기</strong></span>
-        </button>
-        <button className={'btn btn-1'} style={{ background: this.state.isENonZeroFilterOn ? 'skyblue' : 'white' }} onClick={() => this.setState({ isENonZeroFilterOn: !this.state.isENonZeroFilterOn })}>
-          <span><strong>E가 0이 아닌 것만 보기 필터 켜기</strong></span>
-        </button>
+        <FormControl>
+          <InputLabel id="d-status-select-label">극성 필터</InputLabel>
+          <Select 
+            labelId="d-status-select-label"
+            id="d-status-select"
+            color="primary"
+            value={this.state.dStatus} onChange={(e) => this.onDStatusChange(e)}>
+            <MenuItem value={"None"}>필터 없음</MenuItem>
+            <MenuItem value={"NonZero"}>Polar component</MenuItem>
+            <MenuItem value={"Zero"}>Nonpolar component</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl>
+          <InputLabel id="t-status-select-label">회합성 필터</InputLabel>
+          <Select 
+            labelId="t-status-select-label"
+            id="t-status-select"
+            color="primary"
+            value={this.state.eStatus} onChange={(e) => this.onTStatusChange(e)}>
+            <MenuItem value={"None"}>필터 없음</MenuItem>
+            <MenuItem value={"NonZero"}>Associating component</MenuItem>
+            <MenuItem value={"Zero"}>Nonassociating component 보기</MenuItem>
+          </Select>
+        </FormControl>
         <DataTable
           columns={this.state.columns}
           data={this.filterData(this.state.data)}
