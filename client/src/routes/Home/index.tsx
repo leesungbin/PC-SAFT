@@ -173,6 +173,13 @@ class Home extends React.Component<HomeProps, State> {
     }
   }
 
+  saveCanvas = () => {
+    const canvasSave = this.refs.canvas as HTMLCanvasElement;
+    const d = canvasSave && canvasSave.toDataURL();
+    const w = window.open();
+    w && w.document.write("<img src='"+d+"' alt='img from canvas'/>");
+  }
+
   render() {
     // const trianglePoints = [new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(1 / 2, Math.sqrt(3) / 2, 0)];
 
@@ -217,9 +224,10 @@ class Home extends React.Component<HomeProps, State> {
                 <button onClick={() => { this.startCalculate(); }} style={styles.calculateButton}>Calculate
               </button>}
             />
+            <button onClick={() => this.saveCanvas()} style={styles.saveButton}>Save Image</button>
           </div>
           <div>
-            <Stage width={ternaryWidth} height={ternaryWidth} style={{ marginRight: 10, marginLeft: 10, marginTop: -40}}>
+            <Stage ref='canvas' width={ternaryWidth} height={ternaryWidth} style={{ marginRight: 10, marginLeft: 10, marginTop: -40}}>
               <Layer>
                 {/* label */}
                 <Text text={names && names[0]} x={0} y={ternaryWidth * 0.08 - 21} width={ternaryWidth} align="center" fontSize={20} />
@@ -273,7 +281,6 @@ class Home extends React.Component<HomeProps, State> {
             </Content>
           </div>
         </div>
-
         <CalculatingIndicator open={waiting} />
         <ErrorSnack error={this.state.error} onClose={() => this.setState({ error: '' })} />
       </div >
@@ -282,7 +289,10 @@ class Home extends React.Component<HomeProps, State> {
 }
 const styles: { [key: string]: React.CSSProperties } = {
   calculateButton: {
-    width: '100%', height: 40, backgroundColor: "#FECF58", borderRadius: 10, fontSize: 17
+    width: '100%', height: 40, backgroundColor: "#FECF58", borderRadius: 10, fontSize: 17, border: 'none'
+  },
+  saveButton: {
+    marginTop: 10, width: '100%', height: 40, backgroundColor: "#ABCDEF", borderRadius: 10, fontSize: 17, border: 'none',
   }
 }
 // const mobileStyles: { [key: string]: React.CSSProperties } = {
