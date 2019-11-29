@@ -1,6 +1,6 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-src/_lib/endpoint.ts
+/src/_lib/endpoint.ts
 
 # dependencies
 /node_modules
