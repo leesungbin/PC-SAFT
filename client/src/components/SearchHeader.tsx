@@ -13,6 +13,7 @@ export default function SearchHeader({ text, onChangeContent, listComponents }: 
     <div style={{flex: 1, width: '100%'}}>
       <TextField
         value={text}
+        type="search"
         onChange={event => onChangeContent && onChangeContent(event.target.value)}
         placeholder="Search Components"
         InputProps={{

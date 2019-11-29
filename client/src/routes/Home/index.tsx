@@ -4,7 +4,8 @@ import { EQUIL_ENDPOINT, DATA_ENDPOINT, FLASHES_ENDPOINT } from '../../_lib/endp
 
 
 import ContinuosSlider from '../../components/ContinuosSlider';
-import { Typography, Chip, FormGroup } from '@material-ui/core';
+import { Typography, Chip, FormGroup, FormControlLabel } from '@material-ui/core';
+import Switch from '@material-ui/core/Switch';
 import CalculatingIndicator from '../../components/CalculatingIndicator';
 import { ErrorSnack } from '../../components/Snack';
 
@@ -55,6 +56,8 @@ type State = {
   components: Component[],
   constT: boolean,
   constP: boolean,
+  showcl: boolean,
+  expanded: boolean,
 }
 
 class Home extends React.Component<HomeProps, State> {
@@ -69,6 +72,8 @@ class Home extends React.Component<HomeProps, State> {
     components: [],
     constT: false,
     constP: false,
+    showcl: true,
+    expanded: false,
   }
 
   componentDidMount = async () => {
@@ -177,7 +182,7 @@ class Home extends React.Component<HomeProps, State> {
     const canvasSave = this.refs.canvas as HTMLCanvasElement;
     const d = canvasSave && canvasSave.toDataURL();
     const w = window.open();
-    w && w.document.write("<img src='"+d+"' alt='img from canvas'/>");
+    w && w.document.write("<img src='" + d + "' alt='img from canvas'/>");
   }
 
   render() {
@@ -225,9 +230,17 @@ class Home extends React.Component<HomeProps, State> {
               </button>}
             />
             <button onClick={() => this.saveCanvas()} style={styles.saveButton}>Save Image</button>
+
+            {/* exp data input */}
           </div>
-          <div>
-            <Stage ref='canvas' width={ternaryWidth} height={ternaryWidth} style={{ marginRight: 10, marginLeft: 10, marginTop: -40}}>
+          <div style={{ position: 'relative' }}>
+            <div style={{ position: 'absolute', top: 0, left: 10, zIndex: 20 }}>
+              <FormControlLabel
+                control={<Switch checked={this.state.showcl} onChange={() => this.setState({ showcl: !this.state.showcl })} value="Show connected line" />}
+                label="Connect"
+              />
+            </div>
+            <Stage ref='canvas' width={ternaryWidth} height={ternaryWidth} style={{ zIndex: 10, marginRight: 10, marginLeft: 10, marginTop: -30 }}>
               <Layer>
                 {/* label */}
                 <Text text={names && names[0]} x={0} y={ternaryWidth * 0.08 - 21} width={ternaryWidth} align="center" fontSize={20} />
@@ -258,7 +271,10 @@ class Home extends React.Component<HomeProps, State> {
                 {mode === "FLASH" && data && translated.map((e, i) => {
                   return <Tie key={i} liq={e.liq} vap={e.vap} info={{ L: e.x, V: e.y }} />
                 })}
-                {mode === "FLASH" && data && <CLs datas={translated} />}
+                {mode === "FLASH" && data && this.state.showcl && <CLs datas={translated} />}
+                
+                {/* exp data plot */}
+                
               </Layer>
             </Stage>
             <Content>
