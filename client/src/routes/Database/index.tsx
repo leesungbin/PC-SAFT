@@ -3,7 +3,6 @@ import { DATA_ENDPOINT } from '../../_lib/endpoint';
 import DataTable from './Table';
 import './index.css';
 import { Select, MenuItem, InputLabel, FormControl } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
 
 type FilterValue = 'Zero' | 'NonZero' | 'None';
 type Component = {
