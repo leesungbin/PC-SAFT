@@ -70,7 +70,31 @@ func main() {
 	}))
 	mux.Handle("/api/bublp", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
-			ttp.BublP_ttp(db, w, r)
+			ttp.Single_ttp(db, 0, w, r)
+			return
+		}
+		fmt.Fprintf(w, "Get req is not supported.")
+		return
+	}))
+	mux.Handle("/api/bublt", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			ttp.Single_ttp(db, 1, w, r)
+			return
+		}
+		fmt.Fprintf(w, "Get req is not supported.")
+		return
+	}))
+	mux.Handle("/api/dewp", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			ttp.Single_ttp(db, 2, w, r)
+			return
+		}
+		fmt.Fprintf(w, "Get req is not supported.")
+		return
+	}))
+	mux.Handle("/api/dewt", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			ttp.Single_ttp(db, 3, w, r)
 			return
 		}
 		fmt.Fprintf(w, "Get req is not supported.")

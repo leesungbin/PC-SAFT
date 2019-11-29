@@ -8,23 +8,27 @@ import (
 	"net/http"
 
 	. "github.com/leesungbin/PC-SAFT/server/api"
-	"github.com/leesungbin/PC-SAFT/server/parser"
 )
 
-// not api.BublP. It's for request resolving.
-func BublP_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	form := r.Form
-	res_parse, err_parse := parser.Post(form)
+// not api.BublP. It's for request resolving. mode 0: BublP, 1: BublT, 2: DewP, 3: DewT
+func Single_ttp(db *sql.DB, mode int, w http.ResponseWriter, r *http.Request) {
+	var j jsonInput
+	err := json.NewDecoder(r.Body).Decode(&j)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	res_parse, err_parse := getInfoFromBody(j)
 
 	if err_parse != nil {
 		res_json := map[string]interface{}{"status": 400, "error": err_parse}
 		print, _ := json.Marshal(res_json)
+		w.Header().Add("Content-Type", "application/json")
 		fmt.Fprintf(w, "%s", print)
 		return
 	}
 
-	rows, err := db.Query(res_parse.SelectQuery)
+	rows, err := db.Query(res_parse.query)
 	if err != nil {
 		fmt.Printf("%v\n", err)
 	}
@@ -46,8 +50,21 @@ func BublP_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		comps.Data[i] = component
 	}
 
-	res, err := BublP(comps, Eq_Input{T: res_parse.T, X_: res_parse.X_})
-	if err != nil {
+	res := Eq_Result{}
+	var err_eq error
+
+	switch mode {
+	case 0:
+		res, err_eq = BublP(comps, Eq_Input{T: j.T, X_: j.X_})
+	case 1:
+		res, err_eq = BublT(comps, Eq_Input{P: j.P, X_: j.X_})
+	case 2:
+		res, err_eq = DewP(comps, Eq_Input{T: j.T, Y_: j.Y_})
+	case 3:
+		res, err_eq = DewT(comps, Eq_Input{P: j.P, Y_: j.Y_})
+	}
+
+	if err_eq != nil {
 		res_json := map[string]interface{}{"status": 0, "error": err}
 		print, _ := json.Marshal(res_json)
 		fmt.Fprintf(w, "%s", print)
