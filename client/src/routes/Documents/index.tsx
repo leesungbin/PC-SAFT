@@ -1,29 +1,32 @@
 import React from 'react';
 import { Content } from '../../components/Content';
-import './index.css'
+import './index.css';
+import './github.css';
+import ReactHtmlParser from 'react-html-parser';
+import { GITHUB_MARKDOWN_ENDPOINT } from '../../_lib/endpoint';
 
-class Document extends React.Component {
+type State = {
+  markdown?: string
+}
+class Document extends React.Component<{}, State> {
+  state: State = {}
+  componentDidMount = async () => {
+    const res = await fetch('/Readme.md');
+    const markdownRaw = await res.text();
+    const githubRes = await fetch(GITHUB_MARKDOWN_ENDPOINT, {
+      method: 'POST',
+      body: JSON.stringify({ text: markdownRaw })
+    })
+    const markdown = await githubRes.text();
+    this.setState({ markdown });
+  }
   render() {
+    const { markdown } = this.state;
     return (
       <Content>
-
-        {/* <div className="box">
-          Documents <br/>
-
-          a
-        </div> */}
-
-        <div className="container">
-        
-          <h3 className = "title1">saft go 프로그램 작동 원리</h3>
-          <p className = "para1">파란점 해석 </p> <br/><br/>
-          
-          <p className = "para2">분홍점 해석</p>
-
-          
-        </div>
-
-
+        <article className="markdown-body">
+          {ReactHtmlParser(markdown? markdown : '')}
+        </article>
       </Content>
     );
   }
