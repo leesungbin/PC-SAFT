@@ -24,7 +24,7 @@ class Document extends React.Component<{}, State> {
     const { markdown } = this.state;
     return (
       <Content>
-        <article className="markdown-body">
+        <article className="markdown-body" style={{marginTop: 20}}>
           {ReactHtmlParser(markdown? markdown : '')}
         </article>
       </Content>

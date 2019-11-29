@@ -57,7 +57,7 @@ type State = {
   constT: boolean,
   constP: boolean,
   showcl: boolean,
-  expanded: boolean,
+  showexp: boolean,
 }
 
 class Home extends React.Component<HomeProps, State> {
@@ -73,7 +73,7 @@ class Home extends React.Component<HomeProps, State> {
     constT: false,
     constP: false,
     showcl: true,
-    expanded: false,
+    showexp: false,
   }
 
   componentDidMount = async () => {
@@ -235,10 +235,16 @@ class Home extends React.Component<HomeProps, State> {
           </div>
           <div style={{ position: 'relative' }}>
             <div style={{ position: 'absolute', top: 0, left: 10, zIndex: 20 }}>
-              <FormControlLabel
-                control={<Switch checked={this.state.showcl} onChange={() => this.setState({ showcl: !this.state.showcl })} value="Show connected line" />}
-                label="Connect"
-              />
+              <FormGroup>
+                <FormControlLabel
+                  control={<Switch checked={this.state.showcl} onChange={() => this.setState({ showcl: !this.state.showcl })} value="Show connected line" />}
+                  label="Binodal curve"
+                />
+                <FormControlLabel
+                  control={<Switch disabled checked={this.state.showexp} onChange={() => this.setState({ showexp: !this.state.showexp })} value="Show exp data" />}
+                  label="Exp data"
+                />
+              </FormGroup>
             </div>
             <Stage ref='canvas' width={ternaryWidth} height={ternaryWidth} style={{ zIndex: 10, marginRight: 10, marginLeft: 10, marginTop: -30 }}>
               <Layer>
@@ -272,9 +278,9 @@ class Home extends React.Component<HomeProps, State> {
                   return <Tie key={i} liq={e.liq} vap={e.vap} info={{ L: e.x, V: e.y }} />
                 })}
                 {mode === "FLASH" && data && this.state.showcl && <CLs datas={translated} />}
-                
+
                 {/* exp data plot */}
-                
+                {/* this.state.showexp */}
               </Layer>
             </Stage>
             <Content>
