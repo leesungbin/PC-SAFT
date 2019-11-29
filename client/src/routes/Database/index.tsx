@@ -75,9 +75,9 @@ class Database extends React.Component<{}, State> {
   render() {
     return (
       <div style={{ margin: 20, maxWidth: '100%' }}>
-        <FormControl>
+        <FormControl style={{ marginRight: 10 }}>
           <InputLabel id="d-status-select-label">극성 필터</InputLabel>
-          <Select 
+          <Select
             labelId="d-status-select-label"
             id="d-status-select"
             color="primary"
@@ -89,14 +89,14 @@ class Database extends React.Component<{}, State> {
         </FormControl>
         <FormControl>
           <InputLabel id="t-status-select-label">회합성 필터</InputLabel>
-          <Select 
+          <Select
             labelId="t-status-select-label"
             id="t-status-select"
             color="primary"
             value={this.state.eStatus} onChange={(e) => this.onTStatusChange(e)}>
             <MenuItem value={"None"}>필터 없음</MenuItem>
             <MenuItem value={"NonZero"}>Associating component</MenuItem>
-            <MenuItem value={"Zero"}>Nonassociating component 보기</MenuItem>
+            <MenuItem value={"Zero"}>Nonassociating component</MenuItem>
           </Select>
         </FormControl>
         <DataTable

@@ -45,6 +45,7 @@ class DataTable extends React.Component<DataTableProps> {
   render() {
     return (
       <MaterialTable 
+        style={{ marginTop: 20}}
         icons={tableIcons}
         title={this.props.title}
         columns={this.props.columns}
