@@ -28,7 +28,7 @@ class Document extends React.Component<{}, State> {
         {!markdown && <div><LinearProgress /></div>}
         <Content>
 
-          <article className="markdown-body" style={{ marginTop: 20 }}>
+          <article className="markdown-body" style={{ marginTop: 20, marginBottom: 20 }}>
             {ReactHtmlParser(markdown ? markdown : '')}
           </article>
         </Content>

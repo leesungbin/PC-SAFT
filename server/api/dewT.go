@@ -1,6 +1,9 @@
 package api
 
-import "math"
+import (
+	"errors"
+	"math"
+)
 
 type TX_init struct {
 	T  float64   `json:"T"`
@@ -89,6 +92,18 @@ func DewT(components Comps, in Eq_Input) (res Eq_Result, err error) {
 
 		if math.Abs(V_V-V_L)/V_V < 1e-5 {
 			return Eq_Result{in.P, T, x_, in.Y_, V_V, V_L}, nil
+		}
+	}
+
+	// 튀는 값 방지
+	for x := range in.X_ {
+		if x < 0 {
+			return Eq_Result{}, errors.New("x < 0")
+		}
+	}
+	for y := range in.Y_ {
+		if y < 0 {
+			return Eq_Result{}, errors.New("y < 0")
 		}
 	}
 	return Eq_Result{in.P, T, x_, in.Y_, Vv_res, Vl_res}, nil

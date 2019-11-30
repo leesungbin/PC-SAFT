@@ -1,6 +1,9 @@
 package api
 
-import "math"
+import (
+	"errors"
+	"math"
+)
 
 type PX_init struct {
 	P  float64   `json:"P"`
@@ -81,6 +84,18 @@ func DewP(components Comps, in Eq_Input) (res Eq_Result, err error) {
 		x_ = xnew
 		if math.Abs(V_V-V_L)/V_V < 1e-5 {
 			return Eq_Result{P, in.T, x_, in.Y_, V_V, V_L}, nil
+		}
+	}
+
+	// 튀는 값 방지
+	for x := range in.X_ {
+		if x < 0 {
+			return Eq_Result{}, errors.New("x < 0")
+		}
+	}
+	for y := range in.Y_ {
+		if y < 0 {
+			return Eq_Result{}, errors.New("y < 0")
 		}
 	}
 	return Eq_Result{P, in.T, x_, in.Y_, Vv_res, Vl_res}, nil

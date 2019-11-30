@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"math"
 )
 
@@ -129,5 +130,18 @@ func Flash(components Comps, P float64, T float64, z_ []float64) (res FlashResul
 	res.X_ = xyv.X_
 	res.Y_ = xyv.Y_
 	res.V = xyv.V
+
+	// 튀는 값 방지
+	for x := range res.X_ {
+		if x < 0 {
+			return FlashResult{}, errors.New("x < 0")
+		}
+	}
+	for y := range res.Y_ {
+		if y < 0 {
+			return FlashResult{}, errors.New("y < 0")
+		}
+	}
+
 	return
 }
