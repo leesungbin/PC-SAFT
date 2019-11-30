@@ -24,20 +24,20 @@
 
 * 계산 결과를 통해 얻은 파란색 점은 liquid, 분홍색 점은 vapor phase를 나타냅니다. 점 위에 마우스를 올리면 조성과 tieline을 볼 수 있습니다.
 
-  
+  <br/>
 
 ## REST API
-| Endpoint       | Required | Optional | Not Required |
-| -------------- | -------- | -------- | ------------ |
-| ***/equil***   | id       | T or P   | x, y         |
-| ***/flashes*** | id, T, P |          | x, y         |
-| ***/datas***   |          |          | everything   |
-| ***/search***  | name     |          |              |
-| ***/flash***   | id, T, P | x or y   |              |
-| ***/bublp***   | id, T, x |          |              |
-| ***/bublt***   | id, P, x |          |              |
-| ***/dewp***    | id, T, y |          |              |
-| ***/dewt***    | id, P, y |          |              |
+| Endpoint       | Required | Optional | Not Required | Description                                                  |
+| -------------- | -------- | -------- | ------------ | ------------------------------------------------------------ |
+| ***/equil***   | id       | T or P   | x, y         | Ternary Diagram을 그리기 위한 값을 계산합니다. T가 주어지면 BubbleP, P가 주어지면 BubbleT 계산을 진행합니다. |
+| ***/flashes*** | id, T, P |          | x, y         | T, P가 고정된 상태에서 Ternary Diagram을 그리기 위한 값을 계산합니다. |
+| ***/datas***   |          |          |              | Database에서 모든 component들의 열역학적 물성 값을 가져옵니다. |
+| ***/search***  | name     |          |              | name이 이름에 포함된 component들을 가져옵니다.               |
+| ***/flash***   | id, T, P | x or y   |              | T, P가 고정된 상태에서 조성이 주어졌을 때, Flash 계산을 진행합니다. |
+| ***/bublp***   | id, T, x |          |              | T, x 가 주어진 상태에서 조성이 주어졌을 때, BubbleP 계산을 진행합니다. |
+| ***/bublt***   | id, P, x |          |              | P, x 가 주어진 상태에서 조성이 주어졌을 때, BubbleT 계산을 진행합니다. |
+| ***/dewp***    | id, T, y |          |              | T, y 가 주어진 상태에서 조성이 주어졌을 때, DewP 계산을 진행합니다. |
+| ***/dewt***    | id, P, y |          |              | P, y 가 주어진 상태에서 조성이 주어졌을 때, DewT 계산을 진행합니다. |
 
 
 * https://saftgo.app/api 에는 여러개의 endpoint 가 있습니다. 각 endpoint로 적절한 input을 보내면 json 형태로 response 를 받아볼 수 있습니다. (별다른 Authentication 은 없습니다.)

@@ -4,9 +4,8 @@ import { EQUIL_ENDPOINT, DATA_ENDPOINT, FLASHES_ENDPOINT } from '../../_lib/endp
 
 
 import ContinuosSlider from '../../components/ContinuosSlider';
-import { Typography, Chip, FormGroup, FormControlLabel, TextField } from '@material-ui/core';
+import { Typography, Chip, FormGroup, FormControlLabel, TextField, LinearProgress } from '@material-ui/core';
 import Switch from '@material-ui/core/Switch';
-import CalculatingIndicator from '../../components/CalculatingIndicator';
 import { ErrorSnack } from '../../components/Snack';
 
 import './index.css';
@@ -233,6 +232,7 @@ class Home extends React.Component<HomeProps, State> {
 
     return (
       <div>
+        {waiting && <LinearProgress />}
         <ul style={isMobile
           ? { marginLeft: '10%', padding: 0, marginTop: 10, width: '80%', overflowX: 'scroll', height: 40, whiteSpace: 'nowrap' }
           : { marginTop: 10, marginLeft: "7%", height: 50, whiteSpace: 'nowrap', padding: 0, overflowX: 'scroll', width: '86%' }}>
@@ -344,7 +344,7 @@ class Home extends React.Component<HomeProps, State> {
             </Content>
           </div>
         </div>
-        <CalculatingIndicator open={waiting} />
+        {/* <CalculatingIndicator open={waiting} /> */}
         <ErrorSnack error={this.state.error} onClose={() => this.setState({ error: '' })} />
       </div >
     );

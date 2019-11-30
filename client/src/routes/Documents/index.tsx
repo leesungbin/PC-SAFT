@@ -4,6 +4,7 @@ import './index.css';
 import './github.css';
 import ReactHtmlParser from 'react-html-parser';
 import { GITHUB_MARKDOWN_ENDPOINT } from '../../_lib/endpoint';
+import { LinearProgress } from '@material-ui/core';
 
 type State = {
   markdown?: string
@@ -23,11 +24,15 @@ class Document extends React.Component<{}, State> {
   render() {
     const { markdown } = this.state;
     return (
-      <Content>
-        <article className="markdown-body" style={{marginTop: 20}}>
-          {ReactHtmlParser(markdown? markdown : '')}
-        </article>
-      </Content>
+      <>
+        {!markdown && <div><LinearProgress /></div>}
+        <Content>
+
+          <article className="markdown-body" style={{ marginTop: 20 }}>
+            {ReactHtmlParser(markdown ? markdown : '')}
+          </article>
+        </Content>
+      </>
     );
   }
 }
