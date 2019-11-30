@@ -25,7 +25,7 @@ class Document extends React.Component<{}, State> {
     const { markdown } = this.state;
     return (
       <>
-        {!markdown && <div><LinearProgress /></div>}
+        {!markdown && <div className="sticky"><LinearProgress /></div>}
         <Content>
 
           <article className="markdown-body" style={{ marginTop: 20, marginBottom: 20 }}>

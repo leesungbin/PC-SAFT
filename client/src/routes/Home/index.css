@@ -12,3 +12,8 @@
 .component-list .component-list__item:hover {
     background-color: #eee !important;
 }
+.sticky {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+}

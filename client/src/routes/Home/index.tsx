@@ -232,7 +232,7 @@ class Home extends React.Component<HomeProps, State> {
 
     return (
       <div>
-        {waiting && <LinearProgress />}
+        {waiting && <div className="sticky"><LinearProgress /></div>}
         <ul style={isMobile
           ? { marginLeft: '10%', padding: 0, marginTop: 10, width: '80%', overflowX: 'scroll', height: 40, whiteSpace: 'nowrap' }
           : { marginTop: 10, marginLeft: "7%", height: 50, whiteSpace: 'nowrap', padding: 0, overflowX: 'scroll', width: '86%' }}>

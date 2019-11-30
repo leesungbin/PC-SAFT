@@ -14,6 +14,8 @@
     padding-left: 30px;
 }
 
-.title1 {
-    
+.sticky {
+    position: -web-sticky;
+    position: sticky;
+    top: 0;
 }
