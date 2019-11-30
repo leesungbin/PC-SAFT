@@ -107,7 +107,18 @@ func Flashes_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		x2, _, _ := ternary.Abc2xy(p2.X_[0], p2.X_[1], p2.X_[2])
 		return x1 < x2
 	}
+
+	x_rev := func(p1, p2 *FlashResult) bool {
+		x1, _, _ := ternary.Abc2xy(p1.X_[0], p1.X_[1], p1.X_[2])
+		x2, _, _ := ternary.Abc2xy(p2.X_[0], p2.X_[1], p2.X_[2])
+		return x1 > x2
+	}
+
 	By(x).Sort(jsonDatas)
+
+	// initial value
+	x0, y0, _ := ternary.Abc2xy(jsonDatas[0].X_[0], jsonDatas[0].X_[1], jsonDatas[0].X_[2])
+	rev_flag := false
 
 	for i := 0; i < len(jsonDatas)-1; i++ {
 		x1, y1, _ := ternary.Abc2xy(jsonDatas[i].X_[0], jsonDatas[i].X_[1], jsonDatas[i].X_[2])
@@ -116,6 +127,11 @@ func Flashes_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		for j := i + 2; j < len(jsonDatas); j++ {
 			x2, y2, _ := ternary.Abc2xy(jsonDatas[j].X_[0], jsonDatas[j].X_[1], jsonDatas[j].X_[2])
 			tmp := math.Sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1))
+			check_rev := math.Sqrt((x2-x0)*(x2-x0) + (y2-y0)*(y2-y0))
+			if tmp > check_rev {
+				rev_flag = true
+				break
+			}
 			if tmp < min {
 				piece := jsonDatas[j]
 				copy(jsonDatas[i+1:j+1], jsonDatas[i:j])
@@ -123,6 +139,27 @@ func Flashes_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+
+	if rev_flag {
+		By(x_rev).Sort(jsonDatas)
+
+		for i := 0; i < len(jsonDatas)-1; i++ {
+			x1, y1, _ := ternary.Abc2xy(jsonDatas[i].X_[0], jsonDatas[i].X_[1], jsonDatas[i].X_[2])
+			x2, y2, _ := ternary.Abc2xy(jsonDatas[i+1].X_[0], jsonDatas[i+1].X_[1], jsonDatas[i+1].X_[2])
+			min := math.Sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1))
+			for j := i + 2; j < len(jsonDatas); j++ {
+				x2, y2, _ := ternary.Abc2xy(jsonDatas[j].X_[0], jsonDatas[j].X_[1], jsonDatas[j].X_[2])
+				tmp := math.Sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1))
+
+				if tmp < min {
+					piece := jsonDatas[j]
+					copy(jsonDatas[i+1:j+1], jsonDatas[i:j])
+					jsonDatas[i] = piece
+				}
+			}
+		}
+	}
+
 	type resJson struct {
 		Data  []FlashResult `json:"data"`
 		Names []string      `json:"names"`
