@@ -18,7 +18,7 @@ func Cover() (data []Plot) {
 	sq3 := math.Sqrt(3.)
 	now := Point{0.5, sq3 / 2.}
 	// 50 -> BublP : 3 sec, BublT : 12 sec ..
-	n := 20.
+	n := 26.
 	data = make([]Plot, int(n*(n+1)/2+2))
 	dx := 1. / n
 	for i := 0; ; i++ {

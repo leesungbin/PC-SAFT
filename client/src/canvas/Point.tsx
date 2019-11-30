@@ -16,7 +16,7 @@ export default function Point({ setHover, fill, x, y, info, hover }: PointProps)
       {hover &&
         <Text text={
           JSON.stringify(info, (key, val) => { return val.toFixed ? Number(val.toFixed(3)) : val })}
-          x={x} y={y} width={120}  align="center" fill="black" draggable />}
+          x={x} y={y} width={120}  align="center" fill="black" draggable zindex={100} />}
     </Group>
   )
 }

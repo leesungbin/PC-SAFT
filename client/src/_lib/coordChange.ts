@@ -8,7 +8,7 @@ export function coordChange(a: number, b: number, c: number): ({ x: number, y: n
 // points: 삼각형의 각 좌표 배열 [x1, y1, x2, y2, x3, y3]
 //   2
 // 1   3
-export function xyTransform(x: number, y: number, points: number[], ternP: number[]): ({x: number, y: number}) {
+export function xyTransform(points: number[], ternP: number[]): ({x: number, y: number}) {
   const comy = points[3] - points[5]; // y2-y3
   const comx = points[2] - points[4]; // x2-x3
   const p = ternP[0] * comy;

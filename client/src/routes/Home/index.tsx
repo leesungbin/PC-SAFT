@@ -4,7 +4,7 @@ import { EQUIL_ENDPOINT, DATA_ENDPOINT, FLASHES_ENDPOINT } from '../../_lib/endp
 
 
 import ContinuosSlider from '../../components/ContinuosSlider';
-import { Typography, Chip, FormGroup, FormControlLabel } from '@material-ui/core';
+import { Typography, Chip, FormGroup, FormControlLabel, TextField } from '@material-ui/core';
 import Switch from '@material-ui/core/Switch';
 import CalculatingIndicator from '../../components/CalculatingIndicator';
 import { ErrorSnack } from '../../components/Snack';
@@ -14,8 +14,9 @@ import ComponentSelector from '../../components/ComponentSelector';
 import FormControlCondition from '../../components/FormControlCondition';
 import { Stage, Layer, Line, Text } from 'react-konva';
 import Tie from '../../canvas/Tie';
-import { xyTransform, coordChange } from '../../_lib/coordChange';
+import { xyTransform } from '../../_lib/coordChange';
 import { CLs } from '../../canvas/CL';
+import Point from '../../canvas/Point';
 
 type FetchResult = {
   result: {
@@ -57,7 +58,10 @@ type State = {
   constT: boolean,
   constP: boolean,
   showcl: boolean,
+  showtie: boolean,
   showexp: boolean,
+  expData?: number[][],
+  expText?: string,
 }
 
 class Home extends React.Component<HomeProps, State> {
@@ -73,6 +77,7 @@ class Home extends React.Component<HomeProps, State> {
     constT: false,
     constP: false,
     showcl: true,
+    showtie: false,
     showexp: false,
   }
 
@@ -185,6 +190,25 @@ class Home extends React.Component<HomeProps, State> {
     w && w.document.write("<img src='" + d + "' alt='img from canvas'/>");
   }
 
+  setExpData = (expText: string) => {
+    // const { expText } = this.state;
+    this.setState({ expText })
+    let expData: number[][] = [];
+    if (expText) {
+      const lines: string[] = expText.split('\n');
+      lines.forEach(e => {
+        let line: number[] = [];
+        const ok = e.split(' ').length === 3;
+        if (ok) {
+          e.split(' ').forEach((k => {
+            line.push(parseFloat(k));
+          }));
+          expData.push(line);
+        }
+      });
+    }
+    this.setState({expData});
+  }
   render() {
     // const trianglePoints = [new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(1 / 2, Math.sqrt(3) / 2, 0)];
 
@@ -196,11 +220,15 @@ class Home extends React.Component<HomeProps, State> {
     const points = [ternaryWidth * 0.015026, ternaryWidth * 0.92, ternaryWidth * 0.5, ternaryWidth * 0.08, ternaryWidth * 0.984974, ternaryWidth * 0.92];
 
     const translated = data.map(e => {
-      const xy_x = coordChange(e.x[0], e.x[1], e.x[2]);
-      const xy_y = coordChange(e.y[0], e.y[1], e.y[2]);
-      const liq = xyTransform(xy_x.x, xy_x.y, points, e.x);
-      const vap = xyTransform(xy_y.x, xy_y.y, points, e.y);
+      // const xy_x = coordChange(e.x[0], e.x[1], e.x[2]);
+      // const xy_y = coordChange(e.y[0], e.y[1], e.y[2]);
+      const liq = xyTransform(points, e.x);
+      const vap = xyTransform(points, e.y);
       return { liq, vap, T: e.T, P: e.P, x: e.x, y: e.y };
+    });
+
+    const expData = this.state.expData && this.state.expData.map(e => {
+      return xyTransform(points, e)
     });
 
     return (
@@ -245,7 +273,11 @@ class Home extends React.Component<HomeProps, State> {
                   label="Binodal curve"
                 />
                 <FormControlLabel
-                  control={<Switch disabled checked={this.state.showexp} onChange={() => this.setState({ showexp: !this.state.showexp })} value="Show exp data" />}
+                  control={<Switch checked={this.state.showtie} onChange={() => this.setState({ showtie: !this.state.showtie })} value="Show tieline" />}
+                  label="Tieline"
+                />
+                <FormControlLabel
+                  control={<Switch checked={this.state.showexp} onChange={() => this.setState({ showexp: !this.state.showexp })} value="Show exp data" />}
                   label="Exp data"
                 />
               </FormGroup>
@@ -264,7 +296,7 @@ class Home extends React.Component<HomeProps, State> {
                 {/* bublP */}
                 {mode === "BUBLP" && data && P && translated.map((e, i) => {
                   if (P < e.P * 1.001 && P > e.P * 0.999) {
-                    return <Tie key={i} liq={e.liq} vap={e.vap} info={{ L: e.x, V: e.y }} />
+                    return <Tie key={i} liq={e.liq} vap={e.vap} info={{ L: e.x, V: e.y }} showtie={this.state.showtie} />
                   }
                   return null;
                 })}
@@ -272,19 +304,23 @@ class Home extends React.Component<HomeProps, State> {
                 {/* bublT */}
                 {mode === "BUBLT" && data && T && translated.map((e, i) => {
                   if (T < e.T * 1.001 && T > e.T * 0.999) {
-                    return <Tie key={i} liq={e.liq} vap={e.vap} info={{ L: e.x, V: e.y }} />
+                    return <Tie key={i} liq={e.liq} vap={e.vap} info={{ L: e.x, V: e.y }} showtie={this.state.showtie} />
                   }
                   return null;
                 })}
 
                 {/* for flash */}
                 {mode === "FLASH" && data && translated.map((e, i) => {
-                  return <Tie key={i} liq={e.liq} vap={e.vap} info={{ L: e.x, V: e.y }} />
+                  return <Tie key={i} liq={e.liq} vap={e.vap} info={{ L: e.x, V: e.y }} showtie={this.state.showtie} />
                 })}
                 {mode === "FLASH" && data && this.state.showcl && <CLs datas={translated} />}
 
                 {/* exp data plot */}
-                {/* this.state.showexp */}
+                {expData && this.state.showexp &&
+                  expData.map((e, i) =>
+                    <Point key={i} hover={false} setHover={() => { }} fill="purple" x={e.x} y={e.y} info={[]} />
+                  )
+                }
               </Layer>
             </Stage>
             <Content>
@@ -304,6 +340,7 @@ class Home extends React.Component<HomeProps, State> {
                   }
                 </div>
               </div>
+              {this.state.showexp && <TextField style={{width: '100%', marginBottom: 20 }} multiline placeholder="exp data (ex:  0.2 0.3 0.5)" value={this.state.expText} onChange={(e) => this.setExpData(e.target.value)} />}
             </Content>
           </div>
         </div>
