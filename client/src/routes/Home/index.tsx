@@ -205,11 +205,15 @@ class Home extends React.Component<HomeProps, State> {
 
     return (
       <div>
-        <div style={isMobile ? { marginLeft: '10%', marginTop: 10, height: 40, whiteSpace: 'nowrap' } : { marginTop: 10, marginLeft: "7%", height: 40, whiteSpace: 'nowrap' }}>
+        <ul style={isMobile
+          ? { marginLeft: '10%', padding: 0, marginTop: 10, width: '80%', overflowX: 'scroll', height: 40, whiteSpace: 'nowrap' }
+          : { marginTop: 10, marginLeft: "7%", height: 50, whiteSpace: 'nowrap', padding: 0, overflowX: 'scroll', width: '86%' }}>
           {this.state.selectedComponents && this.state.selectedComponents.map((comp, i) => (
-            <Chip style={{ marginRight: 10, marginBottom: 10 }} key={i} label={comp.name} variant="outlined" onDelete={() => this.cancleComponent(i)} />
+            <li key={i} style={{ display: 'inline', listStyle: 'none', margin: 0, padding: 0 }}>
+              <Chip style={{ marginRight: 10, marginBottom: 10 }} label={comp.name} variant="outlined" onDelete={() => this.cancleComponent(i)} />
+            </li>
           ))}
-        </div>
+        </ul>
         <div style={{ display: 'flex', justifyContent: 'space-around', zIndex: 0, flexWrap: "wrap" }}>
           <div style={isMobile ? { width: '80%', margin: '10%', marginTop: 10 } : { width: 300, padding: 30, paddingTop: 10 }}>
             <FormGroup>

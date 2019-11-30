@@ -42,6 +42,8 @@
 
 * https://saftgo.app/api 에는 여러개의 endpoint 가 있습니다. 각 endpoint로 적절한 input을 보내면 json 형태로 response 를 받아볼 수 있습니다. (별다른 Authentication 은 없습니다.)
 
+* 모든 endpoint에는 `POST` Method로 요청을 보내야합니다.
+
 * 계산 작업에 필요한 input은 다음과 같은 json 형태입니다.
 
   ```json
@@ -63,6 +65,8 @@
   > x: array of components' liquid mole fraction
   >
   > y: array of components' vapor mole fraction
+
+  이 중 해당되는 내용을 body에 담아서 request를 보내야합니다.
 
   <br/>
 
