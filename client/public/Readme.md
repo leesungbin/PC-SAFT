@@ -24,7 +24,9 @@
 
 * 이 서비스에서 사용된 api endpoint 는 ***/api/equil*** , ***/api/flashes***, ***/api/datas***, ***/api/search*** 입니다. Command Line을 통해서 직접 POST request를 보내볼 수 있습니다. (REST API 탭을 참고하십시오.)
 
-* 계산 결과를 통해 얻은 파란색 점은 liquid, 분홍색 점은 vapor phase를 나타냅니다. 점 위에 마우스를 올리면 조성과 tieline을 볼 수 있습니다.
+* 계산 결과를 통해 얻은 파란색 점을 연결한 선은 liquid phase의 경계, 분홍색 점을 연결한 선은 vapor phase의 경계를 나타냅니다. 점 위에 마우스를 올리면 조성과 tieline을 볼 수 있습니다.
+
+* phase가 복잡하게 갈릴 경우, 현재의 정렬 알고리즘 상에서는 binodal line이 이상하게 그려질 수 있습니다.
 
 * Exp data 스위치를 켜면, ternary diagram 하단에 값을 입력하여, canvas 내에 plot을 찍어볼 수 있습니다.
 
