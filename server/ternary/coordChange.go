@@ -35,6 +35,8 @@ func Abc2xy(a, b, c float64) (x, y float64, err error) {
 		err = errors.New("a+b+c != 1\n")
 	} else if a < 0 || b < 0 || c < 0 {
 		err = errors.New("some of a,b,c < 0\n")
+	} else if a > 1 || b > 1 || c > 1 {
+		err = errors.New("some of a,b,c > 1\n")
 	} else {
 		y = a / 2 * sq3
 		x = c + y/sq3

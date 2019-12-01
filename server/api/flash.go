@@ -132,12 +132,12 @@ func Flash(components Comps, P float64, T float64, z_ []float64) (res FlashResul
 	res.V = xyv.V
 
 	// 튀는 값 방지
-	for x := range res.X_ {
+	for _, x := range res.X_ {
 		if x < 0 {
 			return FlashResult{}, errors.New("x < 0")
 		}
 	}
-	for y := range res.Y_ {
+	for _, y := range res.Y_ {
 		if y < 0 {
 			return FlashResult{}, errors.New("y < 0")
 		}

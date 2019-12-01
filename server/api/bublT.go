@@ -117,12 +117,12 @@ func BublT(components Comps, in Eq_Input) (res Eq_Result, err error) {
 	// fmt.Printf("max iter, in.X : %v\n", in.X_)
 
 	// 튀는 값 방지
-	for x := range in.X_ {
+	for _, x := range in.X_ {
 		if x < 0 {
 			return Eq_Result{}, errors.New("x < 0")
 		}
 	}
-	for y := range in.Y_ {
+	for _, y := range in.Y_ {
 		if y < 0 {
 			return Eq_Result{}, errors.New("y < 0")
 		}

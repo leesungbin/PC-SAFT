@@ -21,8 +21,9 @@ export function xyTransform(points: number[], ternP: number[]): ({x: number, y: 
   // (1) comx*Y-comy*X+comy*x2-y2*comx = q*Math.sqrt(comx*comx+comy*comy)
   // (2) comx*Y-comy*X+comy*x2-y2*comx  = -q*Math.sqrt(comx*comx+comy*comy)
   const X1 = -(q * Math.sqrt(comx * comx + comy * comy) - comx * Y - comy * points[2] + points[3] * comx) / (comy);
-  const X2 = (q * Math.sqrt(comx * comx + comy * comy) - comx * Y - comy * points[2] + points[3] * comx) / (comy);
-  const line = (x: number) => { return comy / comx * (x - points[2]) + points[3] };
-  if (line(X1) < Y) return {x: X1, y: Y};
-  return {x: X2, y: Y};
+  // const X2 = (q * Math.sqrt(comx * comx + comy * comy) - comx * Y - comy * points[2] + points[3] * comx) / (comy);
+  // const line = (x: number) => { return comy / comx * (x - points[2]) + points[3] };
+  // if (line(X1) < Y) return {x: X1, y: Y};
+  return {x: X1, y: Y};
+  // return {x: X2, y: Y};
 }
