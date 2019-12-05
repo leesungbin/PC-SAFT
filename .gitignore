@@ -1,2 +1,4 @@
 env/local
 web/node_modules
+deploy.env
+docker-compose.yaml
