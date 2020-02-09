@@ -79,7 +79,7 @@ func main() {
 	}))
 	mux.Handle("/api/bublt", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
-			ttp.Single_ttp(db, 1, w, r)
+			ttp.Single_ttp(data, 1, w, r)
 			return
 		}
 		fmt.Fprintf(w, "Get req is not supported.")
@@ -87,7 +87,7 @@ func main() {
 	}))
 	mux.Handle("/api/dewp", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
-			ttp.Single_ttp(db, 2, w, r)
+			ttp.Single_ttp(data, 2, w, r)
 			return
 		}
 		fmt.Fprintf(w, "Get req is not supported.")
@@ -95,7 +95,7 @@ func main() {
 	}))
 	mux.Handle("/api/dewt", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
-			ttp.Single_ttp(db, 3, w, r)
+			ttp.Single_ttp(data, 3, w, r)
 			return
 		}
 		fmt.Fprintf(w, "Get req is not supported.")
@@ -103,7 +103,7 @@ func main() {
 	}))
 	mux.Handle("/api/equil", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
-			ttp.Equil_ttp(db, w, r)
+			ttp.Equil_ttp(data, w, r)
 			// ttp.Equil_ttp_sync(db, w, r)
 			return
 		}
@@ -112,13 +112,13 @@ func main() {
 	}))
 	mux.Handle("/api/flash", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
-			ttp.Flash_ttp(db, w, r)
+			ttp.Flash_ttp(data, w, r)
 			return
 		}
 	}))
 	mux.Handle("/api/flashes", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
-			ttp.Flashes_ttp(db, w, r)
+			ttp.Flashes_ttp(data, w, r)
 			return
 		}
 	}))
@@ -133,7 +133,7 @@ func main() {
 			// res_json := map[string][](api.RowForm){"data": comps}
 			// print, _ := json.Marshal(res_json)
 
-			print, _ := json.Marshal(db)
+			print, _ := json.Marshal(data)
 			w.Header().Add("Content-Type", "application/json")
 			fmt.Fprintf(w, "%s", print)
 			return

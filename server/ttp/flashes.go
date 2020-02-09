@@ -1,7 +1,6 @@
 package ttp
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"math"
@@ -10,6 +9,7 @@ import (
 	"time"
 
 	. "github.com/leesungbin/PC-SAFT/server/api"
+	"github.com/leesungbin/PC-SAFT/server/db"
 	"github.com/leesungbin/PC-SAFT/server/ternary"
 )
 
@@ -21,7 +21,7 @@ type chanFlashInput struct {
 	Z_ []float64
 }
 
-func Flashes_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+func Flashes_ttp(jDB db.DB, w http.ResponseWriter, r *http.Request) {
 	var j jsonInput
 	err := json.NewDecoder(r.Body).Decode(&j)
 	if err != nil {
@@ -29,7 +29,7 @@ func Flashes_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// fmt.Printf("%v %v %v\n", j.T, j.P, j.Id)
-	res_parse, err_parse := getInfoFromBody(j)
+	compInfo, err_parse := getInfoFromBody(j)
 
 	if err_parse != nil {
 		res_json := map[string]interface{}{"status": 400, "error": err_parse}
@@ -39,26 +39,29 @@ func Flashes_ttp(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rows, err := db.Query(res_parse.query)
-	if err != nil {
-		fmt.Printf("%v\n", err)
-	}
+	// rows, err := db.Query(res_parse.query)
+	// if err != nil {
+	// 	fmt.Printf("%v\n", err)
+	// }
 
 	var comps Comps
-	comps.Data = make([]Component, res_parse.Nc)
-	defer rows.Close()
-	for i := 0; rows.Next(); i++ {
-		var (
-			id        int
-			component Component
-		)
-		if err := rows.Scan(
-			&id, &component.Name, &component.Mw, &component.Tc, &component.Pc, &component.Omega,
-			&component.Tb, &component.M, &component.Sig, &component.Eps, &component.K,
-			&component.E, &component.D, &component.X); err != nil {
-			fmt.Printf("err : %v\n", err)
-		}
-		comps.Data[i] = component
+	comps.Data = make([]Component, compInfo.Nc)
+	// defer rows.Close()
+	// for i := 0; rows.Next(); i++ {
+	// 	var (
+	// 		id        int
+	// 		component Component
+	// 	)
+	// 	if err := rows.Scan(
+	// 		&id, &component.Name, &component.Mw, &component.Tc, &component.Pc, &component.Omega,
+	// 		&component.Tb, &component.M, &component.Sig, &component.Eps, &component.K,
+	// 		&component.E, &component.D, &component.X); err != nil {
+	// 		fmt.Printf("err : %v\n", err)
+	// 	}
+	// 	comps.Data[i] = component
+	// }
+	for i, id := range compInfo.Ids {
+		comps.Data[i] = jDB["datas"][id].Data
 	}
 
 	now := time.Now()

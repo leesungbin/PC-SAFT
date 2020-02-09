@@ -11,9 +11,9 @@ func arrayToString(a []float64, delim string) string {
 }
 
 type info struct {
-	Nc    int
-	query string
-	mode  int // Eq: 1, BP: 2, BT: 3, DP: 4, DT: 5,
+	Nc   int
+	Ids  []int
+	mode int // Eq: 1, BP: 2, BT: 3, DP: 4, DT: 5,
 }
 
 func getInfoFromBody(j jsonInput) (res info, err error) {
@@ -38,6 +38,7 @@ func getInfoFromBody(j jsonInput) (res info, err error) {
 		}
 	}
 	res.Nc = len(j.Id)
-	res.query = fmt.Sprintf("select * from component where id in (%s)", arrayToString(j.Id, ","))
+	// res.query = fmt.Sprintf("select * from component where id in (%s)", arrayToString(j.Id, ","))
+	res.Ids = j.Id
 	return
 }

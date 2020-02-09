@@ -6,20 +6,20 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/leesungbin/PC-SAFT/db"
 	. "github.com/leesungbin/PC-SAFT/server/api"
+	"github.com/leesungbin/PC-SAFT/server/db"
 )
 
 // not api.BublP. It's for request resolving. mode 0: BublP, 1: BublT, 2: DewP, 3: DewT
-func Single_ttp(db db.DB, mode int, w http.ResponseWriter, r *http.Request) {
+func Single_ttp(jDB db.DB, mode int, w http.ResponseWriter, r *http.Request) {
 	var j jsonInput
 	err := json.NewDecoder(r.Body).Decode(&j)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	res_parse, err_parse := getInfoFromBody(j)
-
+	compInfo, err_parse := getInfoFromBody(j)
+	// component, err_parse
 	if err_parse != nil {
 		res_json := map[string]interface{}{"status": 400, "error": err_parse}
 		print, _ := json.Marshal(res_json)
@@ -28,26 +28,29 @@ func Single_ttp(db db.DB, mode int, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rows, err := db.Query(res_parse.query)
-	if err != nil {
-		fmt.Printf("%v\n", err)
-	}
+	// rows, err := db.Query(res_parse.query)
+	// if err != nil {
+	// 	fmt.Printf("%v\n", err)
+	// }
 
 	var comps Comps
-	comps.Data = make([]Component, res_parse.Nc)
-	defer rows.Close()
-	for i := 0; rows.Next(); i++ {
-		var (
-			id        int
-			component Component
-		)
-		if err := rows.Scan(
-			&id, &component.Name, &component.Mw, &component.Tc, &component.Pc, &component.Omega,
-			&component.Tb, &component.M, &component.Sig, &component.Eps, &component.K,
-			&component.E, &component.D, &component.X); err != nil {
-			fmt.Printf("err : %v\n", err)
-		}
-		comps.Data[i] = component
+	comps.Data = make([]Component, compInfo.Nc)
+	// defer rows.Close()
+	// for i := 0; rows.Next(); i++ {
+	// 	var (
+	// 		id        int
+	// 		component Component
+	// 	)
+	// 	if err := rows.Scan(
+	// 		&id, &component.Name, &component.Mw, &component.Tc, &component.Pc, &component.Omega,
+	// 		&component.Tb, &component.M, &component.Sig, &component.Eps, &component.K,
+	// 		&component.E, &component.D, &component.X); err != nil {
+	// 		fmt.Printf("err : %v\n", err)
+	// 	}
+	// 	comps.Data[i] = component
+	// }
+	for i, id := range compInfo.Ids {
+		comps.Data[i] = jDB["datas"][id].Data
 	}
 
 	res := Eq_Result{}
