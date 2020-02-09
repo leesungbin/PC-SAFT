@@ -1,7 +1,0 @@
-APP_NAME=pcsaft
-PORT=9709
-POSTGRES_URL=postgres://localhost:5432/pcsaft?sslmode=disable
-POSTGRES_DBNAME=pcsaft
-USER=iseongbin
-PASS=tkvmxmgo@
-DEBUG=true
