@@ -1,4 +1,6 @@
-{
+package jdb
+
+const JSON = `{
   "data": [
     {
       "id": 0,
@@ -1999,4 +2001,4 @@
       }
     }
   ]
-}
+}`

@@ -5,8 +5,6 @@ github.com/jung-kurt/gofpdf v1.0.3-0.20190309125859-24315acbbda5/go.mod h1:7Id9E
 github.com/leesungbin/PC-SAFT v0.0.0-20191123024125-915ff6ab20c7 h1:nGaffrAKTWwtf0wJrNY/fwLCjqskrIkUAyBLpruMFbs=
 github.com/leesungbin/PC-SAFT v0.0.0-20191123154216-38aef19fe72a h1:OVRaMuFbqWr+BIeVlvKjp2JawX+5zIIQQJxER4BL3ZI=
 github.com/leesungbin/PC-SAFT v0.0.0-20191214090040-6735e0ad7b5b h1:95N4udSJyZhw+D1navibGbsXbNnFyyuSdxxRHXITdjs=
-github.com/lib/pq v1.2.0 h1:LXpIM/LZ5xGFhOpXAQUIMM1HdyqzVYM13zNdjCEEcA0=
-github.com/lib/pq v1.2.0/go.mod h1:5WUZQaWbwv1U+lTReE5YruASi9Al49XbQIvNi/34Woo=
 golang.org/x/exp v0.0.0-20180321215751-8460e604b9de/go.mod h1:CJ0aWSM057203Lf6IL+f9T1iT9GByDxfZKAQTCR3kQA=
 golang.org/x/exp v0.0.0-20180807140117-3d87b88a115f/go.mod h1:CJ0aWSM057203Lf6IL+f9T1iT9GByDxfZKAQTCR3kQA=
 golang.org/x/exp v0.0.0-20190125153040-c74c464bbbf2 h1:y102fOLFqhV41b+4GPiJoa0k/x+pJcEi2/HB1Y5T6fU=

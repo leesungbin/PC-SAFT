@@ -133,7 +133,7 @@ func main() {
 			// res_json := map[string][](api.RowForm){"data": comps}
 			// print, _ := json.Marshal(res_json)
 
-			print, _ := json.Marshal(*data)
+			print, _ := json.Marshal(data)
 			w.Header().Add("Content-Type", "application/json")
 			fmt.Fprintf(w, "%s", print)
 			return
