@@ -2,16 +2,16 @@
 package ttp
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
 
+	"github.com/leesungbin/PC-SAFT/db"
 	. "github.com/leesungbin/PC-SAFT/server/api"
 )
 
 // not api.BublP. It's for request resolving. mode 0: BublP, 1: BublT, 2: DewP, 3: DewT
-func Single_ttp(db *sql.DB, mode int, w http.ResponseWriter, r *http.Request) {
+func Single_ttp(db db.DB, mode int, w http.ResponseWriter, r *http.Request) {
 	var j jsonInput
 	err := json.NewDecoder(r.Body).Decode(&j)
 	if err != nil {

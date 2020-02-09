@@ -63,3 +63,7 @@ func SearchAll(db *sql.DB) (comps []RowForm, err error) {
 	}
 	return
 }
+
+// db로부터의 메소드 기능 사용하지 않을 것
+// SearchWithName []RowForm, err
+// SearchAll []RowForm, err

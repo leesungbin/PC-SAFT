@@ -17,13 +17,13 @@ type SaftEnv struct {
 
 func GetAppEnv() SaftEnv {
 	return SaftEnv{
-		APP_NAME:        getLocalEnv("APP_NAME"),
-		PORT:            getLocalEnv("PORT"),
-		POSTGRES_URL:    getLocalEnv("POSTGRES_URL"),
-		POSTGRES_DBNAME: getLocalEnv("POSTGRES_DBNAME"),
-		USER:            getLocalEnv("USER"),
-		PASS:            getLocalEnv("PASS"),
-		DEBUG:           getLocalEnv("DEBUG"),
+		APP_NAME: getLocalEnv("APP_NAME"),
+		PORT:     getLocalEnv("PORT"),
+		// POSTGRES_URL:    getLocalEnv("POSTGRES_URL"),
+		// POSTGRES_DBNAME: getLocalEnv("POSTGRES_DBNAME"),
+		// USER:  getLocalEnv("USER"),
+		// PASS:  getLocalEnv("PASS"),
+		DEBUG: getLocalEnv("DEBUG"),
 	}
 }
 

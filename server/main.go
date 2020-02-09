@@ -5,15 +5,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 
-	"database/sql"
+	// "database/sql"
 
-	"github.com/leesungbin/PC-SAFT/server/api"
+	"github.com/leesungbin/PC-SAFT/server/db"
 	"github.com/leesungbin/PC-SAFT/server/env"
 	"github.com/leesungbin/PC-SAFT/server/ttp"
-
-	_ "github.com/lib/pq"
+	// _ "github.com/lib/pq"
 )
 
 // type Service struct {
@@ -28,22 +26,24 @@ const (
 
 func main() {
 	// var s *Service
-	var dsn string
+	// var dsn string
 	env := env.GetAppEnv()
 
-	if b, e := strconv.ParseBool(env.DEBUG); b && e == nil {
-		dsn = fmt.Sprintf("dbname=%s sslmode=disable", env.POSTGRES_DBNAME)
-	} else {
-		dsn = fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", env.POSTGRES_URL, env.USER, env.PASS, env.POSTGRES_DBNAME)
-	}
-	db, err := sql.Open("postgres", dsn)
+	// if b, e := strconv.ParseBool(env.DEBUG); b && e == nil {
+	// 	dsn = fmt.Sprintf("dbname=%s sslmode=disable", env.POSTGRES_DBNAME)
+	// } else {
+	// 	dsn = fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", env.POSTGRES_URL, env.USER, env.PASS, env.POSTGRES_DBNAME)
+	// }
+	// db, err := sql.Open("postgres", dsn)
 
-	if err != nil {
-		fmt.Println("db connection failed")
-		panic(err)
-	} else {
-		fmt.Println("db connected.")
-	}
+	// if err != nil {
+	// 	fmt.Println("db connection failed")
+	// 	panic(err)
+	// } else {
+	// 	fmt.Println("db connected.")
+	// }
+	data := db.New()
+	data.Read()
 
 	port := fmt.Sprintf(":%s", env.PORT)
 	fmt.Printf("PORT%s\n", port)
@@ -71,7 +71,7 @@ func main() {
 	}))
 	mux.Handle("/api/bublp", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
-			ttp.Single_ttp(db, 0, w, r)
+			ttp.Single_ttp(data, 0, w, r)
 			return
 		}
 		fmt.Fprintf(w, "Get req is not supported.")
@@ -124,14 +124,16 @@ func main() {
 	}))
 	mux.Handle("/api/datas", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
-			comps, err := api.SearchAll(db)
-			if err != nil {
-				fmt.Fprintf(w, "%v", err)
-				return
-			}
+			// comps, err := api.SearchAll(db)
+			// if err != nil {
+			// 	fmt.Fprintf(w, "%v", err)
+			// 	return
+			// }
 
-			res_json := map[string][](api.RowForm){"data": comps}
-			print, _ := json.Marshal(res_json)
+			// res_json := map[string][](api.RowForm){"data": comps}
+			// print, _ := json.Marshal(res_json)
+
+			print, _ := json.Marshal(db)
 			w.Header().Add("Content-Type", "application/json")
 			fmt.Fprintf(w, "%s", print)
 			return
@@ -139,32 +141,33 @@ func main() {
 		fmt.Fprintf(w, "not allowed.")
 		return
 	}))
-	mux.Handle("/api/search", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		type searchInput struct {
-			Name string `json:"name"`
-		}
-		var si searchInput
-		if r.Method == http.MethodPost {
-			err_json := json.NewDecoder(r.Body).Decode(&si)
-			if err_json != nil {
-				http.Error(w, err_json.Error(), http.StatusBadRequest)
-				return
-			}
-			comps, err := api.SearchWithName(db, si.Name)
+	// mux.Handle("/api/search", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	// 	type searchInput struct {
+	// 		Name string `json:"name"`
+	// 	}
+	// 	var si searchInput
+	// 	if r.Method == http.MethodPost {
+	// 		err_json := json.NewDecoder(r.Body).Decode(&si)
+	// 		if err_json != nil {
+	// 			http.Error(w, err_json.Error(), http.StatusBadRequest)
+	// 			return
+	// 		}
+	// 		comps, err := api.SearchWithName(db, si.Name)
 
-			if err != nil {
-				fmt.Fprintf(w, "%v", err)
-				return
-			}
+	// 		if err != nil {
+	// 			fmt.Fprintf(w, "%v", err)
+	// 			return
+	// 		}
 
-			res_json := map[string][](api.RowForm){"data": comps}
-			print, _ := json.Marshal(res_json)
-			w.Header().Add("Content-Type", "application/json")
-			fmt.Fprintf(w, "%s", print)
-			return
-		}
-		fmt.Fprintf(w, "not allowed.")
-		return
-	}))
+	// 		res_json := map[string][](api.RowForm){"data": comps}
+	// 		print, _ := json.Marshal(res_json)
+
+	// 		w.Header().Add("Content-Type", "application/json")
+	// 		fmt.Fprintf(w, "%s", print)
+	// 		return
+	// 	}
+	// 	fmt.Fprintf(w, "not allowed.")
+	// 	return
+	// }))
 	log.Fatal(http.ListenAndServe(port, mux))
 }
