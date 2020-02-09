@@ -9,7 +9,7 @@ import (
 	"time"
 
 	. "github.com/leesungbin/PC-SAFT/server/api"
-	"github.com/leesungbin/PC-SAFT/server/db"
+	"github.com/leesungbin/PC-SAFT/server/jdb"
 	"github.com/leesungbin/PC-SAFT/server/ternary"
 )
 
@@ -21,7 +21,7 @@ type chanFlashInput struct {
 	Z_ []float64
 }
 
-func Flashes_ttp(jDB db.DB, w http.ResponseWriter, r *http.Request) {
+func Flashes_ttp(jDB jdb.DB, w http.ResponseWriter, r *http.Request) {
 	var j jsonInput
 	err := json.NewDecoder(r.Body).Decode(&j)
 	if err != nil {
@@ -61,7 +61,7 @@ func Flashes_ttp(jDB db.DB, w http.ResponseWriter, r *http.Request) {
 	// 	comps.Data[i] = component
 	// }
 	for i, id := range compInfo.Ids {
-		comps.Data[i] = jDB["datas"][id].Data
+		comps.Data[i] = jDB["data"][id].Data
 	}
 
 	now := time.Now()

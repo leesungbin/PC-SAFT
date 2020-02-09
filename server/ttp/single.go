@@ -7,11 +7,11 @@ import (
 	"net/http"
 
 	. "github.com/leesungbin/PC-SAFT/server/api"
-	"github.com/leesungbin/PC-SAFT/server/db"
+	"github.com/leesungbin/PC-SAFT/server/jdb"
 )
 
 // not api.BublP. It's for request resolving. mode 0: BublP, 1: BublT, 2: DewP, 3: DewT
-func Single_ttp(jDB db.DB, mode int, w http.ResponseWriter, r *http.Request) {
+func Single_ttp(jDB jdb.DB, mode int, w http.ResponseWriter, r *http.Request) {
 	var j jsonInput
 	err := json.NewDecoder(r.Body).Decode(&j)
 	if err != nil {
@@ -50,7 +50,7 @@ func Single_ttp(jDB db.DB, mode int, w http.ResponseWriter, r *http.Request) {
 	// 	comps.Data[i] = component
 	// }
 	for i, id := range compInfo.Ids {
-		comps.Data[i] = jDB["datas"][id].Data
+		comps.Data[i] = jDB["data"][id].Data
 	}
 
 	res := Eq_Result{}

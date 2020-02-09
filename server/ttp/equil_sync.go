@@ -7,11 +7,11 @@ import (
 	"time"
 
 	. "github.com/leesungbin/PC-SAFT/server/api"
-	"github.com/leesungbin/PC-SAFT/server/db"
+	"github.com/leesungbin/PC-SAFT/server/jdb"
 	"github.com/leesungbin/PC-SAFT/server/ternary"
 )
 
-func Equil_ttp_sync(jDB db.DB, w http.ResponseWriter, r *http.Request) {
+func Equil_ttp_sync(jDB jdb.DB, w http.ResponseWriter, r *http.Request) {
 	var j jsonInput
 	err := json.NewDecoder(r.Body).Decode(&j)
 	if err != nil {
@@ -51,7 +51,7 @@ func Equil_ttp_sync(jDB db.DB, w http.ResponseWriter, r *http.Request) {
 	// 	comps.Data[i] = component
 	// }
 	for i, id := range compInfo.Ids {
-		comps.Data[i] = jDB["datas"][id].Data
+		comps.Data[i] = jDB["data"][id].Data
 	}
 	now := time.Now()
 

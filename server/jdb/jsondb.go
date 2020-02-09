@@ -1,4 +1,4 @@
-package db
+package jdb
 
 import (
 	"encoding/json"
@@ -24,7 +24,7 @@ func (dbs DB) FilterWithName(n string) (res [](api.RowForm)) {
 func New() *DB {
 	return new(DB)
 }
-func (dbs *DB) Read() error{
+func (dbs *DB) Read() error {
 	jsonFile, err := os.Open("data.json")
 	defer jsonFile.Close()
 	if err != nil {
