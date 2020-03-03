@@ -71,15 +71,20 @@ In this documents, you'll know how to use the SAFT-GO service.
 
 - In react app, it uses 4 api endpoint : `/api/equil`, `/api/flashes`, `/api/datas/` `/api/search/`. You may POST request to saftgo with command line. (see 'REST API' document below)
 
-- 계산 결과를 통해 얻은 파란색 점을 연결한 선은 liquid phase의 경계, 분홍색 점을 연결한 선은 vapor phase의 경계를 나타냅니다. 점 위에 마우스를 올리면 조성과 tieline을 볼 수 있습니다.
+- The line that connects the blue point obtained by the calculation represents the boundary of the liquid phase, and the line connects the pink point represents the boundary of the vapor phase. Move the mouse over the point to see the composition and the tieline.
 
-- phase가 복잡하게 갈릴 경우, 현재의 정렬 알고리즘 상에서는 binodal line이 이상하게 그려질 수 있습니다.
+- If the phase is complicated, the binodal line can be drawn strangely on the current sorting algorithm.
 
-- Exp data 스위치를 켜면, ternary diagram 하단에 값을 입력하여, canvas 내에 plot을 찍어볼 수 있습니다.
+- Turn on the Exp data switch, to plot points on ternary diagram.
 
-  **이 때 띄어쓰기에 유의하십시오.**
+  ```text
+  0.1 0.2 0.7
+  0.2 0.21 0.59
+  ```
 
+  **Please be careful of spacing.**
 
+<br/>
 
 ### Database
 
@@ -100,29 +105,27 @@ Each column in the database has the following meanings:
 | d             | D         | Dipole moment                              |
 | x             |           | non-associated fraction                    |
 
-
-
-
+<br/>
 
 ## REST API
 
 | Endpoint              | Required | Optional | Not Required | Description                                                  |
 | --------------------- | -------- | -------- | ------------ | ------------------------------------------------------------ |
-| ***/api/equil***      | id       | T or P   | x, y         | Ternary Diagram을 그리기 위한 값을 계산합니다. T가 주어지면 BubbleP, P가 주어지면 BubbleT 계산을 진행합니다. |
-| ***/api/flashes***    | id, T, P |          | x, y         | T, P가 고정된 상태에서 Ternary Diagram을 그리기 위한 값을 계산합니다. |
-| ***/api/datas***      |          |          |              | Database에서 모든 component들의 열역학적 물성 값을 가져옵니다. |
+| ***/api/equil***      | id       | T or P   | x, y         | Calculate the compositions of liquid, vapor phases. If T is fixed(or given), Bubble P calculation occurs.(P given -> Bubble T. Prefer bubble calculation than dew) |
+| ***/api/flashes***    | id, T, P |          | x, y         | Calculate the compositions of liquid, vapor phases when T, P are fixed. |
+| ***/api/datas***      |          |          |              | Get all components' thermodynamic properties in the database. |
 | ~~***/api/search***~~ | ~~name~~ |          |              | ~~name이 이름에 포함된 component들을 가져옵니다.~~           |
-| ***/api/flash***      | id, T, P | x or y   |              | T, P가 고정된 상태에서 조성이 주어졌을 때, Flash 계산을 진행합니다. |
-| ***/api/bublp***      | id, T, x |          |              | T, x 가 주어진 상태에서 조성이 주어졌을 때, BubbleP 계산을 진행합니다. |
-| ***/api/bublt***      | id, P, x |          |              | P, x 가 주어진 상태에서 조성이 주어졌을 때, BubbleT 계산을 진행합니다. |
-| ***/api/dewp***       | id, T, y |          |              | T, y 가 주어진 상태에서 조성이 주어졌을 때, DewP 계산을 진행합니다. |
-| ***/api/dewt***       | id, P, y |          |              | P, y 가 주어진 상태에서 조성이 주어졌을 때, DewT 계산을 진행합니다. |
+| ***/api/flash***      | id, T, P | x or y   |              | Do flash calculation when T, P are fixed.                    |
+| ***/api/bublp***      | id, T, x |          |              | Do bubble p calculation when T, x are fixed.                 |
+| ***/api/bublt***      | id, P, x |          |              | Do bubble p calculation when P, x are fixed.                 |
+| ***/api/dewp***       | id, T, y |          |              | Do dew p calculation when T, y are fixed.                    |
+| ***/api/dewt***       | id, P, y |          |              | Do dew p calculation when P, y are fixed.                    |
 
-- https://saftgo.app/api 에는 여러개의 endpoint 가 있습니다. 각 endpoint로 적절한 input을 보내면 json 형태로 response 를 받아볼 수 있습니다. (별다른 Authentication 은 없습니다.)
+- https://saftgo.app/api has several endpoints. Each endpoints wants adequate input in json, and you'll get json response. (There are no special authentications.)
 
-- 모든 endpoint에는 `POST` Method로 요청을 보내야합니다.
+- All API endpoints only listen to POST requests.
 
-- 계산 작업에 필요한 input은 다음과 같은 json 형태입니다.
+- The shape of the input needed for the calculation is like below:
 
   ```
   {
@@ -138,15 +141,15 @@ Each column in the database has the following meanings:
   >
   > P: Pressure (atm)
   >
-  > id: array of components' id (***/search*** 참고)
+  > id: array of components' id (refer ***search*** tab)
   >
   > x: array of components' liquid mole fraction
   >
   > y: array of components' vapor mole fraction
 
-  이 중 해당되는 내용을 body에 담아서 request를 보내야합니다.
+  You should contain adequate values in the body and send the request,
 
-- 계산이 완료되면 받는 reponse의 형태는 다음과 같습니다.
+- The shape of the response is like below:
 
   ```
   {
